@@ -30,7 +30,7 @@ def greetings() -> Tuple[Literal["Good Morning", "Good Afternoon", "Good Evening
     i = int(now.strftime("%I"))
 
     try:
-        user_name = user_name if what_platform() == "Android" else getpass.getuser()
+        user_name = user_name if what_platform() in ["Android", "iOS"] else getpass.getuser()
     except Exception as e:  # NOTE: Apparently an exception is raised but they don't tell us what exception :(
         mov_cli_logger.debug(
             "getpass couldn't get the user name so a random one is being returned. "

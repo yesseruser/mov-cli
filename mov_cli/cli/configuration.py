@@ -44,16 +44,20 @@ def open_config_file(config: Config):
     """Opens the config file in the respectable editor for that platform."""
     editor = config.editor
 
-    if editor is None:
+    if editor is None: 
         platform = utils.what_platform()
+        env_editor = os.environ.get("EDITOR")        
 
-        if platform == "Windows":
-            editor = "notepad"
-        elif platform == "Darwin":
-            editor = "nano" # NOTE: https://support.apple.com/guide/terminal/use-command-line-text-editors-apdb02f1133-25af-4c65-8976-159609f99817/mac
-        elif platform == "iOS":
-            editor = "vi"
-        elif platform == "Linux" or platform == "Android":
-            editor = "nano"
+        if env_editor is not None:
+            editor = env_editor
+        else:
+            if platform == "Windows":
+                editor = "notepad"
+            elif platform == "Darwin":
+                editor = "nano" # NOTE: https://support.apple.com/guide/terminal/use-command-line-text-editors-apdb02f1133-25af-4c65-8976-159609f99817/mac
+            elif platform == "iOS":
+                editor = "vi"
+            elif platform == "Linux" or platform == "Android":
+                editor = "nano"
 
     os.system(f"{editor} {config.config_path}")

@@ -51,9 +51,7 @@ class VLC(Player):
 
             logger.info("The URL was copied into your clipboard. To play it, open a browser and paste the URL.")
 
-            return None # TODO: Idk what we can do here as for ios we don't return a subprocess.Popen. 
-                        # Leaving it like so will print an error from the cli stating the player is not supported.
-                        # I'll leave it to you Ananas. At least it doesn't raise an exception now. ~ Goldy
+            return None
 
         elif self.platform == "Linux" or self.platform == "Windows":
             try:

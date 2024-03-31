@@ -28,7 +28,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
     popen = chosen_player.play(media)
 
-    if popen is None:
+    if popen is None and platform != "iOS":
         mov_cli_logger.error(
             f"The player '{config.player.__class__.__name__.lower()}' is not supported on this platform ({platform}). " \
             "We recommend VLC for iOS and MPV for every other platform."

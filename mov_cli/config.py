@@ -79,10 +79,12 @@ class Config():
         """Returns the player class that was configured in the config. Defaults to MPV."""
         value = self.data.get("player", "mpv")
 
+        platform = utils.what_platform()
+
         if value.lower() == "mpv":
-            return players.MPV
+            return players.MPV(platform)
         elif value.lower() == "vlc":
-            return players.VLC
+            return players.VLC(platform)
 
         return players.CustomPlayer(value)
 

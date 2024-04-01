@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from ..config import Config
     from ..scraper import Scraper
     from ..media import Media, Metadata
+    from ..players import Player
 
     from utils.episode_selector import EpisodeSelector
 
@@ -24,7 +25,7 @@ __all__ = (
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config, scrape_args: Dict[str, bool]) -> Optional[Literal["search"]]:
     platform = what_platform()
 
-    chosen_player = config.player(platform = platform)
+    chosen_player: Player = config.player
 
     popen = chosen_player.play(media)
 

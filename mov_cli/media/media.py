@@ -8,9 +8,11 @@ if TYPE_CHECKING:
 from abc import abstractmethod
 
 __all__ = (
-    "Media", 
-    "Series", 
-    "Movie"
+    "Media",
+    "Multi", 
+    "Single", 
+    "Movie", 
+    "Series"
 )
 
 class Media():
@@ -29,8 +31,8 @@ class Media():
         """The title that should be displayed by the player."""
         ...
 
-class Series(Media):
-    """Represents a TV Show. E.g an Anime or Cartoon."""
+class Multi(Media):
+    """Represents a media that has multiple episodes like a TV Series, Anime or Cartoon."""
     def __init__(
         self, 
         url: str, 
@@ -51,8 +53,8 @@ class Series(Media):
     def display_name(self) -> str:
         return f"{self.title} - S{self.episode.season} EP{self.episode.episode}"
 
-class Movie(Media):
-    """Represents a Film/Movie."""
+class Single(Media):
+    """Represents a media with a single episode, like a Film/Movie or a YouTube video."""
     def __init__(
         self, 
         url: str,
@@ -73,16 +75,6 @@ class Movie(Media):
     def display_name(self) -> str:
         return f"{self.title} ({self.year})"
 
-
-# class LiveTV(Media):
-#     """Represents media that is live, like a tv channel or a live stream."""
-#     def __init__(
-#         self, 
-#         url: str, 
-#         title: str, 
-#         referrer: str, 
-#     ) -> None:
-
-#         super().__init__(
-#             url, title, referrer
-#         )
+# Backwards compatibility for post v4.3.0 extensions.
+Series = Multi
+Movie = Single

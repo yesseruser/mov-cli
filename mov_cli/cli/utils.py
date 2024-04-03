@@ -90,7 +90,7 @@ def steal_scraper_args(query: List[str]) -> Dict[str, bool]:
         query.remove(scrape_arg)
 
     return dict(
-        [(x.replace("--", ""), True) for x in scrape_arguments]
+        [(x.replace("--", "").replace("-", "_"), True) for x in scrape_arguments]
     )
 
 def handle_internal_plugin_error(e: Exception) -> NoReturn:

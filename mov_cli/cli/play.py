@@ -7,9 +7,10 @@ if TYPE_CHECKING:
     from ..config import Config
     from ..scraper import Scraper
     from ..media import Media, Metadata
-    from ..players import Player
 
     from utils.episode_selector import EpisodeSelector
+
+from devgoldyutils import Colours
 
 from .scraper import scrape
 from .episode import handle_episode
@@ -25,7 +26,9 @@ __all__ = (
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config, scrape_args: Dict[str, bool]) -> Optional[Literal["search"]]:
     platform = what_platform()
 
-    chosen_player: Player = config.player
+    chosen_player = config.player
+
+    mov_cli_logger.info(f"Playing '{Colours.BLUE.apply(media.display_name)}' with the '{chosen_player.__class__.__name__}' player...")
 
     popen = chosen_player.play(media)
 

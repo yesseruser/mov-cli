@@ -75,7 +75,7 @@ class Config():
         return self.data.get("version", 1)
 
     @property
-    def player(self) -> Type[Player]:
+    def player(self) -> Player:
         """Returns the player class that was configured in the config. Defaults to MPV."""
         value = self.data.get("player", "mpv")
 

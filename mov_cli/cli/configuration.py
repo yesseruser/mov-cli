@@ -6,8 +6,10 @@ if TYPE_CHECKING:
     from ..config import Config
 
 import os
+from subprocess import check_call, CalledProcessError
 
 from .. import utils
+from ..logger import mov_cli_logger
 
 __all__ = (
     "set_cli_config", 
@@ -60,4 +62,12 @@ def open_config_file(config: Config):
             elif platform == "Linux" or platform == "Android":
                 editor = "nano"
 
-    os.system(f"{editor} {config.config_path}")
+    mov_cli_logger.debug("Opening config file...")
+
+    try:
+        check_call([editor, config.config_path])
+    except (FileNotFoundError, CalledProcessError) as e:
+        mov_cli_logger.error(
+            f"Failed to open config file with the editor '{editor}'! Error: {e}" \
+                f"\nYou can manually edit it over here: '{config.config_path}'."
+        )

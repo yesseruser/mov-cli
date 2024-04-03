@@ -60,8 +60,8 @@ class HTTPClient():
             )
 
             if response.is_error:
-                self.logger.error(
-                    f"GET Request to {response.url} failed! ({response})"
+                self.logger.debug(
+                    f"GET Request to '{response.url}' failed! ({response})"
                 )
 
             return response

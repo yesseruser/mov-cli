@@ -52,8 +52,10 @@ def mov_cli(
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
 
+    plugins = config.plugins
+
     print(
-        welcome_msg(True if query is None else False, version)
+        welcome_msg(plugins, True if query is None else False, version)
     )
 
     mov_cli_logger.debug(f"Config -> {config.data}")
@@ -71,7 +73,7 @@ def mov_cli(
 
         http_client = HTTPClient(config)
 
-        selected_scraper = select_scraper(config.plugins, config.fzf_enabled, config.default_scraper)
+        selected_scraper = select_scraper(plugins, config.fzf_enabled, config.default_scraper)
 
         if selected_scraper is None:
             mov_cli_logger.error(

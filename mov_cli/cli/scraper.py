@@ -118,7 +118,12 @@ def get_plugins_data(plugins: Dict[str, str]) -> List[Tuple[str, str, PluginHook
     plugins_data: List[Tuple[str, str, PluginHookData]] = []
 
     for plugin_namespace, plugin_module_name in plugins.items():
-        plugin_data = load_plugin(plugin_module_name)
+        plugin = load_plugin(plugin_module_name)
+
+        if plugin is None:
+            continue
+
+        plugin_data, _ = plugin
 
         if plugin_data is None:
             continue

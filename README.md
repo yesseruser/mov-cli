@@ -38,7 +38,7 @@
   - Windows
   - Android (via [Termux](https://termux.dev/en/))
   - iOS (via [iSH Shell](https://ish.app/))
-  - *MacOS* (**Not tested**)
+  - MacOS
 - **[python](https://www.python.org/downloads/)** (**required**, with pip)
 - **[lxml](https://pypi.org/project/lxml/)** (optional, ⚡ faster scraping)
 - **[fzf](https://github.com/junegunn/fzf?tab=readme-ov-file#installation)** (optional but **highly recommended**)
@@ -51,6 +51,7 @@ With the prerequisites installed, mov-cli can be installed via the pip command o
 ```sh
 pip install mov-cli -U
 ```
+> Check out the [wiki on installation](https://github.com/mov-cli/mov-cli/wiki/Installation) for more in-depth guidance on installing mov-cli.
 
 ## Usage 🖱️
 mov-cli comes packaged with a CLI interface via the `mov-cli` command you can use in your respective terminal. 
@@ -63,10 +64,12 @@ mov-cli comes packaged with a CLI interface via the `mov-cli` command you can us
 ```sh
 mov-cli -e
 ```
+Alternatively, you may also edit by manually opening the config file. See the [Wiki](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction).  
 ```toml
 [mov-cli.plugins]
 films = "package_name"
 ```
+
 
 2. Scraper away!
 ```sh

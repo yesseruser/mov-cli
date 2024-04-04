@@ -4,7 +4,7 @@ from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
     from .players import Player
-    from typing import Dict, Union, Literal, Any, Optional
+    from typing import Dict, Union, Literal, Any, Optional, Type
 
     JSON_VALUES = Union[str, bool, int, dict]
     SUPPORTED_PARSERS = Literal["lxml", "html.parser"]
@@ -15,7 +15,8 @@ from pathlib import Path
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
 
-from . import players, mov_cli_logger, utils
+from . import players, utils
+from .logger import mov_cli_logger
 
 __all__ = ("Config",)
 
@@ -85,15 +86,17 @@ class Config():
 
     @property
     def player(self) -> Player:
-        """Returns the configured player class. Defaults to MPV."""
+        """Returns the player class that was configured in the config. Defaults to MPV."""
         value = self.data.get("player", "mpv")
 
-        if value.lower() == "mpv":
-            return players.MPV(self)
-        elif value.lower() == "vlc":
-            return players.VLC(self)
+        platform = utils.what_platform()
 
-        return players.CustomPlayer(self, value)
+        if value.lower() == "mpv":
+            return players.MPV(platform)
+        elif value.lower() == "vlc":
+            return players.VLC(platform)
+
+        return players.CustomPlayer(value)
 
     @property
     def plugins(self) -> Dict[str, str]:

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 import re
 import types
+import logging
 import inquirer
 import itertools
 from inquirer.themes import Default
@@ -30,23 +31,29 @@ class MovCliTheme(Default):
 
 # Checking whether there's only one choice in prompt 
 # without losing performance is serious business at mov-cli. ~ Goldy 2024
-def is_it_just_one_choice(iterable: Iterable[T]) -> Tuple[bool, List[T] | Generator[T, Any, None]]:
+def is_it_just_one_choice(choices: Iterable[T]) -> Tuple[bool, List[T] | Generator[T, Any, None]]:
 
-    if isinstance(iterable, types.GeneratorType):
+    if isinstance(choices, types.GeneratorType):
 
-        iterable, unwounded_iterable = itertools.tee(iterable) # nuh uh uh uh, we ain't wasting memory and speed.
+        choices, unwounded_iterable = itertools.tee(choices) # nuh uh uh uh, we ain't wasting memory and speed.
 
-        for index, _ in enumerate(iterable):
+        did_iter = False
+
+        for index, _ in enumerate(choices):
+            did_iter = True
 
             if index >= 1:
                 return False, unwounded_iterable
 
+        if did_iter is False:
+            return False, unwounded_iterable
+
         return True, unwounded_iterable
 
-    if len(iterable) == 1:
-        return True, iterable
+    if len(choices) == 1:
+        return True, choices
 
-    return False, iterable
+    return False, choices
 
 def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Callable[[T], str], fzf_enabled: bool) -> T | None:
     """Prompt the user to pick from a list choices."""
@@ -55,35 +62,39 @@ def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Calla
     is_just_one, choices = is_it_just_one_choice(choices)
 
     if is_just_one is True:
-        logger.info("Skipping prompt as there is only a single choice to choose from...")
+        logger.debug("Skipping prompt as there is only a single choice to choose from...")
         return next(choices) if isinstance(choices, itertools._tee) else choices[0]
+
+    # silence the global logger so it doesn't mess with fzf or inquirer's output.
+    previous_logger_level = mov_cli_logger.level
+    mov_cli_logger.setLevel(logging.CRITICAL)
+
+    choices, unwounded_choices = itertools.tee(choices)
 
     if fzf_enabled:
         logger.debug("Launching fzf...")
         # We pass this in as a generator to take advantage of iterfzf's streaming capabilities.
         # You can find that explained as the second bullet point here: https://github.com/dahlia/iterfzf#key-features
-        choice_picked, choices = iterfzf(
+        choice_picked = iterfzf(
             iterable = ((display(choice), choice) for choice in choices), 
             prompt = text + ": ", 
             ansi = True
         )
 
     else:
-
-        if isinstance(choices, types.GeneratorType):
-            logger.debug("Converting choices to list for inquirer...")
-            choices = [choice for choice in choices]
-
         logger.debug("Launching inquirer (fallback ui)...")
         choice_picked = inquirer.prompt(
             questions = [inquirer.List("choices", message = text, choices = [display(x) for x in choices])], 
             theme = MovCliTheme()
         )["choices"]
 
+    # restore the logger
+    mov_cli_logger.setLevel(previous_logger_level)
+
     # Using this to remove ansi colours returned in the picked choice.
     ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])') 
 
-    for choice in choices:
+    for choice in unwounded_choices:
         if choice_picked is None:
             return None
 

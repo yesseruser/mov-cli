@@ -8,7 +8,8 @@ if TYPE_CHECKING:
 import httpx
 from devgoldyutils import LoggerAdapter, Colours
 
-from . import mov_cli_logger, errors
+from . import errors
+from .logger import mov_cli_logger
 
 __all__ = ("HTTPClient",)
 
@@ -59,8 +60,8 @@ class HTTPClient():
             )
 
             if response.is_error:
-                self.logger.error(
-                    f"GET Request to {response.url} failed! ({response})"
+                self.logger.debug(
+                    f"GET Request to '{response.url}' failed! ({response})"
                 )
 
             return response

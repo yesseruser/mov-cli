@@ -28,13 +28,15 @@ dependencies = [
     "importlib-metadata; python_version<'3.8'",
     "toml",
     "devgoldyutils>=2.5.7",
-    "typer[all]",
+    "typer[all]==0.10.0",
     "inquirer",
     "beautifulsoup4",
     "Unidecode",
+    "thefuzz",
+    "deprecation",
 
     # Included plugins
-    "mov-cli-test"
+    "mov-cli-test>=1.1.0"
 ]
 
 dynamic = ["version"]
@@ -54,11 +56,14 @@ BugTracker = "https://github.com/mov-cli/mov-cli/issues"
 version = { attr = "mov_cli.__version__" }
 
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["mov_cli"]
+[tool.setuptools.packages.find]
+include = ["mov_cli*"]
+
+[tool.setuptools.package-data]
+"mov_cli" = ["config.template.toml"]
 
 [project.scripts]
 mov-cli = "mov_cli.cli.__main__:app"

@@ -22,7 +22,7 @@
   <br>
   <br>
   <a href="https://discord.gg/BMzC7ePsBV">
-    <img src="https://github.com/mov-cli/mov-cli/assets/132799819/5cecb97f-f60c-4e5a-b64b-2e0e2f23197c" alt="Logo" width="400">
+    <img src="https://invidget.switchblade.xyz/BMzC7ePsBV" alt="Logo" width="400">
   </a>
 
 </div>

@@ -129,5 +129,4 @@ def mov_cli(
                 )
 
 def app():
-    uwu_app.command()(mov_cli)
-    uwu_app() # Wait whaaaaa.
+    typer.run(mov_cli)

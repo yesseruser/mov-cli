@@ -17,7 +17,7 @@ from devgoldyutils import LoggerAdapter
 from . import players, utils
 from .logger import mov_cli_logger
 
-__all__ = ("Config",)
+__all__ = ("Config", )
 
 @final
 class ConfigUIData(TypedDict):
@@ -46,6 +46,7 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersData
     plugins: Dict[str, str]
+    
 
 logger = LoggerAdapter(mov_cli_logger, prefix = "Config")
 
@@ -82,9 +83,9 @@ class Config():
         platform = utils.what_platform()
 
         if value.lower() == "mpv":
-            return players.MPV(platform)
+            return players.MPV(platform, self)
         elif value.lower() == "vlc":
-            return players.VLC(platform)
+            return players.VLC(platform, self)
 
         return players.CustomPlayer(value)
 
@@ -157,6 +158,10 @@ class Config():
         }
 
         return self.data.get("http", {}).get("headers", default_headers)
+        
+    @property
+    def resolution(self) -> int:
+        return self.data.get("quality", {}).get("resolution", {})
 
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""

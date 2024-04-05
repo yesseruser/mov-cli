@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
 from ...media import Metadata, MetadataType, ExtraMetadata, AiringType
 from base64 import b64decode
-from thefuzz import fuzz
 
 __all__ = ("TheMovieDB",)
 
@@ -62,12 +61,7 @@ class TheMovieDB:
 
             serial_list.append(item)
 
-        sorted_list: List[TMDbSerial] = self.__sort(serial_list, query)[:limit]
-        # Is there are point in fuzzy sorting? The search api (tmdb) should do that for us and fzf exists for that reason. ~ Goldy
-
-        # Also yield won't actually do anything performance wise if we've already appended the items into a list.
-        # Actually in this case we can't really take advantage of yield as the api returns all results at once. ~ Goldy
-        for item in sorted_list:
+        for item in serial_list:
             yield Metadata(
                 id = item.id,
                 title = item.title,
@@ -140,12 +134,3 @@ class TheMovieDB:
             genres = genres,
             airing = airing
         )
-
-    def __sort_key(self, query):
-        def similarity_score(item: TMDbSerial):
-            return fuzz.ratio(item.title, query)
-        return similarity_score
-
-    def __sort(self, unsorted, query):
-        sorted_list = sorted(unsorted, key=self.__sort_key(query), reverse=True)
-        return sorted_list

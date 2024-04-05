@@ -5,7 +5,6 @@
 [![Python Versions][python-shield]][pypi-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![Discord][discord-shield]][discord-url]
 
 <div align="center">
 
@@ -20,8 +19,13 @@
   ·
   <a href="https://github.com/mov-cli/mov-cli/issues">Request Feature</a>
 
-</div>
+  <br>
+  <br>
+  <a href="https://discord.gg/BMzC7ePsBV">
+    <img src="https://github.com/mov-cli/mov-cli/assets/132799819/5cecb97f-f60c-4e5a-b64b-2e0e2f23197c" alt="Logo" width="400">
+  </a>
 
+</div>
 <br>
 
 > [!Note]

@@ -29,7 +29,7 @@
 <br>
 
 > [!Note]
-> v4 is constantly changing so be sure to keep the tool up to date and with that said I would advise not using it as a library yet.
+> v4 is constantly changing so be sure to **keep the tool and your plugins up to date**. Also I would advise not using it as a library yet as the API still has many breaking changes.
 
 ## Installation 🛠️
 

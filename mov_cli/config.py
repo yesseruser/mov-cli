@@ -46,6 +46,7 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersData
     plugins: Dict[str, str]
+    resolution: int
     
 
 logger = LoggerAdapter(mov_cli_logger, prefix = "Config")

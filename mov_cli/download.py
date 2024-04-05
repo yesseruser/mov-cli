@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .config import Config
     from .media import Series, Movie
 
-class Download(): 
+class Download():
     def __init__(self, config: Config) -> None:
         self.config = config
 

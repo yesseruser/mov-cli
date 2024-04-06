@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional, Literal, Dict
+    from typing import Optional, Literal
 
     from ..config import Config
     from ..scraper import Scraper

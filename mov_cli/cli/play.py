@@ -23,7 +23,7 @@ __all__ = (
     "play",
 )
 
-def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config, scrape_args: Dict[str, bool]) -> Optional[Literal["search"]]:
+def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config) -> Optional[Literal["search"]]:
     platform = what_platform()
 
     chosen_player = config.player
@@ -70,9 +70,9 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
             mov_cli_logger.info("No more episodes :(")
             return None
 
-        media = scrape(metadata, episode, scraper, **scrape_args)
+        media = scrape(metadata, episode, scraper)
 
-        return play(media, metadata, scraper, episode, config, scrape_args)
+        return play(media, metadata, scraper, episode, config)
 
     elif option == "select":
         popen.kill()
@@ -82,9 +82,9 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
         if episode is None:
             return None
 
-        media = scrape(metadata, episode, scraper, **scrape_args)
+        media = scrape(metadata, episode, scraper)
 
-        return play(media, metadata, scraper, episode, config, scrape_args)
+        return play(media, metadata, scraper, episode, config)
 
     popen.wait()
 

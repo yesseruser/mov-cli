@@ -2,12 +2,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Dict, Literal, Iterable
+    from typing import Dict, Literal, Iterable, Optional
 
     from .config import Config
     from .utils import EpisodeSelector
     from .http_client import HTTPClient
     from .media import Metadata, Multi, Single
+
+    ScraperOptionsT = Dict[str, str | bool]
 
 from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
@@ -20,10 +22,10 @@ __all__ = ("Scraper", "MediaNotFound")
 
 class Scraper(ABC):
     """A base class for building scrapers from."""
-    def __init__(self, config: Config, http_client: HTTPClient, options: Dict[str, str | bool]) -> None:
+    def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
         self.config = config
         self.http_client = http_client
-        self.options = options
+        self.options = options or {}
 
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 

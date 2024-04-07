@@ -70,20 +70,19 @@ mov-cli comes packaged with a CLI interface via the `mov-cli` command you can us
 ```sh
 mov-cli -e
 ```
-Alternatively, you may also edit by manually opening the config file. See the [Wiki](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction).  
+Alternatively, you may also edit by manually opening the config file. See this [Wiki page](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction) on that.  
 ```toml
 [mov-cli.plugins]
-films = "package_name"
+youtube = "mov-cli-youtube"
 ```
 
-
-2. Scraper away!
+2. Scrape away!
 ```sh
 mov-cli -s youtube flight 370
 ```
 <img src="https://github.com/mov-cli/mov-cli/assets/132799819/8ccbd4b9-16d7-44cd-af8c-f788da1d5118">
 
-> The above command should search for `flight 370` with the following scraper.
+> The command above searches for `flight 370` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
 
 ## Contributing ✨
 Pull requests are welcome and *appreciated*. For major changes, please open an issue first to discuss what you would like to change.

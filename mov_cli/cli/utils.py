@@ -2,7 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Literal, Tuple, List, Dict, NoReturn
+    from typing import Literal, Tuple, List, NoReturn
+
+    from mov_cli.scraper import ScraperOptionsT
 
 import random
 import getpass
@@ -86,7 +88,7 @@ def welcome_msg(plugins: Dict[str, str], display_hint: bool = False, display_ver
 
     return text + "\n"
 
-def steal_scraper_args(query: List[str]) -> Dict[str, bool]:
+def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
     scrape_arguments = [x for x in query if "--" in x]
 
     mov_cli_logger.debug(f"Scraper args picked up on --> {scrape_arguments}")

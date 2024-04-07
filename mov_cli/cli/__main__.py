@@ -65,7 +65,7 @@ def mov_cli(
         return None
 
     if query is not None:
-        scrape_args = steal_scraper_args(query) 
+        scrape_options = steal_scraper_args(query) 
         # This allows passing arguments to scrapers like this: 
         # https://github.com/mov-cli/mov-cli-youtube/commit/b538d82745a743cd74a02530d6a3d476cd60b808#diff-4e5b064838aa74a5375265f4dfbd94024b655ee24a191290aacd3673abed921a
 
@@ -82,7 +82,7 @@ def mov_cli(
             )
             return False
 
-        chosen_scraper = use_scraper(selected_scraper, config, http_client)
+        chosen_scraper = use_scraper(selected_scraper, config, http_client, scrape_options)
 
         choice = search(query, auto_select, chosen_scraper, config.fzf_enabled)
 
@@ -101,7 +101,7 @@ def mov_cli(
             mov_cli_logger.error("You didn't select a season/episode.")
             return False
 
-        media = scrape(choice, chosen_episode, chosen_scraper, **scrape_args)
+        media = scrape(choice, chosen_episode, chosen_scraper)
 
         if download:
             dl = Download(config)
@@ -111,7 +111,7 @@ def mov_cli(
             popen.wait()
 
         else:
-            option = play(media, choice, chosen_scraper, chosen_episode, config, scrape_args)
+            option = play(media, choice, chosen_scraper, chosen_episode, config)
 
             if option == "search":
                 query = input(Colours.BLUE.apply("  Enter Query: "))
@@ -131,5 +131,4 @@ def mov_cli(
                 )
 
 def app():
-    uwu_app.command()(mov_cli)
-    uwu_app() # Wait whaaaaa.
+    typer.run(mov_cli)

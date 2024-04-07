@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from typing import Optional
 
     from ..media import Media
+    from .. import Config
     from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
@@ -19,8 +20,9 @@ __all__ = ("VLC",)
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.ORANGE.apply("VLC"))
 
 class VLC(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, **kwargs) -> None:
+    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
         self.platform = platform
+        self.config = config
 
         super().__init__(**kwargs)
 
@@ -63,6 +65,9 @@ class VLC(Player):
 
                 if media.referrer is not None:
                     args.append(f'--http-referrer="{media.referrer}"')
+
+                if self.config.resolution:
+                    args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas
 
                 return subprocess.Popen(args)
 

@@ -19,3 +19,6 @@ test = "mov-cli-test"
 
 # [mov-cli.downloads] # Do not use backslashes use forward slashes
 # save_path = "~/Downloads"
+
+# [mov-cli.quality]
+# resolution = 720

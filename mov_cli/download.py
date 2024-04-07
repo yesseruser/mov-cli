@@ -19,11 +19,9 @@ class Download():
         
         file = os.path.join(self.config.download_location, title + ".mp4")
 
-        args = [
+        args = [ # TODO: Check if url is a m3u8 if not use aria2
             "ffmpeg",
             "-n",
-            "-thread_queue_size",
-            "4096",
             "-headers",
             f"Referer: {media.referrer}",
             "-i",

@@ -5,7 +5,6 @@
 [![Python Versions][python-shield]][pypi-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![Discord][discord-shield]][discord-url]
 
 <div align="center">
 
@@ -20,12 +19,17 @@
   ·
   <a href="https://github.com/mov-cli/mov-cli/issues">Request Feature</a>
 
-</div>
+  <br>
+  <br>
+  <a href="https://discord.gg/BMzC7ePsBV">
+    <img src="https://invidget.switchblade.xyz/BMzC7ePsBV" alt="Logo" width="400">
+  </a>
 
+</div>
 <br>
 
 > [!Note]
-> v4 is constantly changing so be sure to keep the tool up to date and with that said I would advise not using it as a library yet.
+> v4 is constantly changing so be sure to **keep the tool and your plugins up to date**. Also I would advise not using it as a library yet as the API still has many breaking changes.
 
 ## Installation 🛠️
 

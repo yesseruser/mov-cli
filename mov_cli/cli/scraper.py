@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..http_client import HTTPClient
     from ..utils.episode_selector import EpisodeSelector
 
-    from ..scraper import Scraper
+    from ..scraper import Scraper, ScraperOptionsT
     from ..plugins import PluginHookData
 
 from devgoldyutils import Colours
@@ -26,27 +26,28 @@ __all__ = (
     "select_scraper", 
 )
 
-def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper, **kwargs) -> Media:
+def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Media:
     mov_cli_logger.info(f"Scrapping media for '{Colours.CLAY.apply(choice.title)}'...")
 
     try:
-        media = scraper.scrape(choice, episode, **kwargs)
+        media = scraper.scrape(choice, episode)
     except Exception as e:
         handle_internal_plugin_error(e)
 
     return media
 
 def use_scraper(
-    selected_scraper: Optional[Tuple[str, Type[Scraper]]], 
+    selected_scraper: Tuple[str, Type[Scraper]], 
     config: Config, 
-    http_client: HTTPClient
+    http_client: HTTPClient,
+    scraper_options: ScraperOptionsT
 ) -> Scraper:
     scraper_name, scraper_class = selected_scraper
 
     mov_cli_logger.info(f"Using '{Colours.BLUE.apply(scraper_name)}' scraper...")
 
     try:
-        chosen_scraper = scraper_class(config, http_client)
+        chosen_scraper = scraper_class(config, http_client, scraper_options)
     except Exception as e:
         handle_internal_plugin_error(e)
 

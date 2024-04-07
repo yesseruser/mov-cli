@@ -79,11 +79,11 @@ films = "package_name"
 
 2. Scraper away!
 ```sh
-mov-cli -s films spider man no way home
+mov-cli -s youtube flight 370
 ```
-<img width="370px" src="https://github.com/mov-cli/mov-cli/assets/66202304/86189cab-b246-405e-a266-6c624bee2d36">
+<img src="https://github.com/mov-cli/mov-cli/assets/132799819/8ccbd4b9-16d7-44cd-af8c-f788da1d5118">
 
-> The above command should search for `spider man no way home` with the following scraper.
+> The above command should search for `flight 370` with the following scraper.
 
 ## Contributing ✨
 Pull requests are welcome and *appreciated*. For major changes, please open an issue first to discuss what you would like to change.

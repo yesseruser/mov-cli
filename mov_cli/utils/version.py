@@ -19,8 +19,6 @@ __all__ = (
 
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.GREEN.apply("version"))
 
-logger = LoggerAdapter(mov_cli_logger, prefix = Colours.GREEN.apply("version"))
-
 def update_available() -> bool:
     logger.debug("Checking if mov-cli needs updating...")
 

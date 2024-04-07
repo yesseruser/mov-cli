@@ -83,20 +83,24 @@ def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Calla
 
     else:
         logger.debug("Launching inquirer (fallback ui)...")
-        choice_picked = inquirer.prompt(
+        inquirer_result = inquirer.prompt(
             questions = [inquirer.List("choices", message = text, choices = [display(x) for x in choices])], 
             theme = MovCliTheme()
-        )["choices"]
+        )
+
+        if inquirer_result is not None:
+            choice_picked = inquirer_result["choices"]
 
     # restore the logger
     mov_cli_logger.setLevel(previous_logger_level)
 
     # Using this to remove ansi colours returned in the picked choice.
-    ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])') 
+    ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+
+    if choice_picked is None:
+        return None
 
     for choice in unwounded_choices:
-        if choice_picked is None:
-            return None
 
         if ansi_remover.sub('', choice_picked) == ansi_remover.sub('', display(choice)):
             return choice

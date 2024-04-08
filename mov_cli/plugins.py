@@ -24,7 +24,9 @@ logger = LoggerAdapter(mov_cli_logger, prefix = "Plugins")
 
 class PluginHookData(TypedDict):
     version: int
+    """The version of the plugin hook to use. Version 1 is latest currently."""
     package_name: str
+    """The name of the pypi package. This is required for the plugin update notifier to work."""
     scrapers: Dict[str, Scraper] | Dict[Literal["DEFAULT"], Scraper]
 
 def load_plugin(module_name: str) -> Optional[Tuple[Optional[PluginHookData], ModuleType]]:

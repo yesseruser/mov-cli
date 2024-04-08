@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 import os
 import toml
+import shutil
 from pathlib import Path
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
@@ -106,8 +107,8 @@ class Config():
 
     @property
     def fzf_enabled(self) -> bool:
-        """Returns whether fzf is allowed to be used."""
-        return self.data.get("ui", {}).get("fzf", True)
+        """Returns whether fzf is allowed to be used. Defaults to True of fzf is available."""
+        return self.data.get("ui", {}).get("fzf", True if shutil.which("fzf") is not None else False)
 
     @property
     def parser(self) -> SUPPORTED_PARSERS | Any:

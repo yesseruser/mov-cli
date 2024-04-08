@@ -2,9 +2,11 @@
 
 [![Stargazers][stars-shield]][stars-url]
 [![Pypi Version][pypi-shield]][pypi-url]
+[![Pypi Downloads][pypi-dl-shield]][pypi-url]
 [![Python Versions][python-shield]][pypi-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
+
 
 <div align="center">
 
@@ -68,20 +70,19 @@ mov-cli comes packaged with a CLI interface via the `mov-cli` command you can us
 ```sh
 mov-cli -e
 ```
-Alternatively, you may also edit by manually opening the config file. See the [Wiki](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction).  
+Alternatively, you may also edit by manually opening the config file. See this [Wiki page](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction) on that.  
 ```toml
 [mov-cli.plugins]
-films = "package_name"
+youtube = "mov-cli-youtube"
 ```
 
-
-2. Scraper away!
+2. Scrape away!
 ```sh
-mov-cli -s films spider man no way home
+mov-cli -s youtube flight 370
 ```
-<img width="370px" src="https://github.com/mov-cli/mov-cli/assets/66202304/86189cab-b246-405e-a266-6c624bee2d36">
+<img src="https://github.com/mov-cli/mov-cli/assets/132799819/8ccbd4b9-16d7-44cd-af8c-f788da1d5118">
 
-> The above command should search for `spider man no way home` with the following scraper.
+> The command above searches for `flight 370` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
 
 ## Contributing ✨
 Pull requests are welcome and *appreciated*. For major changes, please open an issue first to discuss what you would like to change.
@@ -109,5 +110,4 @@ Inspired by [ani-cli](https://github.com/pystardust/ani-cli), [lobster](https://
 [issues-url]: https://github.com/mov-cli/mov-cli/issues
 [license-shield]: https://img.shields.io/github/license/mov-cli/mov-cli?style=flat
 [license-url]: ./LICENSE
-[discord-shield]: https://img.shields.io/badge/Discord-7289da?logo=discord&logoColor=white
-[discord-url]: https://discord.gg/BMzC7ePsBV
+[pypi-dl-shield]: https://img.shields.io/pypi/dm/mov-cli?color=informational&label=pypi%20downloads

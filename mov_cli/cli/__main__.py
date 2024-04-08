@@ -101,6 +101,13 @@ def mov_cli(
 
         media = scrape(choice, chosen_episode, chosen_scraper)
 
+        if media.url is None:
+            mov_cli_logger.error(
+                "Scraper didn't return a streamable url." \
+                    "\nThis is NOT a mov-cli issue. This IS an plugin issue"
+            )
+            return False
+
         if download:
             dl = Download(config)
             mov_cli_logger.debug(f"Downloading from this url -> '{media.url}'")
@@ -129,4 +136,5 @@ def mov_cli(
                 )
 
 def app():
-    typer.run(mov_cli)
+    uwu_app.command()(mov_cli)
+    uwu_app()

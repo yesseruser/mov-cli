@@ -52,15 +52,22 @@ def mov_cli(
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
 
-    print(
-        welcome_msg(True if query is None else False, version)
-    )
-
     mov_cli_logger.debug(f"Config -> {config.data}")
 
     if edit is True:
         open_config_file(config)
         return None
+
+    plugins = config.plugins
+
+    welcome_message = welcome_msg(
+        plugins = plugins, 
+        check_for_updates = True if query is None and config.skip_update_checker is False else False, 
+        display_hint = True if query is None else False, 
+        display_version = version
+    )
+
+    print(welcome_message)
 
     if query is not None:
         scrape_options = steal_scraper_args(query) 
@@ -71,7 +78,7 @@ def mov_cli(
 
         http_client = HTTPClient(config)
 
-        selected_scraper = select_scraper(config.plugins, config.fzf_enabled, config.default_scraper)
+        selected_scraper = select_scraper(plugins, config.fzf_enabled, config.default_scraper)
 
         if selected_scraper is None:
             mov_cli_logger.error(

@@ -100,6 +100,10 @@ class Config():
         return self.data.get("editor")
 
     @property
+    def skip_update_checker(self) -> bool:
+        return self.data.get("skip_update_checker", False)
+
+    @property
     def default_scraper(self) -> Optional[str]:
         """Returns the scraper that should be used to scrape by default."""
         return self.data.get("scrapers", {}).get("default", None)

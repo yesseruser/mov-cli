@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Literal, Tuple, List, NoReturn
+    from typing import Literal, Tuple, List, NoReturn, Dict
 
     from mov_cli.scraper import ScraperOptionsT
 
@@ -57,7 +57,7 @@ def greetings() -> Tuple[Literal["Good Morning", "Good Afternoon", "Good Evening
     return greeting, user_name
 
 # This function below is inspired by animdl: https://github.com/justfoolingaround/animdl
-def welcome_msg(plugins: Dict[str, str], display_hint: bool = False, display_version: bool = False) -> str:
+def welcome_msg(plugins: Dict[str, str], check_for_updates: bool = False, display_hint: bool = False, display_version: bool = False) -> str:
     """Returns cli welcome message."""
     now = datetime.now()
     adjective = random.choice(
@@ -78,13 +78,15 @@ def welcome_msg(plugins: Dict[str, str], display_hint: bool = False, display_ver
     if display_version is True:
         text += f"\n\n{Colours.CLAY}-> {Colours.RESET}Version: {Colours.BLUE}{mov_cli_version}{Colours.RESET}"
 
-    if update_available():
-        text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}pip install mov-cli -U"
+    if check_for_updates:
 
-    plugin_needs_updating, plugins_to_update = plugin_update_available(plugins)
+        if update_available():
+            text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}pip install mov-cli -U"
 
-    if plugin_needs_updating:
-        text += f"\n\n {Colours.ORANGE}|˶˙ᵕ˙ )ﾉﾞ {Colours.GREEN}Some plugins need updating! --> {Colours.RESET}pip install {' '.join(plugins_to_update)} -U"
+        plugin_needs_updating, plugins_to_update = plugin_update_available(plugins)
+
+        if plugin_needs_updating:
+            text += f"\n\n {Colours.ORANGE}|˶˙ᵕ˙ )ﾉﾞ {Colours.GREEN}Some plugins need updating! --> {Colours.RESET}pip install {' '.join(plugins_to_update)} -U"
 
     return text + "\n"
 

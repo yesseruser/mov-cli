@@ -44,6 +44,7 @@ def update_available() -> bool:
 
 def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
     plugins_with_updates: List[str] = []
+    logger.debug("Checking if plugins need updating...")
 
     for _, module_name in plugins.items():
         plugin = load_plugin(module_name)
@@ -52,26 +53,41 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
             continue
 
         plugin_module = plugin[1]
-        plugin_version: Optional[int] = getattr(plugin_module, "__version__", None)
+        plugin_hook_data = plugin[0]
+
+        plugin_version: Optional[str] = getattr(plugin_module, "__version__", None)
 
         if plugin_version is None:
+            logger.debug(
+                f"Skipped update check for '{module_name}' as the plugin " \
+                    "doesn't expose '__version__' in it's root module ('__init__.py')."
+            )
             continue
 
-        logger.debug(f"Checking if the plugin '{module_name}' is up to date...")
+        pypi_package_name = plugin_hook_data.get("package_name", None)
 
-        # NOTE: Welp, this would break for plugins not named consistently but I can't think of a solution rn and it's getting late 😴
-        pypi_package_name = module_name.replace("_", "-")
-        response = httpx.get(f"https://pypi.org/pypi/{pypi_package_name}/json")
+        if pypi_package_name is None:
+            logger.debug(
+                f"Skipped update check for '{module_name}' as the plugin " \
+                    "doesn't contain 'package_name' in it's hook data."
+            )
+            continue
 
-        if response.status_code > 400:
-            logger.warning(f"Failed to check pypi version of the plugin '{module_name}'!")
+        try:
+            response = httpx.get(f"https://pypi.org/pypi/{pypi_package_name}/json")
+        except httpx.HTTPError as e:
+            logger.warning(f"Failed to check for update of the plugin '{module_name}'! Error: {e}")
+            continue
+
+        if response.status_code >= 400:
+            logger.warning(f"Failed to check for update of the plugin '{module_name}'! Response: {response}")
             continue
 
         pypi_json = response.json()
-        pypi_version: int = pypi_json["info"]["version"]
+        pypi_version: str = pypi_json["info"]["version"]
 
-        if pypi_version > plugin_version:
-            plugins_with_updates.append(module_name)
+        if version.parse(pypi_version) > version.parse(plugin_version):
+            plugins_with_updates.append(pypi_package_name)
 
     if not plugins_with_updates == []:
         return True, plugins_with_updates

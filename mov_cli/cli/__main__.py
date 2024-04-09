@@ -12,7 +12,7 @@ from .play import play
 from .search import search
 from .ui import welcome_msg
 from .episode import handle_episode
-from .plugins import show_all_plugins, get_plugins_data
+from .plugins import show_all_plugins
 from .scraper import select_scraper, use_scraper, scrape, steal_scraper_args
 from .configuration import open_config_file, set_cli_config
 
@@ -35,13 +35,11 @@ def mov_cli(
     auto_select: Optional[int] = typer.Option(None, "--choice", "-c", help = "Auto select the search results. E.g. Setting it to 1 with query 'nyan cat' will pick " \
         "the first nyan cat video to show up in search results."
     ), 
-    list_scrapers: Optional[str] = typer.Option(None, "--list-scrapers", "-ls", help = "Prints all scrapers available in the plugin"),
-
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
     download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."),
-    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins."),
+    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."),
 ):
     config = Config()
 
@@ -61,52 +59,12 @@ def mov_cli(
     if edit:
         open_config_file(config)
         return None
-    
-    if list_plugins:
-        string = "Configured Plugins:\r\n\n"
-
-        plugins = []
-
-        plugins_data = get_plugins_data(config.plugins)
-
-        for plugin_namespace, _, plugin_hook_data in plugins_data:
-            plugins.append(f"- {Colours.PINK_GREY}{plugin_namespace}{Colours.RESET}\n")
-        
-        if not plugins:
-            mov_cli_logger.error("You don't have any plugins configured!")
-
-            return None
-
-        print(string + "\n".join(plugins))
-        return None
-    
-    if list_scrapers is not None: # NOTE: This is the best way, i can come up with at 6 am.
-        string = f"Scrapers in {list_scrapers}:\r\n\n"
-
-        scrapers = []
-
-        plugins_data = get_plugins_data(config.plugins)
-
-        for plugin_namespace, _, plugin_hook_data in plugins_data:
-            if list_scrapers == plugin_namespace:
-                plugin_scrapers = plugin_hook_data["scrapers"]
-
-                for scraper in plugin_scrapers:
-                    if len(plugin_scrapers) != 1:
-                        if scraper != "DEFAULT":
-                            scrapers.append(f"- {Colours.PINK_GREY}{plugin_namespace}.{scraper}{Colours.RESET}\n")
-                    else:
-                        scrapers.append(f"- {Colours.PINK_GREY}{plugin_namespace}.{scraper}{Colours.RESET}\n")         
-        
-        if not scrapers:
-            mov_cli_logger.error(f"Could not find plugin under namespace: {list_scrapers}")
-
-            return None
-
-        print(string + "\n".join(scrapers))
-        return None
 
     plugins = config.plugins
+
+    if list_plugins:
+        show_all_plugins(plugins)
+        return None
 
     welcome_message = welcome_msg(
         plugins = plugins, 

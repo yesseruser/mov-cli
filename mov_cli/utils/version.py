@@ -103,8 +103,7 @@ def get_plugin_version_hook(module_name: str):
             f"Skipped update check for '{module_name}' as the plugin " \
                 "doesn't expose '__version__' in it's root module ('__init__.py')."
         )
-        
-    
+
         return None, None
     
     return plugin_version, plugin_hook_data

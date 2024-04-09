@@ -24,6 +24,7 @@ __all__ = (
     "scrape", 
     "use_scraper", 
     "select_scraper", 
+    "show_all_plugins"
 )
 
 def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Media:
@@ -134,3 +135,22 @@ def get_plugins_data(plugins: Dict[str, str]) -> List[Tuple[str, str, PluginHook
         )
 
     return plugins_data
+
+def show_all_plugins(plugins: Dict[str, str]) -> None:
+
+    for plugin_namespace, plugin_module_name, plugin_hook_data in get_plugins_data(plugins):
+        # TODO: Have 'get_plugins_data' return plugin module so we should have to load the plugin twice.
+        plugin = load_plugin(plugin_module_name)
+
+        if plugin is not None:
+            _, plugin_module = plugin
+
+            plugin_version = getattr(plugin_module, "__version__", "N/A")
+
+            print(f"- {Colours.PURPLE.apply(plugin_module_name)} ({plugin_namespace}) [{Colours.GREY.apply(plugin_version)}]")
+
+            for scraper_name in plugin_hook_data["scrapers"]:
+                if scraper_name == "DEFAULT":
+                    continue
+
+                print(f"  - {Colours.PINK_GREY.apply(scraper_name)}")

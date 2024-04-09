@@ -42,7 +42,7 @@ def show_all_plugins(plugins: Dict[str, str]) -> None:
 
             plugin_version = getattr(plugin_module, "__version__", "N/A")
 
-            print(f"- {Colours.PURPLE.apply(plugin_module_name)} ({plugin_namespace}) [{Colours.GREY.apply(plugin_version)}]")
+            print(f"- {Colours.PURPLE.apply(plugin_module_name)} ({plugin_namespace}) [{Colours.BLUE.apply(plugin_version)}]")
 
             for scraper_name in plugin_hook_data["scrapers"]:
                 if scraper_name == "DEFAULT":

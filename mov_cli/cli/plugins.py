@@ -53,7 +53,7 @@ def show_all_plugins(plugins: Dict[str, str]) -> None:
 def handle_internal_plugin_error(e: Exception) -> NoReturn:
     mov_cli_logger.critical(
         "An error occurred inside a plugin. This is MOST LIKELY not a mov-cli error, " \
-            f"make sure your plugins are up to date and ONLY report this to the plugin! \nError: {e}"
+            f"make SURE mov-cli and your plugins are up to date. Also report this to the plugin, not mov-cli! \nError: {e}"
     )
 
     raise e

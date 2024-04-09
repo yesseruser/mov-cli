@@ -38,7 +38,7 @@ def show_all_plugins(plugins: Dict[str, str]) -> None:
         plugin = load_plugin(plugin_module_name)
 
         if plugin is not None:
-            _, plugin_module = plugin
+            plugin_module = plugin[1]
 
             plugin_version = getattr(plugin_module, "__version__", "N/A")
 

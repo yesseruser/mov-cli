@@ -10,12 +10,15 @@ from dataclasses import dataclass, field
 __all__ = ("MetadataType", "Metadata", "ExtraMetadata", "AiringType")
 
 class MetadataType(Enum):
-    SERIES = 0
+    MULTI = 0
     """Media with multiple seasons and episodes."""
-    MOVIE = 1
+    SINGLE = 1
     """Media with no seasons and episodes. Like a film or short animation."""
-    LIVE = 2
-    """Media that is live, like a tv channel or a live stream."""
+
+    SERIES = 0
+    """DEPRECATED!!! USE 'MetadataType.MULTI' INSTEAD! This will be removed after v4.4."""
+    MOVIE = 1
+    """DEPRECATED!!! USE 'MetadataType.SINGLE' INSTEAD!. This will be removed after v4.4."""
 
 class AiringType(Enum):
     DONE = 0

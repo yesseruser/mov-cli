@@ -9,44 +9,38 @@ if TYPE_CHECKING:
     from ..http_client import HTTPClient
     from ..utils.episode_selector import EpisodeSelector
 
-    from ..scraper import Scraper
     from ..plugins import PluginHookData
+    from ..scraper import Scraper, ScraperOptionsT
 
 from devgoldyutils import Colours
 
 from .ui import prompt
-from .utils import handle_internal_plugin_error
+from .plugins import get_plugins_data, handle_internal_plugin_error
 
-from ..plugins import load_plugin
 from ..logger import mov_cli_logger
 
-__all__ = (
-    "scrape", 
-    "use_scraper", 
-    "select_scraper", 
-)
-
-def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper, **kwargs) -> Media:
+def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Media:
     mov_cli_logger.info(f"Scrapping media for '{Colours.CLAY.apply(choice.title)}'...")
 
     try:
-        media = scraper.scrape(choice, episode, **kwargs)
+        media = scraper.scrape(choice, episode)
     except Exception as e:
         handle_internal_plugin_error(e)
 
     return media
 
 def use_scraper(
-    selected_scraper: Optional[Tuple[str, Type[Scraper]]], 
+    selected_scraper: Tuple[str, Type[Scraper]], 
     config: Config, 
-    http_client: HTTPClient
+    http_client: HTTPClient,
+    scraper_options: ScraperOptionsT
 ) -> Scraper:
     scraper_name, scraper_class = selected_scraper
 
     mov_cli_logger.info(f"Using '{Colours.BLUE.apply(scraper_name)}' scraper...")
 
     try:
-        chosen_scraper = scraper_class(config, http_client)
+        chosen_scraper = scraper_class(config, http_client, scraper_options)
     except Exception as e:
         handle_internal_plugin_error(e)
 
@@ -95,6 +89,18 @@ def select_scraper(plugins: Dict[str, str], fzf_enabled: bool, default_scraper: 
 
     return None
 
+def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
+    scrape_arguments = [x for x in query if "--" in x]
+
+    mov_cli_logger.debug(f"Scraper args picked up on --> {scrape_arguments}")
+
+    for scrape_arg in scrape_arguments:
+        query.remove(scrape_arg)
+
+    return dict(
+        [(x.replace("--", "").replace("-", "_"), True) for x in scrape_arguments]
+    )
+
 def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
@@ -113,18 +119,3 @@ def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookDa
                 return id, scraper
 
     return None, available_scrapers
-
-def get_plugins_data(plugins: Dict[str, str]) -> List[Tuple[str, str, PluginHookData]]:
-    plugins_data: List[Tuple[str, str, PluginHookData]] = []
-
-    for plugin_namespace, plugin_module_name in plugins.items():
-        plugin_data = load_plugin(plugin_module_name)
-
-        if plugin_data is None:
-            continue
-
-        plugins_data.append(
-            (plugin_namespace, plugin_module_name, plugin_data)
-        )
-
-    return plugins_data

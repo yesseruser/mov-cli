@@ -14,10 +14,6 @@ from ..media import MetadataType
 from ..utils import EpisodeSelector
 from ..logger import mov_cli_logger
 
-__all__ = (
-    "handle_episode", 
-)
-
 def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Metadata, fzf_enabled: bool) -> Optional[EpisodeSelector]:
     if choice.type == MetadataType.MOVIE:
         return EpisodeSelector()

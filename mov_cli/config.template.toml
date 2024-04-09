@@ -4,6 +4,7 @@ player = "mpv"
 debug = false
 # parser = "lxml"
 # editor = "nano"
+skip_update_checker = false
 
 [mov-cli.ui]
 # fzf = true

@@ -13,7 +13,7 @@ from devgoldyutils import Colours
 
 from ..logger import mov_cli_logger
 from .. import __version__ as mov_cli_version
-from ..utils import  what_platform, update_available, plugin_update_available
+from ..utils import  what_platform, update_available, plugin_update_available, get_plugin_version_hook
 
 __all__ = (
     "greetings", 
@@ -77,6 +77,14 @@ def welcome_msg(plugins: Dict[str, str], check_for_updates: bool = False, displa
 
     if display_version is True:
         text += f"\n\n{Colours.CLAY}-> {Colours.RESET}Version: {Colours.BLUE}{mov_cli_version}{Colours.RESET}"
+
+        for _, module_name in plugins.items():
+            version, hook = get_plugin_version_hook(module_name)
+
+            if version is None:
+                continue
+
+            text += f"\n\n{Colours.CLAY}-> {Colours.RESET}{module_name}: {Colours.BLUE}{version}{Colours.RESET}"
 
     if check_for_updates:
 

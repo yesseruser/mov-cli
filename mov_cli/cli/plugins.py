@@ -34,7 +34,7 @@ def get_plugins_data(plugins: Dict[str, str]) -> List[Tuple[str, str, PluginHook
 def show_all_plugins(plugins: Dict[str, str]) -> None:
 
     for plugin_namespace, plugin_module_name, plugin_hook_data in get_plugins_data(plugins):
-        # TODO: Have 'get_plugins_data' return plugin module so we should have to load the plugin twice.
+        # TODO: Have 'get_plugins_data' return plugin module so we shouldn't have to load the plugin twice.
         plugin = load_plugin(plugin_module_name)
 
         if plugin is not None:

@@ -11,11 +11,6 @@ from subprocess import check_call, CalledProcessError
 from .. import utils
 from ..logger import mov_cli_logger
 
-__all__ = (
-    "set_cli_config", 
-    "open_config_file"
-)
-
 def set_cli_config(config: Config, **kwargs: Optional[Any]) -> Config:
     debug = kwargs.get("debug")
     player = kwargs.get("player")

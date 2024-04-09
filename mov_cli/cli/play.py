@@ -19,10 +19,6 @@ from .watch_options import watch_options
 from ..utils import what_platform
 from ..logger import mov_cli_logger
 
-__all__ = (
-    "play",
-)
-
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config) -> Optional[Literal["search"]]:
     platform = what_platform()
 

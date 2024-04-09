@@ -10,10 +10,11 @@ from devgoldyutils import Colours
 
 from .play import play
 from .search import search
+from .ui import welcome_msg
 from .episode import handle_episode
-from .scraper import select_scraper, use_scraper, scrape, get_plugins_data
+from .plugins import show_all_plugins, get_plugins_data
+from .scraper import select_scraper, use_scraper, scrape, steal_scraper_args
 from .configuration import open_config_file, set_cli_config
-from .utils import welcome_msg, steal_scraper_args
 
 from ..config import Config
 from ..download import Download

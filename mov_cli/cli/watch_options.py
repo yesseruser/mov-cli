@@ -14,10 +14,6 @@ from subprocess import Popen
 from .ui import prompt
 from ..media import Series
 
-__all__ = (
-    "watch_options", 
-)
-
 def watch_options(
     popen: Popen, 
     player: Player, 

@@ -145,7 +145,8 @@ def mov_cli(
 
                     version = False,
                     edit = False,
-                    download = False
+                    download = False,
+                    list_plugins = False
                 )
 
 def app():

@@ -84,6 +84,9 @@ mov-cli -s youtube flight 370
 
 > The command above searches for `flight 370` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
 
+## Star Graph ⭐
+[![Star Graph Chart](https://api.star-history.com/svg?repos=mov-cli/mov-cli&type=Date)](https://star-history.com/#mov-cli/mov-cli&Date)
+
 ## Contributing ✨
 Pull requests are welcome and *appreciated*. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -93,7 +96,6 @@ Pull requests are welcome and *appreciated*. For major changes, please open an i
 
 ## Inspiration 🌟
 Inspired by [ani-cli](https://github.com/pystardust/ani-cli), [lobster](https://github.com/justchokingaround/lobster) and [animdl](https://github.com/justfoolingaround/animdl)
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

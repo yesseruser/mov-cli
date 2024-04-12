@@ -2,7 +2,7 @@
 
 [![Stargazers][stars-shield]][stars-url]
 [![Pypi Version][pypi-shield]][pypi-url]
-[![Pypi Downloads][pypi-dl-shield]][pypi-url]
+[![Pypi Downloads][pypi-dl-shield]][pypi-stats-url]
 [![Python Versions][python-shield]][pypi-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
@@ -107,6 +107,7 @@ Inspired by [ani-cli](https://github.com/pystardust/ani-cli), [lobster](https://
 [stars-url]: https://github.com/mov-cli/mov-cli/stargazers
 [pypi-shield]: https://img.shields.io/pypi/v/mov-cli?style=flat
 [pypi-url]: https://pypi.org/project/mov-cli/
+[pypi-stats-url]: https://pypistats.org/packages/mov-cli
 [python-shield]: https://img.shields.io/pypi/pyversions/mov-cli?style=flat
 [issues-shield]: https://img.shields.io/github/issues/mov-cli/mov-cli?style=flat
 [issues-url]: https://github.com/mov-cli/mov-cli/issues

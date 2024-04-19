@@ -59,7 +59,6 @@ class VLC(Player):
             try:
                 args = [
                     "vlc", 
-                    # f'--sub-file={media.subtitles}', # some way to add subs!! TODO
                     f'--meta-title="{media.display_name}"', 
                     media.url, 
                     "--quiet"
@@ -70,6 +69,16 @@ class VLC(Player):
 
                 if media.audio_url is not None:
                     args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
+
+                if media.subtitles is not None:
+                    subtitles = media.subtitles
+
+                    if media.subtitles.startswith("https://"):
+                        # TODO: If it's a url download the subtitles 
+                        # to a temporary directory then give the path to vlc.
+                        ...
+
+                    args.append(f"--sub-file={subtitles}")
 
                 if self.config.resolution:
                     args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas

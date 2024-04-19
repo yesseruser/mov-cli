@@ -22,7 +22,8 @@ class Media():
         url: str, 
         title: str, 
         audio_url: Optional[str], 
-        referrer: Optional[str]
+        referrer: Optional[str], 
+        subtitles: Optional[str]
     ) -> None:
         self.url = url
         """The stream-able url of the media."""
@@ -32,6 +33,8 @@ class Media():
         """The stream-able url that provides audio for the media if the main url doesn't stream with audio."""
         self.referrer = referrer
         """The required referrer for streaming the media content."""
+        self.subtitles = subtitles
+        """The url or file path to the subtitles."""
 
     @property
     @abstractmethod
@@ -48,17 +51,17 @@ class Multi(Media):
         episode: EpisodeSelector, 
         audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
-        subtitles: Optional[dict] = None
+        subtitles: Optional[str] = None
     ) -> None:
         self.episode = episode
         """The episode and season of this series."""
-        self.subtitles = subtitles
 
         super().__init__(
             url, 
             title = title, 
             audio_url = audio_url, 
-            referrer = referrer
+            referrer = referrer,
+            subtitles = subtitles
         )
 
     @property
@@ -74,17 +77,17 @@ class Single(Media):
         audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
         year: Optional[str] = None, 
-        subtitles: Optional[dict] = None 
+        subtitles: Optional[str] = None 
     ) -> None:
         self.year = year
         """The year this film was released."""
-        self.subtitles = subtitles
 
         super().__init__(
             url, 
             title = title, 
             audio_url = audio_url, 
-            referrer = referrer
+            referrer = referrer,
+            subtitles = subtitles
         )
 
     @property

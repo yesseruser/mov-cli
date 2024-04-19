@@ -34,9 +34,3 @@ class PlayerNotFound(MovCliException):
             f"The player '{player.__class__.__name__}' was not found. Are you sure you have it installed? " \
             "Are you sure the environment variable is set correctly?"
         )
-
-class SubtitlesKeyMissing(MovCliException):
-    def __init__(self, subtitle_provider: str) -> None:
-        super().__init__(
-            f"You don't have a key specified for subtitles provider '{subtitle_provider}' in the config!" v4
-        )

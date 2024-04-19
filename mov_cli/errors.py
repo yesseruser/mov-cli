@@ -10,9 +10,7 @@ from .logger import mov_cli_logger
 
 __all__ = (
     "MovCliException", 
-    "PlayerNotFound", 
-    "PlayerNotSupported", 
-    "SubtitlesKeyMissing"
+    "PlayerNotFound"
 )
 
 class MovCliException(Exception):

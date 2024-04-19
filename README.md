@@ -2,10 +2,11 @@
 
 [![Stargazers][stars-shield]][stars-url]
 [![Pypi Version][pypi-shield]][pypi-url]
+[![Pypi Downloads][pypi-dl-shield]][pypi-stats-url]
 [![Python Versions][python-shield]][pypi-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![Discord][discord-shield]][discord-url]
+
 
 <div align="center">
 
@@ -20,12 +21,17 @@
   ·
   <a href="https://github.com/mov-cli/mov-cli/issues">Request Feature</a>
 
-</div>
+  <br>
+  <br>
+  <a href="https://discord.gg/BMzC7ePsBV">
+    <img src="https://invidget.switchblade.xyz/BMzC7ePsBV" alt="Logo" width="400">
+  </a>
 
+</div>
 <br>
 
 > [!Note]
-> v4 is constantly changing so be sure to keep the tool up to date and with that said I would advise not using it as a library yet.
+> v4 is constantly changing so be sure to **keep the tool and your plugins up to date**. Also I would advise not using it as a library yet as the API still has many breaking changes.
 
 ## Installation 🛠️
 
@@ -37,7 +43,7 @@
   - Linux
   - Windows
   - Android (via [Termux](https://termux.dev/en/))
-  - iOS (via [iSH Shell](https://ish.app/))
+  - *iOS (via [iSH Shell](https://ish.app/))* (unstable, https://github.com/mov-cli/mov-cli/issues/256)
   - MacOS
 - **[python](https://www.python.org/downloads/)** (**required**, with pip)
 - **[lxml](https://pypi.org/project/lxml/)** (optional, ⚡ faster scraping)
@@ -64,20 +70,22 @@ mov-cli comes packaged with a CLI interface via the `mov-cli` command you can us
 ```sh
 mov-cli -e
 ```
-Alternatively, you may also edit by manually opening the config file. See the [Wiki](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction).  
+Alternatively, you may also edit by manually opening the config file. See this [Wiki page](https://github.com/mov-cli/mov-cli/wiki/Configuration#introduction) on that.  
 ```toml
 [mov-cli.plugins]
-films = "package_name"
+youtube = "mov-cli-youtube"
 ```
 
-
-2. Scraper away!
+2. Scrape away!
 ```sh
-mov-cli -s films spider man no way home
+mov-cli -s youtube flight 370
 ```
-<img width="370px" src="https://github.com/mov-cli/mov-cli/assets/66202304/86189cab-b246-405e-a266-6c624bee2d36">
+<img src="https://github.com/mov-cli/mov-cli/assets/132799819/8ccbd4b9-16d7-44cd-af8c-f788da1d5118">
 
-> The above command should search for `spider man no way home` with the following scraper.
+> The command above searches for `flight 370` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
+
+## Star Graph ⭐
+[![Star Graph Chart](https://api.star-history.com/svg?repos=mov-cli/mov-cli&type=Date)](https://star-history.com/#mov-cli/mov-cli&Date)
 
 ## Contributing ✨
 Pull requests are welcome and *appreciated*. For major changes, please open an issue first to discuss what you would like to change.
@@ -89,7 +97,6 @@ Pull requests are welcome and *appreciated*. For major changes, please open an i
 ## Inspiration 🌟
 Inspired by [ani-cli](https://github.com/pystardust/ani-cli), [lobster](https://github.com/justchokingaround/lobster) and [animdl](https://github.com/justfoolingaround/animdl)
 
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/mov-cli/mov-cli.svg?style=for-the-badge
@@ -100,10 +107,10 @@ Inspired by [ani-cli](https://github.com/pystardust/ani-cli), [lobster](https://
 [stars-url]: https://github.com/mov-cli/mov-cli/stargazers
 [pypi-shield]: https://img.shields.io/pypi/v/mov-cli?style=flat
 [pypi-url]: https://pypi.org/project/mov-cli/
+[pypi-stats-url]: https://pypistats.org/packages/mov-cli
 [python-shield]: https://img.shields.io/pypi/pyversions/mov-cli?style=flat
 [issues-shield]: https://img.shields.io/github/issues/mov-cli/mov-cli?style=flat
 [issues-url]: https://github.com/mov-cli/mov-cli/issues
 [license-shield]: https://img.shields.io/github/license/mov-cli/mov-cli?style=flat
 [license-url]: ./LICENSE
-[discord-shield]: https://img.shields.io/badge/Discord-7289da?logo=discord&logoColor=white
-[discord-url]: https://discord.gg/BMzC7ePsBV
+[pypi-dl-shield]: https://img.shields.io/pypi/dm/mov-cli?color=informational&label=pypi%20downloads

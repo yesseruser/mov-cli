@@ -4,9 +4,10 @@ player = "mpv"
 debug = false
 # parser = "lxml"
 # editor = "nano"
+skip_update_checker = false
 
 [mov-cli.ui]
-fzf = true
+# fzf = true
 
 [mov-cli.plugins] # E.g: namespace = "package-name"
 test = "mov-cli-test"
@@ -19,3 +20,6 @@ test = "mov-cli-test"
 
 # [mov-cli.downloads] # Do not use backslashes use forward slashes
 # save_path = "~/Downloads"
+
+# [mov-cli.quality]
+# resolution = 720

@@ -10,10 +10,11 @@ from devgoldyutils import Colours
 
 from .play import play
 from .search import search
+from .ui import welcome_msg
 from .episode import handle_episode
-from .scraper import select_scraper, use_scraper, scrape
+from .plugins import show_all_plugins
+from .scraper import select_scraper, use_scraper, scrape, steal_scraper_args
 from .configuration import open_config_file, set_cli_config
-from .utils import welcome_msg, steal_scraper_args
 
 from ..config import Config
 from ..download import Download
@@ -37,7 +38,8 @@ def mov_cli(
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
-    download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing.")
+    download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."),
+    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."),
 ):
     config = Config()
 
@@ -52,18 +54,29 @@ def mov_cli(
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
 
-    print(
-        welcome_msg(True if query is None else False, version)
-    )
-
     mov_cli_logger.debug(f"Config -> {config.data}")
 
-    if edit is True:
+    if edit:
         open_config_file(config)
         return None
 
+    plugins = config.plugins
+
+    if list_plugins:
+        show_all_plugins(plugins)
+        return None
+
+    welcome_message = welcome_msg(
+        plugins = plugins, 
+        check_for_updates = True if query is None and config.skip_update_checker is False else False, 
+        display_hint = True if query is None else False, 
+        display_version = version
+    )
+
+    print(welcome_message)
+
     if query is not None:
-        scrape_args = steal_scraper_args(query) 
+        scrape_options = steal_scraper_args(query) 
         # This allows passing arguments to scrapers like this: 
         # https://github.com/mov-cli/mov-cli-youtube/commit/b538d82745a743cd74a02530d6a3d476cd60b808#diff-4e5b064838aa74a5375265f4dfbd94024b655ee24a191290aacd3673abed921a
 
@@ -71,7 +84,7 @@ def mov_cli(
 
         http_client = HTTPClient(config)
 
-        selected_scraper = select_scraper(config.plugins, config.fzf_enabled, config.default_scraper)
+        selected_scraper = select_scraper(plugins, config.fzf_enabled, config.default_scraper)
 
         if selected_scraper is None:
             mov_cli_logger.error(
@@ -80,7 +93,7 @@ def mov_cli(
             )
             return False
 
-        chosen_scraper = use_scraper(selected_scraper, config, http_client)
+        chosen_scraper = use_scraper(selected_scraper, config, http_client, scrape_options)
 
         choice = search(query, auto_select, chosen_scraper, config.fzf_enabled)
 
@@ -99,7 +112,14 @@ def mov_cli(
             mov_cli_logger.error("You didn't select a season/episode.")
             return False
 
-        media = scrape(choice, chosen_episode, chosen_scraper, **scrape_args)
+        media = scrape(choice, chosen_episode, chosen_scraper)
+
+        if media.url is None:
+            mov_cli_logger.error(
+                "Scraper didn't return a streamable url." \
+                    "\nThis is NOT a mov-cli issue. This IS an plugin issue"
+            )
+            return False
 
         if download:
             dl = Download(config)
@@ -109,7 +129,7 @@ def mov_cli(
             popen.wait()
 
         else:
-            option = play(media, choice, chosen_scraper, chosen_episode, config, scrape_args)
+            option = play(media, choice, chosen_scraper, chosen_episode, config)
 
             if option == "search":
                 query = input(Colours.BLUE.apply("  Enter Query: "))
@@ -125,9 +145,10 @@ def mov_cli(
 
                     version = False,
                     edit = False,
-                    download = False
+                    download = False,
+                    list_plugins = False
                 )
 
 def app():
     uwu_app.command()(mov_cli)
-    uwu_app() # Wait whaaaaa.
+    uwu_app()

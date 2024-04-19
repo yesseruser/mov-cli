@@ -6,10 +6,6 @@ if TYPE_CHECKING:
 
     T = TypeVar("T")
 
-__all__ = (
-    "auto_select_choice",
-)
-
 def auto_select_choice(choices: Iterable[T], auto_select: int) -> Optional[T]:
 
     if auto_select == 0:

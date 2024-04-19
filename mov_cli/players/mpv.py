@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Optional
     from ..media import Media
+    from .. import Config
     from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
@@ -18,8 +19,9 @@ __all__ = ("MPV",)
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.PURPLE.apply("MPV"))
 
 class MPV(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, **kwargs) -> None:
+    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
         self.platform = platform
+        self.config = config
 
         super().__init__(**kwargs)
 
@@ -55,6 +57,12 @@ class MPV(Player):
                 if media.referrer is not None:
                     args.append(f"--referrer={media.referrer}")
 
+                if media.audio_url is not None:
+                    args.append(f"--audio-file={media.audio_url}")
+
+                if self.config.resolution:
+                    args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
+
                 return subprocess.Popen(args)
 
             elif self.platform == "Darwin":
@@ -69,9 +77,15 @@ class MPV(Player):
                 if media.referrer is not None:
                     args.append(f"--mpv-referrer={media.referrer}")
 
+                if media.audio_url is not None:
+                    args.append(f"--mpv-audio-file={media.audio_url}")
+
+                if self.config.resolution:
+                    args.append(f"--mpv-hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
+
                 return subprocess.Popen(args)
 
-        except ModuleNotFoundError:
+        except (ModuleNotFoundError, FileNotFoundError):
             raise errors.PlayerNotFound(self)
 
         return None

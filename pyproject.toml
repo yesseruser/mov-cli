@@ -28,12 +28,12 @@ dependencies = [
     "importlib-metadata; python_version<'3.8'",
     "toml",
     "devgoldyutils>=2.5.7",
-    "typer[all]==0.10.0",
+    "typer>=0.12.2",
     "inquirer",
     "beautifulsoup4",
     "Unidecode",
-    "thefuzz",
     "deprecation",
+    "packaging",
 
     # Included plugins
     "mov-cli-test>=1.1.0"

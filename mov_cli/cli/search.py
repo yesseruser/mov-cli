@@ -11,14 +11,10 @@ from devgoldyutils import Colours
 
 from .ui import prompt
 from .auto_select import auto_select_choice
-from .utils import handle_internal_plugin_error
+from .plugins import handle_internal_plugin_error
 
 from ..media import MetadataType
 from ..logger import mov_cli_logger
-
-__all__ = (
-    "search", 
-)
 
 def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool) -> Optional[Metadata]:
     choice = None

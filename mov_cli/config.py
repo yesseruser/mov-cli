@@ -4,13 +4,14 @@ from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
     from .players import Player
-    from typing import Dict, Union, Literal, Any, Optional, Type
+    from typing import Dict, Union, Literal, Any, Optional
 
     JSON_VALUES = Union[str, bool, int, dict]
     SUPPORTED_PARSERS = Literal["lxml", "html.parser"]
 
 import os
 import toml
+import shutil
 from pathlib import Path
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
@@ -18,7 +19,7 @@ from devgoldyutils import LoggerAdapter
 from . import players, utils
 from .logger import mov_cli_logger
 
-__all__ = ("Config",)
+__all__ = ("Config", )
 
 @final
 class ConfigUIData(TypedDict):
@@ -47,6 +48,8 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersData
     plugins: Dict[str, str]
+    resolution: int
+    
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -92,9 +95,9 @@ class Config():
         platform = utils.what_platform()
 
         if value.lower() == "mpv":
-            return players.MPV(platform)
+            return players.MPV(platform, self)
         elif value.lower() == "vlc":
-            return players.VLC(platform)
+            return players.VLC(platform, self)
 
         return players.CustomPlayer(value)
 
@@ -108,14 +111,18 @@ class Config():
         return self.data.get("editor")
 
     @property
+    def skip_update_checker(self) -> bool:
+        return self.data.get("skip_update_checker", False)
+
+    @property
     def default_scraper(self) -> Optional[str]:
         """Returns the scraper that should be used to scrape by default."""
         return self.data.get("scrapers", {}).get("default", None)
 
     @property
     def fzf_enabled(self) -> bool:
-        """Returns whether fzf is allowed to be used."""
-        return self.data.get("ui", {}).get("fzf", True)
+        """Returns whether fzf is allowed to be used. Defaults to True of fzf is available."""
+        return self.data.get("ui", {}).get("fzf", True if shutil.which("fzf") is not None else False)
 
     @property
     def parser(self) -> SUPPORTED_PARSERS | Any:
@@ -172,6 +179,10 @@ class Config():
         }
 
         return self.data.get("http", {}).get("headers", default_headers)
+        
+    @property
+    def resolution(self) -> int:
+        return self.data.get("quality", {}).get("resolution", {})
 
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""

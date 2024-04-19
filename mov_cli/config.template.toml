@@ -6,7 +6,7 @@ debug = false
 # editor = "nano"
 skip_update_checker = false
 
-[mov-cli.ui]
+# [mov-cli.ui]
 # fzf = true
 
 [mov-cli.plugins] # E.g: namespace = "package-name"

@@ -17,11 +17,19 @@ __all__ = (
 
 class Media():
     """Represents any piece of media in mov-cli that can be streamed or downloaded."""
-    def __init__(self, url: str, title: str, referrer: Optional[str]) -> None:
+    def __init__(
+        self, 
+        url: str, 
+        title: str, 
+        audio_url: Optional[str], 
+        referrer: Optional[str]
+    ) -> None:
         self.url = url
-        """The stream-able url."""
+        """The stream-able url of the media."""
         self.title = title
         """A title to represent this stream-able media."""
+        self.audio_url = audio_url
+        """The stream-able url that provides audio for the media if the main url doesn't stream with audio."""
         self.referrer = referrer
         """The required referrer for streaming the media content."""
 
@@ -38,6 +46,7 @@ class Multi(Media):
         url: str, 
         title: str, 
         episode: EpisodeSelector, 
+        audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
         subtitles: Optional[dict] = None
     ) -> None:
@@ -46,7 +55,10 @@ class Multi(Media):
         self.subtitles = subtitles
 
         super().__init__(
-            url, title, referrer
+            url, 
+            title = title, 
+            audio_url = audio_url, 
+            referrer = referrer
         )
 
     @property
@@ -57,18 +69,22 @@ class Single(Media):
     """Represents a media with a single episode, like a Film/Movie or a YouTube video."""
     def __init__(
         self, 
-        url: str,
-        title: str,
-        referrer: Optional[str] = None,
-        year: Optional[str] = None,
-        subtitles: Optional[dict] = None
+        url: str, 
+        title: str, 
+        audio_url: Optional[str] = None, 
+        referrer: Optional[str] = None, 
+        year: Optional[str] = None, 
+        subtitles: Optional[dict] = None 
     ) -> None:
         self.year = year
         """The year this film was released."""
         self.subtitles = subtitles
 
         super().__init__(
-            url, title, referrer
+            url, 
+            title = title, 
+            audio_url = audio_url, 
+            referrer = referrer
         )
 
     @property
@@ -77,4 +93,6 @@ class Single(Media):
 
 # Backwards compatibility for post v4.3.0 extensions.
 Series = Multi
+"""DEPRECATED!!! USE 'Multi' INSTEAD! This will be removed after v4.4."""
 Movie = Single
+"""DEPRECATED!!! USE 'Single' INSTEAD! This will be removed after v4.4."""

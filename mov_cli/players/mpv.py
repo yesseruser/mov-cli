@@ -56,6 +56,9 @@ class MPV(Player):
                 if media.referrer is not None:
                     args.append(f"--referrer={media.referrer}")
 
+                if media.audio_url is not None:
+                    args.append(f"--audio-file={media.audio_url}")
+
                 if self.config.resolution:
                     args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
 
@@ -73,12 +76,15 @@ class MPV(Player):
                 if media.referrer is not None:
                     args.append(f"--mpv-referrer={media.referrer}")
 
+                if media.audio_url is not None:
+                    args.append(f"--mpv-audio-file={media.audio_url}")
+
                 if self.config.resolution:
                     args.append(f"--mpv-hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
 
                 return subprocess.Popen(args)
 
-        except ModuleNotFoundError:
+        except (ModuleNotFoundError, FileNotFoundError):
             raise errors.PlayerNotFound(self)
 
         return None

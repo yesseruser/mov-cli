@@ -60,18 +60,22 @@ class VLC(Player):
                 args = [
                     "vlc", 
                     f'--meta-title="{media.display_name}"', 
-                    media.url
+                    media.url, 
+                    "--quiet"
                 ]
 
                 if media.referrer is not None:
                     args.append(f'--http-referrer="{media.referrer}"')
+
+                if media.audio_url is not None:
+                    args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
 
                 if self.config.resolution:
                     args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas
 
                 return subprocess.Popen(args)
 
-            except ModuleNotFoundError:
+            except (ModuleNotFoundError, FileNotFoundError):
                 raise errors.PlayerNotFound(self)
 
         return None

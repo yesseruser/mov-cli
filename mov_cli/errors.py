@@ -8,6 +8,11 @@ if TYPE_CHECKING:
 from devgoldyutils import Colours
 from .logger import mov_cli_logger
 
+__all__ = (
+    "MovCliException", 
+    "PlayerNotFound"
+)
+
 class MovCliException(Exception):
     """Raises whenever there's a known error in mov-cli."""
     def __init__(self, message: str, logger: logging.Logger = None):

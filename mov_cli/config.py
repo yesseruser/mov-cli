@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict, final
+from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
     from .players import Player
@@ -48,7 +49,15 @@ class ConfigData(TypedDict):
     scrapers: ScrapersData
     plugins: Dict[str, str]
     resolution: int
-    
+
+HttpHeadersData = TypedDict(
+    "HttpHeadersData", 
+    {
+        "User-Agent": NotRequired[str],
+        "Accept-Language": NotRequired[str],
+        "Accept": NotRequired[str]
+    }
+)
 
 logger = LoggerAdapter(mov_cli_logger, prefix = "Config")
 
@@ -155,7 +164,7 @@ class Config():
             return None
 
     @property
-    def http_headers(self) -> dict:
+    def http_headers(self) -> HttpHeadersData:
         """Returns http headers."""
         default_headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0",

@@ -49,7 +49,6 @@ class ConfigData(TypedDict):
     scrapers: ScrapersData
     plugins: Dict[str, str]
     resolution: int
-    
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -139,11 +138,6 @@ class Config():
     def debug(self) -> bool:
         """Returns whether debug should be enabled or not."""
         return self.data.get("debug", False)
-
-    @property
-    def open_subtitles_key(self) -> Optional[str]:
-        """Returns the user's key for open subtitles."""
-        return self.data.get("subtitles", {}).get("open_subtitles_key", None)
 
     @property
     def proxy(self) -> dict | None:

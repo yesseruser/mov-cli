@@ -4,16 +4,20 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Optional
 
-    from ..media import Media
     from .. import Config
+    from pathlib import Path
+    from ..media import Media
     from ..utils.platform import SUPPORTED_PLATFORMS
 
+import httpx
 import subprocess
+import unicodedata
 from devgoldyutils import Colours, LoggerAdapter
 
 from .. import errors
-from ..logger import mov_cli_logger
 from .player import Player
+from ..logger import mov_cli_logger
+from ..utils import get_temp_directory
 
 __all__ = ("VLC",)
 
@@ -28,7 +32,6 @@ class VLC(Player):
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the VLC media player."""
-
         logger.info("Launching VLC Media Player...")
 
         if self.platform == "Android":
@@ -46,8 +49,6 @@ class VLC(Player):
             )
 
         elif self.platform == "iOS":
-            logger.debug("Detected your using iOS. \r\n")
-
             with open('/dev/clipboard', 'w') as f:
                 f.write(f"vlc://{media.url}")
 
@@ -73,10 +74,9 @@ class VLC(Player):
                 if media.subtitles is not None:
                     subtitles = media.subtitles
 
-                    if media.subtitles.startswith("https://"):
-                        # TODO: If it's a url download the subtitles 
-                        # to a temporary directory then give the path to vlc.
-                        ...
+                    if subtitles.startswith("https://"):
+                        logger.debug("Subtitles detected as a url.")
+                        subtitles = str(self.__url_subtitles_to_file(media, subtitles))
 
                     args.append(f"--sub-file={subtitles}")
 
@@ -89,3 +89,27 @@ class VLC(Player):
                 raise errors.PlayerNotFound(self)
 
         return None
+
+    def __url_subtitles_to_file(self, media: Media, subtitles_url: str) -> Path:
+        sub_file_exists_already = False
+        temp_dir = get_temp_directory(self.platform)
+
+        file_name = unicodedata.normalize("NFKD", media.display_name).encode("ascii", "ignore").decode("ascii")
+
+        for path in temp_dir.iterdir():
+
+            if path.name == file_name:
+                sub_file_exists_already = True
+                logger.debug("Subtitles already exists in temp directory, skipping download...")
+                break
+
+        file_path = temp_dir.joinpath(file_name)
+
+        if sub_file_exists_already is False:
+            logger.debug("Downloading subtitles to temp directory as vlc does not support streaming of subs via url...")
+            response = httpx.get(url = subtitles_url)
+
+            with file_path.open("wb") as file:
+                file.write(response.content)
+
+        return file_path

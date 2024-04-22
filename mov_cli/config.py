@@ -18,6 +18,7 @@ from devgoldyutils import LoggerAdapter
 
 from . import players, utils
 from .logger import mov_cli_logger
+from .utils import get_appdata_directory
 
 __all__ = ("Config", )
 
@@ -182,30 +183,9 @@ class Config():
         """Function that returns the path to the config file with multi platform support."""
         platform = utils.what_platform()
 
-        appdata_dir = Path("./mov-cli-temp")
+        appdata_folder = get_appdata_directory(platform)
 
-        if platform == "Windows":
-            user_profile = Path(os.getenv("USERPROFILE"))
-            appdata_dir = user_profile.joinpath("AppData", "Local")
-
-        elif platform == "Darwin": # NOTE: Path maybe incorrect
-            user_profile = Path.home()
-            appdata_dir = user_profile.joinpath("Library", "Application Support")
-
-        elif platform == "iOS":
-            user_profile = Path(os.getenv("HOME"))
-            appdata_dir = user_profile.joinpath("Library")
-
-            appdata_dir.mkdir(exist_ok = True)
-
-        elif platform == "Linux" or platform == "Android":
-            user_profile = Path(os.getenv("HOME"))
-            appdata_dir = user_profile.joinpath(".config")
- 
-            appdata_dir.mkdir(exist_ok = True) # on android the .config file may not exist.
-
-        config_path = appdata_dir.joinpath("mov-cli", "config.toml")
-        config_path.parent.mkdir(exist_ok = True)
+        config_path = appdata_folder.joinpath("config.toml")
 
         if not config_path.exists():
             logger.debug("The 'config.toml' file doesn't exist so we're creating it...")

@@ -101,6 +101,8 @@ class Config():
             return players.MPV(platform, self)
         elif value.lower() == "vlc":
             return players.VLC(platform, self)
+        elif value.lower() == "syncplay":
+            return players.SyncPlay(platform, self)
 
         return players.CustomPlayer(value)
 

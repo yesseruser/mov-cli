@@ -93,7 +93,9 @@ def mov_cli(
             )
             return False
 
-        chosen_scraper = use_scraper(selected_scraper, config, http_client, scrape_options)
+        selected_scraper[2].update(scrape_options)
+
+        chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
         choice = search(query, auto_select, chosen_scraper, config.fzf_enabled)
 

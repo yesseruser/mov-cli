@@ -4,10 +4,16 @@ from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
     from .players import Player
-    from typing import Dict, Union, Literal, Any, Optional
+    from typing import Dict, Literal, Any, Optional
 
-    JSON_VALUES = Union[str, bool, int, dict]
-    SUPPORTED_PARSERS = Literal["lxml", "html.parser"]
+    SupportedParsersT = Literal["lxml", "html.parser"]
+
+    @final
+    class ScraperData(TypedDict):
+        namespace: str
+        options: Dict[str, str | bool]
+
+    ScrapersConfigT = Dict[Literal["default"], str] | Dict[str, ScraperData]
 
 import os
 import toml
@@ -20,7 +26,7 @@ from . import players, utils
 from .logger import mov_cli_logger
 from .utils import get_appdata_directory
 
-__all__ = ("Config", )
+__all__ = ("Config",)
 
 @final
 class ConfigUIData(TypedDict):
@@ -35,19 +41,16 @@ class ConfigDownloadsData(TypedDict):
     save_path: str
 
 @final
-class ScrapersData(TypedDict):
-    default: str
-
-@final
 class ConfigData(TypedDict):
     version: int
     debug: bool
     player: str
-    parser: SUPPORTED_PARSERS
+    editor: str
+    parser: SupportedParsersT
     ui: ConfigUIData
     http: ConfigHTTPData
     downloads: ConfigDownloadsData
-    scrapers: ScrapersData | Dict[str, str]
+    scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
     resolution: int
 
@@ -106,13 +109,32 @@ class Config():
         return self.data.get("plugins", {"test": "mov-cli-test"})
 
     @property
-    def scrapers(self) -> ScrapersData | Dict[str, str]:
-        return self.data.get("scrapers", {})
+    def scrapers(self) -> ScrapersConfigT:
+        scrapers = self.data.get("scrapers", {})
+
+        consistent_scrapers: Dict[str, ScraperData] = {}
+
+        for scraper, plugin_namespace_or_dict in scrapers.items():
+
+            if scraper == "default":
+                consistent_scrapers["default"] = plugin_namespace_or_dict
+
+            elif isinstance(plugin_namespace_or_dict, str):
+                consistent_scrapers[scraper] = {"namespace": plugin_namespace_or_dict, "options": {}}
+
+            else:
+                dict = plugin_namespace_or_dict
+                consistent_scrapers[scraper] = {
+                    "namespace": dict["namespace"], 
+                    "options": dict["options"]
+                }
+
+        return consistent_scrapers
 
     @property
     def editor(self) -> Optional[str]:
         """Returns the editor that should be opened while editing."""
-        return self.data.get("editor")
+        return self.data.get("editor", None)
 
     @property
     def skip_update_checker(self) -> bool:
@@ -129,7 +151,7 @@ class Config():
         return self.data.get("ui", {}).get("fzf", True if shutil.which("fzf") is not None else False)
 
     @property
-    def parser(self) -> SUPPORTED_PARSERS | Any:
+    def parser(self) -> SupportedParsersT | Any:
         """Returns the parser type configured by the user else it just returns the default."""
         default_parser = "lxml" if find_spec("lxml") else "html.parser"
         return self.data.get("parser", default_parser)

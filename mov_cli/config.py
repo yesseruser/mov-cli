@@ -202,10 +202,10 @@ class Config():
         }
 
         return self.data.get("http", {}).get("headers", default_headers)
-        
+
     @property
-    def resolution(self) -> int:
-        return self.data.get("quality", {}).get("resolution", {})
+    def resolution(self) -> Optional[int]:
+        return self.data.get("quality", {}).get("resolution")
 
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""

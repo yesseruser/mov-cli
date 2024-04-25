@@ -69,7 +69,7 @@ def mov_cli(
     welcome_message = welcome_msg(
         plugins = plugins, 
         check_for_updates = True if query is None and config.skip_update_checker is False else False, 
-        display_hint = True if query is None else False, 
+        display_tip = True if query is None else False, 
         display_version = version
     )
 

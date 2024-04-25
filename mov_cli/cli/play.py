@@ -25,6 +25,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
     chosen_player = config.player
 
     mov_cli_logger.info(f"Playing '{Colours.BLUE.apply(media.display_name)}' with the '{chosen_player.__class__.__name__}' player...")
+    mov_cli_logger.debug(f"Streaming with this url -> '{media.url}'")
 
     popen = chosen_player.play(media)
 
@@ -35,8 +36,6 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
         )
 
         return False
-
-    mov_cli_logger.debug(f"Streaming with this url -> '{media.url}'")
 
     option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
 

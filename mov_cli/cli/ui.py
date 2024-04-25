@@ -10,12 +10,15 @@ if TYPE_CHECKING:
     T = TypeVar('T')
 
 import re
+import os
+import json
 import types
 import random
 import logging
 import getpass
 import inquirer
 import itertools
+from pathlib import Path
 from datetime import datetime
 from inquirer.themes import Default
 from devgoldyutils import Colours, LoggerAdapter
@@ -153,12 +156,19 @@ def greetings() -> Tuple[Literal["Good Morning", "Good Afternoon", "Good Evening
     return greeting, user_name
 
 # This function below is inspired by animdl: https://github.com/justfoolingaround/animdl
-def welcome_msg(plugins: Dict[str, str], check_for_updates: bool = False, display_hint: bool = False, display_version: bool = False) -> str:
+def welcome_msg(
+    plugins: Dict[str, str], 
+    check_for_updates: bool = False, 
+    display_tip: bool = False, 
+    display_version: bool = False
+) -> str:
     """Returns cli welcome message."""
     now = datetime.now()
     adjective = random.choice(
         ("gorgeous", "wonderful", "beautiful", "magnificent")
     )
+
+    random_tips_path = Path(os.path.split(__file__)[0]).joinpath("random_tips.json")
 
     greeting, user_name = greetings()
 
@@ -167,9 +177,17 @@ def welcome_msg(plugins: Dict[str, str], check_for_updates: bool = False, displa
         f"\n    It's {Colours.BLUE}%I:%M %p {Colours.RESET}on a {Colours.PURPLE}{adjective} {Colours.PINK_GREY}%A! {Colours.RESET}"
     )
 
-    if display_hint is True and display_version is False:
-        text += f"\n\n- Hint: {Colours.CLAY}mov-cli {Colours.PINK_GREY}-s films {Colours.ORANGE}mr.robot{Colours.RESET}" \
-            f"\n- Hint: {Colours.CLAY}mov-cli {Colours.PINK_GREY}-s anime {Colours.ORANGE}chuunibyou demo take on me{Colours.RESET}"
+    if display_tip and display_version is False:
+
+        if random.randint(0, 1) == 0:
+            text += f"\n\n- {Colours.BLUE}Hint: {Colours.RESET}mov-cli {Colours.PINK_GREY}-s films {Colours.ORANGE}mr.robot{Colours.RESET}" \
+                f"\n- {Colours.BLUE}Hint: {Colours.RESET}mov-cli {Colours.PINK_GREY}-s anime {Colours.ORANGE}chuunibyou demo take on me{Colours.RESET}"
+
+        else:
+            random_tips_json: List[str] = json.load(random_tips_path.open("r")) # TODO: This should be cached after the caching system is implemented.
+            random_tip = random.choice(random_tips_json)
+
+            text += f"\n\n- {Colours.ORANGE}TIP: {Colours.RESET}{random_tip}"
 
     if display_version is True:
         text += f"\n\n{Colours.CLAY}-> {Colours.RESET}Version: {Colours.BLUE}{mov_cli.__version__}{Colours.RESET}"

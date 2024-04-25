@@ -47,7 +47,7 @@ class ConfigData(TypedDict):
     ui: ConfigUIData
     http: ConfigHTTPData
     downloads: ConfigDownloadsData
-    scrapers: ScrapersData
+    scrapers: ScrapersData | Dict[str, str]
     plugins: Dict[str, str]
     resolution: int
 
@@ -104,6 +104,10 @@ class Config():
     @property
     def plugins(self) -> Dict[str, str]:
         return self.data.get("plugins", {"test": "mov-cli-test"})
+
+    @property
+    def scrapers(self) -> ScrapersData | Dict[str, str]:
+        return self.data.get("scrapers", {})
 
     @property
     def editor(self) -> Optional[str]:

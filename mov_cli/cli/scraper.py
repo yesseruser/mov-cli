@@ -46,11 +46,11 @@ def use_scraper(
 
     return chosen_scraper
 
-def select_scraper(plugins: Dict[str, str], fzf_enabled: bool, default_scraper: Optional[str] = None) -> Optional[Tuple[str, Type[Scraper]]]:
+def select_scraper(plugins: Dict[str, str], scrapers: Dict[str, str], fzf_enabled: bool, default_scraper: Optional[str] = None) -> Optional[Tuple[str, Type[Scraper]]]:
     plugins_data = get_plugins_data(plugins)
 
     if default_scraper is not None:
-        scraper_name, scraper_or_available_scrapers = get_scraper(default_scraper, plugins_data)
+        scraper_name, scraper_or_available_scrapers = get_scraper(default_scraper, plugins_data, scrapers)
 
         if scraper_name is None:
             mov_cli_logger.error(
@@ -101,16 +101,23 @@ def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
         [(x.replace("--", "").replace("-", "_"), True) for x in scrape_arguments]
     )
 
-def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
+def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]], user_defined_scrapers: Dict[str, str]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
+    # scraper namespace override.
+    for scraper_namespace in user_defined_scrapers:
+
+        if scraper_id.lower() == scraper_namespace.lower():
+            mov_cli_logger.debug(f"Using the scraper overridden namespace '{scraper_namespace}'...")
+            scraper_id = user_defined_scrapers[scraper_namespace]
+
     for plugin_namespace, _, plugin_hook_data in plugins_data:
-        scrapers = plugin_hook_data["scrapers"]
+        plugin_scrapers = plugin_hook_data["scrapers"]
 
-        if scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in scrapers:
-            return f"{plugin_namespace}.DEFAULT", scrapers["DEFAULT"]
+        if scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in plugin_scrapers:
+            return f"{plugin_namespace}.DEFAULT", plugin_scrapers["DEFAULT"]
 
-        for scraper_name, scraper in scrapers.items():
+        for scraper_name, scraper in plugin_scrapers.items():
             id = f"{plugin_namespace}.{scraper_name}".lower()
 
             available_scrapers.append(id)

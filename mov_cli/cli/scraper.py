@@ -71,7 +71,7 @@ def select_scraper(plugins: Dict[str, str], fzf_enabled: bool, default_scraper: 
     )
 
     if chosen_plugin is not None:
-        plugin_namespace, _, plugin_data = chosen_plugin
+        plugin_namespace, _, plugin_data, plugin = chosen_plugin
 
         chosen_scraper = prompt(
             "Select a scraper", 
@@ -104,7 +104,7 @@ def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
 def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
-    for plugin_namespace, _, plugin_hook_data in plugins_data:
+    for plugin_namespace, _, plugin_hook_data, plugin in plugins_data:
         scrapers = plugin_hook_data["scrapers"]
 
         if scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in scrapers:

@@ -17,6 +17,7 @@ from devgoldyutils import Colours
 from .ui import prompt
 from .plugins import get_plugins_data, handle_internal_plugin_error
 
+from ..utils import what_platform
 from ..logger import mov_cli_logger
 
 def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Media:
@@ -90,24 +91,52 @@ def select_scraper(plugins: Dict[str, str], fzf_enabled: bool, default_scraper: 
     return None
 
 def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
-    scrape_arguments = [x for x in query if "--" in x]
+    args_to_kidnap: List[str] = []
+    arg_values_to_kidnap: List[str] = []
 
-    mov_cli_logger.debug(f"Scraper args picked up on --> {scrape_arguments}")
+    scraper_options_args: List[Tuple[str, str | bool]] = []
 
-    for scrape_arg in scrape_arguments:
-        query.remove(scrape_arg)
+    for index, arg in enumerate(query):
 
-    return dict(
-        [(x.replace("--", "").replace("-", "_"), True) for x in scrape_arguments]
-    )
+        if arg.startswith("--"):
+            arg_value = True
+
+            try:
+                arg_value_maybe = query[index + 1]
+
+                if not arg_value_maybe.startswith("--"):
+                    arg_value = arg_value_maybe
+
+                    arg_values_to_kidnap.append(arg_value)
+
+            except IndexError as e:
+                mov_cli_logger.debug(
+                    f"No scraper option argument value was found after '{arg}' so we'll assume this argument is a flag. \nError: {e}"
+                )
+
+            args_to_kidnap.append(arg)
+            scraper_options_args.append((arg.replace("--", "").replace("-", "_"), arg_value))
+
+    # KIDNAP THEM ARGS!!!!!
+    for arg_or_arg_value in args_to_kidnap + arg_values_to_kidnap:
+        query.remove(arg_or_arg_value)
+
+    mov_cli_logger.debug(f"Scraper args picked up on --> {scraper_options_args}")
+
+    return dict(scraper_options_args)
 
 def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
+    platform = what_platform().upper()
+
     for plugin_namespace, _, plugin_hook_data, plugin in plugins_data:
         scrapers = plugin_hook_data["scrapers"]
 
-        if scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in scrapers:
+        if scraper_id.lower() == plugin_namespace.lower() and f"{platform}.DEFAULT" in scrapers:
+            return f"{plugin_namespace}.{platform}.DEFAULT", scrapers[f"{platform}.DEFAULT"]
+
+        elif scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in scrapers:
             return f"{plugin_namespace}.DEFAULT", scrapers["DEFAULT"]
 
         for scraper_name, scraper in scrapers.items():

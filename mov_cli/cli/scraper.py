@@ -17,6 +17,7 @@ from devgoldyutils import Colours
 from .ui import prompt
 from .plugins import get_plugins_data, handle_internal_plugin_error
 
+from ..utils import what_platform
 from ..logger import mov_cli_logger
 
 def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Media:
@@ -104,10 +105,15 @@ def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
 def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
+    platform = what_platform().upper()
+
     for plugin_namespace, _, plugin_hook_data, plugin in plugins_data:
         scrapers = plugin_hook_data["scrapers"]
 
-        if scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in scrapers:
+        if scraper_id.lower() == plugin_namespace.lower() and f"{platform}.DEFAULT" in scrapers:
+            return f"{plugin_namespace}.{platform}.DEFAULT", scrapers[f"{platform}.DEFAULT"]
+
+        elif scraper_id.lower() == plugin_namespace.lower() and "DEFAULT" in scrapers:
             return f"{plugin_namespace}.DEFAULT", scrapers["DEFAULT"]
 
         for scraper_name, scraper in scrapers.items():

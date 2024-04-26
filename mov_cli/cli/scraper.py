@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..http_client import HTTPClient
     from ..utils.episode_selector import EpisodeSelector
 
-    from ..plugins import PluginHookData
+    from .plugins import PluginsDataT
     from ..scraper import Scraper, ScraperOptionsT
 
 from devgoldyutils import Colours
@@ -125,13 +125,13 @@ def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
 
     return dict(scraper_options_args)
 
-def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
+def get_scraper(scraper_id: str, plugins_data: PluginsDataT) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
     platform = what_platform().upper()
 
-    for plugin_namespace, _, plugin_hook_data, plugin in plugins_data:
-        scrapers = plugin_hook_data["scrapers"]
+    for plugin_namespace, _, plugin in plugins_data:
+        scrapers = plugin.hook_data["scrapers"]
 
         if scraper_id.lower() == plugin_namespace.lower() and f"{platform}.DEFAULT" in scrapers:
             return f"{plugin_namespace}.{platform}.DEFAULT", scrapers[f"{platform}.DEFAULT"]

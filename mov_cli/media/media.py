@@ -92,9 +92,9 @@ class Single(Media):
 
     @property
     def display_name(self) -> str:
-        return f"{self.title} ({self.year})"
+        return f"{self.title} ({self.year})" if self.year is not None else self.title
 
-# Backwards compatibility for post v4.3.0 extensions.
+# Backwards compatibility for post v4.3 extensions.
 Series = Multi
 """DEPRECATED!!! USE 'Multi' INSTEAD! This will be removed after v4.4."""
 Movie = Single

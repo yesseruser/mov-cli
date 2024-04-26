@@ -83,11 +83,11 @@ def select_scraper(plugins: Dict[str, str], fzf_enabled: bool, default_scraper: 
     )
 
     if chosen_plugin is not None:
-        plugin_namespace, _, plugin_data, plugin = chosen_plugin
+        plugin_namespace, _, plugin = chosen_plugin
 
         chosen_scraper = prompt(
             "Select a scraper", 
-            choices = [scraper for scraper in plugin_data["scrapers"].items()], 
+            choices = [scraper for scraper in plugin.scrapers], 
             display = lambda x: Colours.BLUE.apply(x[0].lower()), 
             fzf_enabled = fzf_enabled
         )

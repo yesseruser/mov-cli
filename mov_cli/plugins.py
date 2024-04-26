@@ -49,6 +49,10 @@ class Plugin:
 
         return non_default_scrapers
 
+    @property
+    def version(self) -> Optional[str]:
+        return getattr(self.module, "__version__", None)
+
 def load_plugin(module_name: str) -> Optional[Plugin]:
     try:
         plugin_module = importlib.import_module(module_name.replace("-", "_"))

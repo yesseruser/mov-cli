@@ -63,7 +63,7 @@ build-backend = "setuptools.build_meta"
 include = ["mov_cli*"]
 
 [tool.setuptools.package-data]
-"mov_cli" = ["config.template.toml"]
+"mov_cli" = ["config.template.toml", "cli/random_tips.json"]
 
 [project.scripts]
 mov-cli = "mov_cli.cli.__main__:app"

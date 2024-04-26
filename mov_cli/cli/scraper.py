@@ -4,14 +4,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type, Optional, Tuple, List, Dict
 
+    from .plugins import PluginsDataT
+
     from ..config import Config
     from ..media import Metadata, Media
     from ..http_client import HTTPClient
     from ..utils.episode_selector import EpisodeSelector
 
-    from ..plugins import PluginHookData
     from ..scraper import Scraper, ScraperOptionsT
 
+from thefuzz import fuzz
 from devgoldyutils import Colours
 
 from .ui import prompt
@@ -56,9 +58,18 @@ def select_scraper(plugins: Dict[str, str], fzf_enabled: bool, default_scraper: 
         if scraper_name is None:
             mov_cli_logger.error(
                 f"Could not find a scraper by the id '{default_scraper}'! Are you sure the plugin is installed and in your config? " \
-                    "Read the wiki for more on that: 'https://github.com/mov-cli/mov-cli/wiki#plugins'." \
-                    f"\n\n  {Colours.GREEN}Available Scrapers{Colours.RESET} -> {scraper_or_available_scrapers}"
+                    "Read the wiki for more on that: 'https://github.com/mov-cli/mov-cli/wiki#plugins'."
             )
+
+            scrapers_beautifully_formatted = Colours.ORANGE.apply(f"{f'{Colours.RESET} | {Colours.ORANGE}'.join(scraper_or_available_scrapers)}")
+
+            print(f"\nAvailable Scrapers -> {scrapers_beautifully_formatted}")
+
+            did_you_mean_these = [(x, fuzz.ratio(default_scraper, x)) for x in scraper_or_available_scrapers]
+            did_you_mean_these.sort(key = lambda x: x[1], reverse = True)
+
+            if len(did_you_mean_these) > 0:
+                print(Colours.PURPLE.apply(f"\n* Did you mean: {Colours.GREEN}{did_you_mean_these[0][0]}\n"))
 
             return None
 
@@ -125,13 +136,13 @@ def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
 
     return dict(scraper_options_args)
 
-def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]]) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
+def get_scraper(scraper_id: str, plugins_data: PluginsDataT) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]]]:
     available_scrapers = []
 
     platform = what_platform().upper()
 
-    for plugin_namespace, _, plugin_hook_data, plugin in plugins_data:
-        scrapers = plugin_hook_data["scrapers"]
+    for plugin_namespace, _, plugin in plugins_data:
+        scrapers = plugin.hook_data["scrapers"]
 
         if scraper_id.lower() == plugin_namespace.lower() and f"{platform}.DEFAULT" in scrapers:
             return f"{plugin_namespace}.{platform}.DEFAULT", scrapers[f"{platform}.DEFAULT"]

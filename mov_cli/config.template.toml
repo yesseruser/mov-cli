@@ -11,7 +11,7 @@ skip_update_checker = false
 
 [mov-cli.plugins] # E.g: namespace = "package-name"
 test = "mov-cli-test"
-ip
+
 # [mov-cli.scrapers]
 # default = "films"
 

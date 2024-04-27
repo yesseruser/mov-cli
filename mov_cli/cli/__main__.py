@@ -126,7 +126,9 @@ def mov_cli(
             mov_cli_logger.debug(f"Downloading from this url -> '{media.url}'")
 
             popen = dl.download(media)
-            popen.wait()
+            
+            if popen:
+                popen.wait()
 
         else:
             option = play(media, choice, chosen_scraper, chosen_episode, config)

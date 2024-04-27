@@ -33,6 +33,7 @@ class ConfigHTTPData(TypedDict):
 @final
 class ConfigDownloadsData(TypedDict):
     save_path: str
+    yt_dlp: bool
 
 @final
 class ScrapersData(TypedDict):
@@ -136,6 +137,11 @@ class Config():
     def download_location(self) -> str:
         """Returns download location. Defaults to OS's download location."""
         return self.data.get("downloads", {}).get("save_path", os.getcwd())
+    
+    @property
+    def use_yt_dlp(self) -> str:
+        """Returns if yt-dlp should be used. Defaults to True."""
+        return self.data.get("downloads", {}).get("yt_dlp", True)
 
     @property
     def debug(self) -> bool:

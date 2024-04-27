@@ -34,8 +34,8 @@ class Download():
 
             ydl_options = {
                 "outtmpl": file,
-                "add_header": f"Referer: {media.referrer}",
-                "quiet": not self.config.debug
+                "quiet": not self.config.debug,
+                "http_headers": {"Referer": media.referrer}
             }
 
             with yt_dlp.YoutubeDL(ydl_options) as ydl:
@@ -44,7 +44,6 @@ class Download():
             return None
 
         else:
-
             self.logger.debug("Using FFmpeg as the URL was either not a m3u8 or yt-dlp is not installed")
             
 

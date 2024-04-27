@@ -135,11 +135,11 @@ class Config():
 
     @property
     def download_location(self) -> str:
-        """Returns download location. Defaults to OS's download location."""
+        """Returns download location. Defaults to current working directory."""
         return self.data.get("downloads", {}).get("save_path", os.getcwd())
-    
+
     @property
-    def use_yt_dlp(self) -> str:
+    def use_yt_dlp(self) -> bool:
         """Returns if yt-dlp should be used. Defaults to True."""
         return self.data.get("downloads", {}).get("yt_dlp", True)
 

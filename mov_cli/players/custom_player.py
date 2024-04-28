@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 import subprocess
 from devgoldyutils import Colours, LoggerAdapter
 
-from .. import errors
 from ..logger import mov_cli_logger
 from .player import Player
 
@@ -26,11 +25,8 @@ class CustomPlayer(Player):
 
     def play(self, media: Media) -> subprocess.Popen:
         """Plays this media in a custom player."""
-        logger.info(f"Launching your custom media player '{self.player_command}'...")
+        logger.debug(f"Launching your custom media player '{self.player_command}'...")
 
-        try:
-            return subprocess.Popen(
-                [self.player_command, media.url]
-            )
-        except ModuleNotFoundError:
-            raise errors.PlayerNotFound(self)
+        return subprocess.Popen(
+            [self.player_command, media.url]
+        )

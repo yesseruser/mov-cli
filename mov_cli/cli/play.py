@@ -39,15 +39,22 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
     )
     mov_cli_logger.debug(f"Streaming with this url -> '{media.url}'")
 
-    popen = chosen_player.play(media)
+    try:
+        popen = chosen_player.play(media)
+    except FileNotFoundError as e:
+        mov_cli_logger.error(
+            f"The player '{chosen_player.display_name}' was not found! " \
+                f"Are you sure you have it installed? Are you sure it's in path? \nError: {e}"
+        )
+        return None
 
     if popen is None and platform != "iOS":
         mov_cli_logger.error(
-            f"The player '{config.player.__class__.__name__.lower()}' is not supported on this platform ({platform}). " \
-            "We recommend VLC for iOS and MPV for every other platform."
+            f"The player '{chosen_player.display_name}' is not supported on this platform ({platform}). " \
+            "We recommend VLC for iOS, IINA for MacOS and MPV for every other platform."
         )
 
-        return False
+        return None
 
     option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
 

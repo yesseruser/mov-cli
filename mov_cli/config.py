@@ -100,6 +100,8 @@ class Config():
             return players.VLC(platform, self)
         elif value.lower() == "syncplay":
             return players.SyncPlay(platform, self)
+        elif value.lower() == "iina":
+            return players.IINA(platform, self)
 
         return players.CustomPlayer(value)
 

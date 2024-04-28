@@ -14,7 +14,6 @@ import subprocess
 import unicodedata
 from devgoldyutils import Colours, LoggerAdapter
 
-from .. import errors
 from .player import Player
 from ..logger import mov_cli_logger
 from ..utils import get_temp_directory
@@ -28,11 +27,10 @@ class VLC(Player):
         self.platform = platform
         self.config = config
 
-        super().__init__(**kwargs)
+        super().__init__(display_name = Colours.ORANGE.apply("VLC"), **kwargs)
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the VLC media player."""
-        logger.info("Launching VLC Media Player...")
 
         if self.platform == "Android":
             return subprocess.Popen(
@@ -57,36 +55,32 @@ class VLC(Player):
             return None
 
         elif self.platform == "Linux" or self.platform == "Windows":
-            try:
-                args = [
-                    "vlc", 
-                    f'--meta-title="{media.display_name}"', 
-                    media.url, 
-                    "--quiet"
-                ]
+            args = [
+                "vlc", 
+                f'--meta-title="{media.display_name}"', 
+                media.url, 
+                "--quiet"
+            ]
 
-                if media.referrer is not None:
-                    args.append(f'--http-referrer="{media.referrer}"')
+            if media.referrer is not None:
+                args.append(f'--http-referrer="{media.referrer}"')
 
-                if media.audio_url is not None:
-                    args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
+            if media.audio_url is not None:
+                args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
 
-                if media.subtitles is not None:
-                    subtitles = media.subtitles
+            if media.subtitles is not None:
+                subtitles = media.subtitles
 
-                    if subtitles.startswith("https://"):
-                        logger.debug("Subtitles detected as a url.")
-                        subtitles = str(self.__url_subtitles_to_file(media, subtitles))
+                if subtitles.startswith("https://"):
+                    logger.debug("Subtitles detected as a url.")
+                    subtitles = str(self.__url_subtitles_to_file(media, subtitles))
 
-                    args.append(f"--sub-file={subtitles}")
+                args.append(f"--sub-file={subtitles}")
 
-                if self.config.resolution is not None:
-                    args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas
+            if self.config.resolution is not None:
+                args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas
 
-                return subprocess.Popen(args)
-
-            except (ModuleNotFoundError, FileNotFoundError):
-                raise errors.PlayerNotFound(self)
+            return subprocess.Popen(args)
 
         return None
 

@@ -8,75 +8,63 @@ if TYPE_CHECKING:
     from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
-from devgoldyutils import Colours, LoggerAdapter
+from devgoldyutils import Colours
 
-from .. import errors
-from ..logger import mov_cli_logger
 from .player import Player
 
 __all__ = ("SyncPlay",)
-
-logger = LoggerAdapter(mov_cli_logger, prefix = Colours.PURPLE.apply("SyncPlay"))
 
 class SyncPlay(Player):
     def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
         self.platform = platform
         self.config = config
 
-        super().__init__(display_name = "Syncplay", **kwargs)
+        super().__init__(display_name = Colours.BLUE.apply("Syncplay"), **kwargs)
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in SyncPlay."""
+        if self.platform == "Windows" or self.platform == "Linux":
+            args = [
+                "syncplay",
+                media.url,
+                "--",
+                f"--force-media-title={media.display_name}",
+            ]
 
-        logger.info("Launching SyncPlay...")
+            if media.referrer is not None:
+                args.append(f"--referrer={media.referrer}")
 
-        try:
+            if media.audio_url is not None:
+                args.append(f"--audio-file={media.audio_url}")
 
-            if self.platform == "Windows" or self.platform == "Linux":
-                args = [
-                    "syncplay",
-                    media.url,
-                    "--",
-                    f"--force-media-title={media.display_name}",
-                ]
+            if media.subtitles is not None:
+                args.append(f"--sub-file={media.subtitles}")
 
-                if media.referrer is not None:
-                    args.append(f"--referrer={media.referrer}")
+            if self.config.resolution is not None:
+                args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: Only M3U8
 
-                if media.audio_url is not None:
-                    args.append(f"--audio-file={media.audio_url}")
+            return subprocess.Popen(args)
 
-                if media.subtitles is not None:
-                    args.append(f"--sub-file={media.subtitles}")
+        elif self.platform == "Darwin": # NOTE: Limits you to IINA
+            args = [
+                "syncplay",
+                media.url,
+                "--",
+                f"--mpv-force-media-title={media.display_name}",
+            ]
 
-                if self.config.resolution is not None:
-                    args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: Only M3U8
+            if media.referrer is not None:
+                args.append(f"--mpv-referrer={media.referrer}")
 
-                return subprocess.Popen(args)
+            if media.audio_url is not None: # TODO: This will need testing.
+                args.append(f"--mpv-audio-file={media.audio_url}")
 
-            elif self.platform == "Darwin": # NOTE: Limits you to IINA
-                args = [
-                    "syncplay",
-                    media.url,
-                    "--",
-                    f"--mpv-force-media-title={media.display_name}",
-                ]
+            if media.subtitles is not None: # TODO: This will need testing.
+                args.append(f"--mpv-sub-file={media.subtitles}")
 
-                if media.referrer is not None:
-                    args.append(f"--mpv-referrer={media.referrer}")
+            if self.config.resolution is not None: # TODO: This will need testing.
+                args.append(f"--mpv-hls-bitrate={self.config.resolution}")
 
-                if media.audio_url is not None: # TODO: This will need testing.
-                    args.append(f"--mpv-audio-file={media.audio_url}")
-
-                if media.subtitles is not None: # TODO: This will need testing.
-                    args.append(f"--mpv-sub-file={media.subtitles}")
-
-                if self.config.resolution is not None: # TODO: This will need testing.
-                    args.append(f"--mpv-hls-bitrate={self.config.resolution}")
-
-                return subprocess.Popen(args)
-
-        except (ModuleNotFoundError, FileNotFoundError):
-            raise errors.PlayerNotFound(self)
+            return subprocess.Popen(args)
 
         return None

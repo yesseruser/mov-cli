@@ -23,7 +23,7 @@ class SyncPlay(Player):
         self.platform = platform
         self.config = config
 
-        super().__init__(**kwargs)
+        super().__init__(display_name = "Syncplay", **kwargs)
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in SyncPlay."""

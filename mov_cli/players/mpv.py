@@ -27,7 +27,6 @@ class MPV(Player):
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the MPV media player."""
-
         logger.info("Launching MPV Media Player...")
 
         if self.platform == "Android":

@@ -16,6 +16,7 @@ from .scraper import scrape
 from .episode import handle_episode
 from .watch_options import watch_options
 
+from ..media import MetadataType
 from ..utils import what_platform
 from ..logger import mov_cli_logger
 
@@ -24,7 +25,18 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
     chosen_player = config.player
 
-    mov_cli_logger.info(f"Playing '{Colours.BLUE.apply(media.display_name)}' with the '{chosen_player.__class__.__name__}' player...")
+    episode_details_string = ""
+
+    if metadata.type == MetadataType.MULTI:
+        season_string = Colours.CLAY.apply(str(episode.season))
+        episode_string = Colours.ORANGE.apply(str(episode.episode))
+
+        episode_details_string = f"episode {episode_string} in season {season_string} of " if episode.season > 1 else f"episode {episode_string} of "
+
+    mov_cli_logger.info(
+        f"Playing {episode_details_string}'{Colours.BLUE.apply(media.title)}' " \
+            f"with {chosen_player.display_name}..."
+    )
     mov_cli_logger.debug(f"Streaming with this url -> '{media.url}'")
 
     popen = chosen_player.play(media)

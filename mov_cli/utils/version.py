@@ -55,7 +55,7 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
         plugin_version = plugin.version
         pypi_package_name = plugin.hook_data.get("package_name", None)
 
-        if plugin_version is not None:
+        if plugin_version is None:
             logger.debug(
                 f"The plugin '{module_name}' doesn't expose '__version__' in" \
                     "it's root module ('__init__.py') so it the update checker will skip it."

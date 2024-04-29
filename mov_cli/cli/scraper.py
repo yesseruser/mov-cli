@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from ..media import Metadata, Media
     from ..http_client import HTTPClient
     from ..utils.episode_selector import EpisodeSelector
-
     from ..scraper import Scraper, ScraperOptionsT
 
 from thefuzz import fuzz

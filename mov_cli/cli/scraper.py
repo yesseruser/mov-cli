@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..config import Config, ScrapersConfigT
     from ..utils.episode_selector import EpisodeSelector
 
-    from ..plugins import PluginHookData
+    from .plugins import PluginsDataT
     from ..scraper import Scraper, ScraperOptionsT
 
 from devgoldyutils import Colours
@@ -71,11 +71,11 @@ def select_scraper(plugins: Dict[str, str], scrapers: ScrapersConfigT, fzf_enabl
     )
 
     if chosen_plugin is not None:
-        plugin_namespace, _, plugin_data, plugin = chosen_plugin
+        plugin_namespace, _, plugin = chosen_plugin
 
         chosen_scraper = prompt(
             "Select a scraper", 
-            choices = [scraper for scraper in plugin_data["scrapers"].items()], 
+            choices = [scraper for scraper in plugin.scrapers], 
             display = lambda x: Colours.BLUE.apply(x[0].lower()), 
             fzf_enabled = fzf_enabled
         )
@@ -124,7 +124,7 @@ def steal_scraper_args(query: List[str]) -> ScraperOptionsT:
 
     return dict(scraper_options_args)
 
-def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookData]], user_defined_scrapers: ScrapersConfigT) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]], ScraperOptionsT]:
+def get_scraper(scraper_id: str, plugins_data: PluginsDataT, user_defined_scrapers: ScrapersConfigT) -> Tuple[str, Type[Scraper] | Tuple[None, List[str]], ScraperOptionsT]:
     scraper_options = {}
     available_scrapers = []
 
@@ -138,8 +138,8 @@ def get_scraper(scraper_id: str, plugins_data: List[Tuple[str, str, PluginHookDa
 
     platform = what_platform().upper()
 
-    for plugin_namespace, _, plugin_hook_data, plugin in plugins_data:
-        plugin_scrapers = plugin_hook_data["scrapers"]
+    for plugin_namespace, _, plugin in plugins_data:
+        plugin_scrapers = plugin.hook_data["scrapers"]
 
         if scraper_id.lower() == plugin_namespace.lower() and f"{platform}.DEFAULT" in plugin_scrapers:
             return f"{plugin_namespace}.{platform}.DEFAULT", plugin_scrapers[f"{platform}.DEFAULT"], scraper_options

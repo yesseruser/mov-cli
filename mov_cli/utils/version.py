@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Tuple, List, Optional, Dict
+    from typing import Tuple, List, Dict
 
 import httpx
 from packaging import version
@@ -14,8 +14,7 @@ from ..logger import mov_cli_logger
 
 __all__ = (
     "update_available", 
-    "plugin_update_available",
-    "get_plugin_version_hook"
+    "plugin_update_available"
 )
 
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.GREEN.apply("version"))
@@ -48,16 +47,20 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
     logger.debug("Checking if plugins need updating...")
 
     for _, module_name in plugins.items():
-        plugin_version, plugin_hook_data = get_plugin_version_hook(module_name)
+        plugin = load_plugin(module_name)
+
+        if plugin is None:
+            continue
+
+        plugin_version = plugin.version
+        pypi_package_name = plugin.hook_data.get("package_name", None)
 
         if plugin_version is None:
             logger.debug(
-                f"Skipped update check for '{module_name}' as the plugin " \
-                    "doesn't expose '__version__' in it's root module ('__init__.py')."
+                f"The plugin '{module_name}' doesn't expose '__version__' in" \
+                    "it's root module ('__init__.py') so it the update checker will skip it."
             )
             continue
-
-        pypi_package_name = plugin_hook_data.get("package_name", None)
 
         if pypi_package_name is None:
             logger.debug(
@@ -86,24 +89,3 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
         return True, plugins_with_updates
 
     return False, []
-
-def get_plugin_version_hook(module_name: str):
-    plugin = load_plugin(module_name)
-
-    if plugin is None:
-        return None, None
-
-    plugin_module = plugin[1]
-    plugin_hook_data = plugin[0]
-
-    plugin_version: Optional[str] = getattr(plugin_module, "__version__", None)
-
-    if plugin_version is None:
-        logger.debug(
-            f"Skipped update check for '{module_name}' as the plugin " \
-                "doesn't expose '__version__' in it's root module ('__init__.py')."
-        )
-
-        return None, None
-    
-    return plugin_version, plugin_hook_data

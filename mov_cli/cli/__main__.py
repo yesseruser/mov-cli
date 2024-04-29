@@ -84,7 +84,7 @@ def mov_cli(
 
         http_client = HTTPClient(config)
 
-        selected_scraper = select_scraper(plugins, config.fzf_enabled, config.default_scraper)
+        selected_scraper = select_scraper(plugins, config.scrapers, config.fzf_enabled, config.default_scraper)
 
         if selected_scraper is None:
             mov_cli_logger.error(
@@ -93,7 +93,9 @@ def mov_cli(
             )
             return False
 
-        chosen_scraper = use_scraper(selected_scraper, config, http_client, scrape_options)
+        selected_scraper[2].update(scrape_options)
+
+        chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
         choice = search(query, auto_select, chosen_scraper, config.fzf_enabled)
 

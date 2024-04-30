@@ -48,7 +48,9 @@ class HTTPClient():
         self.logger.debug(Colours.GREEN.apply("GET") + f" -> {url}")
 
         if include_default_headers is True:
-            headers.update({"Referer": url})
+            if headers["Referer"] is None:
+                headers.update({"Referer": url})
+                
             headers.update(self.config.http_headers)
 
         try:
@@ -72,15 +74,40 @@ class HTTPClient():
 
             raise e
 
-    def post(self, url: str, data: dict = None, json: dict = None, **kwargs) -> Response: 
+    def post(
+        self, 
+        url: str,
+        data: dict = {},
+        json: dict = {}, 
+        headers: dict = {}, 
+        include_default_headers: bool = True, 
+        redirect: bool = False, 
+        **kwargs
+    ) -> Response:
         """Performs a POST request and returns httpx.Response."""
-        self.logger.debug(Colours.ORANGE.apply("POST") + f": {url}")
+        self.logger.debug(Colours.GREEN.apply("POST") + f" -> {url}")
 
-        self.__httpx_client.headers["Referer"] = url
+        if include_default_headers is True:
+            if headers["Referer"] is None:
+                headers.update({"Referer": url})
 
-        return self.__httpx_client.post(
-            url, data = data, json = json, **kwargs
+            headers.update(self.config.http_headers)
+
+        response = self.__httpx_client.post(
+            url,
+            data = data,
+            json = json,
+            headers = headers, 
+            follow_redirects = redirect, 
+            **kwargs
         )
+
+        if response.is_error:
+            self.logger.debug(
+                f"POST Request to '{response.url}' failed! ({response})"
+            )
+
+        return response
 
     def set_cookies(self, cookies: dict) -> None:
         """Sets cookies."""

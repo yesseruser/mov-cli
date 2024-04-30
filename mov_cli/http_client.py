@@ -48,7 +48,7 @@ class HTTPClient():
         self.logger.debug(Colours.GREEN.apply("GET") + f" -> {url}")
 
         if include_default_headers is True:
-            if headers["Referer"] is None:
+            if headers.get("Referer") is None:
                 headers.update({"Referer": url})
                 
             headers.update(self.config.http_headers)
@@ -88,7 +88,7 @@ class HTTPClient():
         self.logger.debug(Colours.GREEN.apply("POST") + f" -> {url}")
 
         if include_default_headers is True:
-            if headers["Referer"] is None:
+            if headers.get("Referer") is None:
                 headers.update({"Referer": url})
 
             headers.update(self.config.http_headers)

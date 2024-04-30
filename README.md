@@ -31,12 +31,12 @@
 <br>
 
 > [!Note]
-> v4 is constantly changing so be sure to **keep the tool and your plugins up to date**. Also I would advise not using it as a library yet as the API still has many breaking changes.
+> v4 is constantly changing so be sure to **keep the tool and your plugins up to date**. Also, I would advise not using it as a library yet as the API still has many breaking changes.
 
 ## What is mov-cli? 💫
-mov-cli is a command line tool that streamlines the process of streaming media from the comfort of your terminal so you can show off to your friends the superiority of the command line. 💪 The tool is sort of a framework that handles metadata and configuration, then simply invokes your media player.
+mov-cli is a command line tool that streamlines the process of streaming media from the comfort of your terminal; ~~*so you can show off to your friends the superiority of the command line.*~~ 💪 The tool is sort of a framework that handles metadata and configuration, then simply invokes your media player.
 
-mov-cli is **not** a piracy tool; in fact we encourage the opposite through the existence of our plugins [mov-cli-fs](https://github.com/mov-cli/mov-cli-files) and [mov-cli-media-server](https://github.com/mov-cli/mov-cli-ms). 🫵 You obtain the media. You pick the plugins.
+mov-cli is **not** a piracy tool; in fact, we encourage the opposite through the existence of our plugins [mov-cli-fs](https://github.com/mov-cli/mov-cli-files) and [mov-cli-media-server](https://github.com/mov-cli/mov-cli-ms). 🫵 You obtain the media. You pick the plugins.
 
 ## Installation 🛠️
 

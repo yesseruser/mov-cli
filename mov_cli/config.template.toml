@@ -21,6 +21,7 @@ test = "test.DEFAULT"
 
 # [mov-cli.downloads] # Do not use backslashes use forward slashes
 # save_path = "~/Downloads"
+# yt_dlp = true
 
 # [mov-cli.quality]
 # resolution = 720

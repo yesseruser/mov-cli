@@ -15,10 +15,11 @@ from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
 from devgoldyutils import LoggerAdapter
 
-from . import errors
 from .logger import mov_cli_logger
 
-__all__ = ("Scraper", "MediaNotFound")
+__all__ = (
+    "Scraper",
+)
 
 class Scraper(ABC):
     """A base class for building scrapers from."""
@@ -41,7 +42,7 @@ class Scraper(ABC):
         ...
 
     @abstractmethod
-    def scrape(self, metadata: Metadata, episode: EpisodeSelector) -> Multi | Single:
+    def scrape(self, metadata: Metadata, episode: EpisodeSelector) -> Optional[Multi | Single]:
         """
         Where your scraping for the media should be performed. 
         Should return or yield an instance of Media.
@@ -52,11 +53,3 @@ class Scraper(ABC):
     def scrape_episodes(self, metadata: Metadata) -> Dict[int, int] | Dict[None, Literal[1]]:
         """Returns episode count for each season in that Movie/Series."""
         ...
-
-class MediaNotFound(errors.MovCliException):
-    """Raises when a scraper fails to find a show/movie/tv-station."""
-    def __init__(self, message, scraper: Scraper) -> None:
-        super().__init__(
-            f"Failed to find media: {message}",
-            logger = scraper.logger
-        )

@@ -18,6 +18,7 @@ from .configuration import open_config_file, set_cli_config
 
 from ..config import Config
 from ..download import Download
+from ..media import MetadataType
 from ..logger import mov_cli_logger
 from ..http_client import HTTPClient
 
@@ -116,10 +117,12 @@ def mov_cli(
 
         media = scrape(choice, chosen_episode, chosen_scraper)
 
-        if media.url is None:
+        if media is None:
+            episode_details_string = f" ep {chosen_episode.episode} season {chosen_episode.season} of" if choice.type == MetadataType.MULTI else ""
+
             mov_cli_logger.error(
-                "Scraper didn't return a streamable url." \
-                    "\nThis is NOT a mov-cli issue. This IS an plugin issue"
+                f"The scraper '{chosen_scraper.__class__.__name__}' couldn't find{episode_details_string} '{choice.title}'! " \
+                    "Don't report this to mov-cli, report this to the plugin itself."
             )
             return False
 

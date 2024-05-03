@@ -21,7 +21,7 @@ from .plugins import get_plugins_data, handle_internal_plugin_error
 from ..utils import what_platform
 from ..logger import mov_cli_logger
 
-def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Media:
+def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Optional[Media]:
     mov_cli_logger.info(f"Scrapping '{Colours.CLAY.apply(choice.title)}'...")
 
     try:

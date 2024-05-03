@@ -1,12 +1,12 @@
 ---
-name: Feature request
+name: Feature Request
 about: Suggest a feature or enhancement for mov-cli.
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''
 ---
 
-<!-- Please reframe from reporting plugin specific issues here, report those issues to the plugins themsevles. -->
+<!-- Please refrain from reporting plugin specific issues here, report those issues to the plugins themsevles. -->
 
 **Describe the feature / change you'd like.**
 <!-- A clear and concise description of what you want to see. -->

@@ -6,7 +6,7 @@ labels: bug
 assignees: ''
 ---
 
-<!-- Please reframe from reporting plugin specific issues here, report those issues to the plugins themsevles. -->
+<!-- Please refrain from reporting plugin specific issues here, report those issues to the plugins themsevles. -->
 
 **Describe the bug:**
 <!-- A clear and concise description of what the bug is. Explain the steps that you took leading up to the bug to help aid in recreating it. -->

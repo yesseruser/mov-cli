@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from typing import List, Callable, Optional, Tuple
 
 from enum import Enum
+from devgoldyutils import Colours
 from dataclasses import dataclass, field
 
 __all__ = ("MetadataType", "Metadata", "ExtraMetadata", "AiringType")
@@ -41,6 +42,11 @@ class Metadata:
     extra_func: Callable[[], Optional[ExtraMetadata]] = field(default = lambda: None)
     """Callback that returns extra metadata."""
 
+    @property
+    def display_name(self) -> str:
+        return f"{Colours.BLUE if self.type == MetadataType.SINGLE else Colours.PINK_GREY}{self.title}" \
+            f"{Colours.RESET}" + (f" ({self.year})" if self.year is not None else "")
+
     def get_extra(self) -> Optional[ExtraMetadata]:
         """Returns extra metadata."""
         return self.extra_func()
@@ -52,7 +58,6 @@ class ExtraMetadata():
     """Description of Series, Film or TV Station."""
     image_url: Optional[str]
     """Url to high res image cover of Series, Film or TV Station."""
-
     alternate_titles: List[str] | Tuple[str, str]
 
     cast: List[str] | None = field(default = None)

@@ -32,8 +32,7 @@ def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled
         choice = prompt(
             "Choose Result", 
             choices = (choice for choice in search_results), 
-            display = lambda x: f"{Colours.BLUE if x.type == MetadataType.SINGLE else Colours.PINK_GREY}{x.title}" \
-                f"{Colours.RESET}" + (f" ({x.year})" if x.year is not None else ""), 
+            display = lambda x: x.display_name, 
             fzf_enabled = fzf_enabled
         )
 

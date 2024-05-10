@@ -4,4 +4,4 @@ from .config import *
 from .scraper import *
 from .download import *
 
-__version__ = "4.4alpha1"
+__version__ = "4.4alpha2"

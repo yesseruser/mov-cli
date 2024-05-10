@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from pathlib import Path
     from typing import Optional, Any
     from ..config import Config
 
@@ -37,12 +38,12 @@ def set_cli_config(config: Config, **kwargs: Optional[Any]) -> Config:
 
     return config
 
-def open_config_file(config: Config):
+def open_config_file(config: Config, file_path: Optional[Path] = None):
     """Opens the config file in the respectable editor for that platform."""
     editor = config.editor
+    platform = utils.what_platform()
 
     if editor is None: 
-        platform = utils.what_platform()
         env_editor = os.environ.get("EDITOR")        
 
         if env_editor is not None:
@@ -59,8 +60,10 @@ def open_config_file(config: Config):
 
     mov_cli_logger.debug("Opening config file...")
 
+    appdata_path = utils.get_appdata_directory(platform)
+
     try:
-        check_call([editor, config.config_path])
+        check_call([editor, config.config_path if file_path is None else appdata_path.joinpath(file_path)])
     except (FileNotFoundError, CalledProcessError) as e:
         mov_cli_logger.error(
             f"Failed to open config file with the editor '{editor}'! Error: {e}" \

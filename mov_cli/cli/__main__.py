@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 
 import typer
 import logging
+from pathlib import Path
 from devgoldyutils import Colours
 
 from .play import play
@@ -58,7 +59,8 @@ def mov_cli(
     mov_cli_logger.debug(f"Config -> {config.data}")
 
     if edit:
-        open_config_file(config)
+        file_path = None if query is None else Path(query[0])
+        open_config_file(config, file_path)
         return None
 
     plugins = config.plugins

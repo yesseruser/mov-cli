@@ -35,6 +35,7 @@ dependencies = [
     "deprecation",
     "packaging",
     "thefuzz",
+    "python-decouple",
 
     # Included plugins
     "mov-cli-test>=1.1.0"

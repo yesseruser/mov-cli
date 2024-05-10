@@ -19,6 +19,7 @@ import os
 import toml
 import shutil
 from pathlib import Path
+from decouple import AutoConfig
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
 
@@ -70,6 +71,7 @@ class Config():
     """Class that wraps the mov-cli configuration file. Mostly used under the CLI interface."""
     def __init__(self, override_config: ConfigData = None, config_path: Path = None) -> None:
         self.config_path = config_path
+        self._env_path = self.__get_env_file()
 
         self.data: ConfigData = {}
 
@@ -215,6 +217,10 @@ class Config():
     def resolution(self) -> Optional[int]:
         return self.data.get("quality", {}).get("resolution")
 
+    def get_env_config(self) -> AutoConfig:
+        """Returns python decouple config object for mov-cli's appdata .env file."""
+        return AutoConfig(self._env_path)
+
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""
         platform = utils.what_platform()
@@ -236,3 +242,18 @@ class Config():
             logger.info(f"Config created at '{config_path}'.")
 
         return config_path
+
+    def __get_env_file(self) -> Path:
+        """Function that returns the path to the mov-cli .env file."""
+        platform = utils.what_platform()
+
+        appdata_folder = get_appdata_directory(platform)
+
+        env_file_path = appdata_folder.joinpath(".env")
+
+        if not env_file_path.exists():
+            logger.debug("The 'config.toml' file doesn't exist so we're creating it...")
+            open(env_file_path, "w").close()
+            logger.info(f".env file created at '{env_file_path}'.")
+
+        return env_file_path

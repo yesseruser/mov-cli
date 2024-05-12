@@ -9,6 +9,7 @@ class EpisodeSelector:
     """Swift util to use when asking the scraper which episode of a show to scrape."""
     episode: int = field(default = 1)
     season: int = field(default = 1)
+    media_episodes: dict = field(default = dict)
 
     # NOTE: I made it private as I don't want library devs using 
     # this method yet because it may drastically change in the future.
@@ -18,4 +19,4 @@ class EpisodeSelector:
 
     def _previous_season(self) -> None:
         self.season -= 1
-        self.episode = 1
+        self.episode = self.media_episodes.get(self.season, 1)

@@ -119,6 +119,6 @@ def __handle_next_season(episode: EpisodeSelector, season_episode_count: int, me
         if episode.season <= 1:
             return False
 
-        episode._previous_season(media_episodes)
+        episode._previous_season()
 
     return True

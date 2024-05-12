@@ -18,9 +18,10 @@ def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Meta
     if choice.type == MetadataType.MOVIE:
         return EpisodeSelector()
 
+    metadata_episodes = scraper.scrape_episodes(choice)
+
     if episode_string is None:
         mov_cli_logger.info(f"Scrapping episodes for '{Colours.CLAY.apply(choice.title)}'...")
-        metadata_episodes = scraper.scrape_episodes(choice)
 
         if metadata_episodes.get(None) == 1:
             return EpisodeSelector()
@@ -45,7 +46,7 @@ def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Meta
         if episode is None:
             return None
 
-        return EpisodeSelector(episode, season)
+        return EpisodeSelector(episode, season, metadata_episodes)
 
     try:
         episode_season = episode_string.split(":")
@@ -68,4 +69,4 @@ def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Meta
 
         return None
 
-    return EpisodeSelector(episode, season)
+    return EpisodeSelector(episode, season, metadata_episodes)

@@ -16,6 +16,6 @@ class EpisodeSelector:
         self.episode = 1
         self.season += 1
 
-    def _previous_season(self) -> None:
+    def _previous_season(self, media_episodes: dict) -> None:
         self.season -= 1
-        self.episode = 1
+        self.episode = media_episodes.get(self.season)

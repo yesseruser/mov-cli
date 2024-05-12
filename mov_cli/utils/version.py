@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Tuple, List, Dict
+    from pathlib import Path
 
 import httpx
 from packaging import version
@@ -14,7 +15,8 @@ from ..logger import mov_cli_logger
 
 __all__ = (
     "update_available", 
-    "plugin_update_available"
+    "plugin_update_available",
+    "update_command",
 )
 
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.GREEN.apply("version"))
@@ -89,3 +91,14 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
         return True, plugins_with_updates
 
     return False, []
+
+def update_command(mov_cli_path: Path, package: str | list = "mov-cli"):
+    path = str(mov_cli_path)
+
+    if "pipx" in path:
+        return "pipx upgrade mov-cli --include-injected"
+    else:
+        if isinstance(package, list):
+            return f"pip install {' '.join(package)} -U"
+        else:
+            return f"pip install {package} -U"

@@ -27,7 +27,7 @@ import mov_cli
 
 from ..iterfzf import iterfzf
 from ..logger import mov_cli_logger
-from ..utils import  what_platform, update_available, plugin_update_available
+from ..utils import  what_platform, update_available, plugin_update_available, update_command
 
 __all__ = (
     "prompt", 
@@ -164,11 +164,12 @@ def welcome_msg(
 ) -> str:
     """Returns cli welcome message."""
     now = datetime.now()
+    mov_cli_path = Path(os.path.split(__file__)[0])
     adjective = random.choice(
         ("gorgeous", "wonderful", "beautiful", "magnificent")
     )
 
-    random_tips_path = Path(os.path.split(__file__)[0]).joinpath("random_tips.json")
+    random_tips_path = mov_cli_path.joinpath("random_tips.json")
 
     greeting, user_name = greetings()
 
@@ -195,11 +196,13 @@ def welcome_msg(
     if check_for_updates:
 
         if update_available():
-            text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}pip install mov-cli -U"
+            update = update_command(mov_cli_path)
+            text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}{update}"
 
         plugin_needs_updating, plugins_to_update = plugin_update_available(plugins)
 
         if plugin_needs_updating:
-            text += f"\n\n {Colours.ORANGE}|˶˙ᵕ˙ )ﾉﾞ {Colours.GREEN}Some plugins need updating! --> {Colours.RESET}pip install {' '.join(plugins_to_update)} -U"
+            update = update_command(mov_cli_path, plugins_to_update)
+            text += f"\n\n {Colours.ORANGE}|˶˙ᵕ˙ )ﾉﾞ {Colours.GREEN}Some plugins need updating! --> {Colours.RESET}{update}"
 
     return text + "\n"

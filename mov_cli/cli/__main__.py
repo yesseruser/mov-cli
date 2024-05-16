@@ -46,11 +46,11 @@ def mov_cli(
     config = Config()
 
     config = set_cli_config(
-        config,
-        debug = debug,
-        player = player,
-        scraper = scraper,
-        fzf = fzf
+        config, 
+        debug = debug, 
+        player = player, 
+        scraper = (scraper, ["scrapers", "default"]), 
+        fzf = (fzf, ["ui", "fzf"])
     )
 
     if config.debug:

@@ -8,11 +8,9 @@ if TYPE_CHECKING:
 from abc import abstractmethod
 
 __all__ = (
-    "Media",
+    "Media", 
     "Multi", 
-    "Single", 
-    "Movie", 
-    "Series"
+    "Single"
 )
 
 class Media():
@@ -93,9 +91,3 @@ class Single(Media):
     @property
     def display_name(self) -> str:
         return f"{self.title} ({self.year})" if self.year is not None else self.title
-
-# Backwards compatibility for post v4.3 extensions.
-Series = Multi
-"""DEPRECATED!!! USE 'Multi' INSTEAD! This will be removed after v4.4."""
-Movie = Single
-"""DEPRECATED!!! USE 'Single' INSTEAD! This will be removed after v4.4."""

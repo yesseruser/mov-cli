@@ -8,18 +8,18 @@ from enum import Enum
 from devgoldyutils import Colours
 from dataclasses import dataclass, field
 
-__all__ = ("MetadataType", "Metadata", "ExtraMetadata", "AiringType")
+__all__ = (
+    "MetadataType", 
+    "Metadata", 
+    "ExtraMetadata", 
+    "AiringType"
+)
 
 class MetadataType(Enum):
     MULTI = 0
     """Media with multiple seasons and episodes."""
     SINGLE = 1
     """Media with no seasons and episodes. Like a film or short animation."""
-
-    SERIES = 0
-    """DEPRECATED!!! USE 'MetadataType.MULTI' INSTEAD! This will be removed after v4.4."""
-    MOVIE = 1
-    """DEPRECATED!!! USE 'MetadataType.SINGLE' INSTEAD!. This will be removed after v4.4."""
 
 class AiringType(Enum):
     DONE = 0

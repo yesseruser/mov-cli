@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+mov-cli
+mov-cli-youtube

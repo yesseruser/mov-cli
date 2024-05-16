@@ -12,7 +12,7 @@ import time
 from subprocess import Popen
 
 from .ui import prompt
-from ..media import Series
+from ..media import Multi
 
 def watch_options(
     popen: Popen, 
@@ -27,7 +27,7 @@ def watch_options(
         "quit"
     ]
 
-    if isinstance(media, Series):
+    if isinstance(media, Multi):
         options.insert(0, "next")
         options.insert(1, "previous")
         options.insert(2, "select")

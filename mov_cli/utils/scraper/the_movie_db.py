@@ -46,7 +46,7 @@ class TheMovieDB:
         tv = self.http_client.get(self.search_url.format("tv", query, self.api_key)).json()["results"]
 
         for item in movie:
-            item = TMDbSerial(item, MetadataType.MOVIE)
+            item = TMDbSerial(item, MetadataType.SINGLE)
 
             if not item.release_date:
                 continue
@@ -54,7 +54,7 @@ class TheMovieDB:
             serial_list.append(item)
 
         for item in tv:
-            item = TMDbSerial(item, MetadataType.SERIES)
+            item = TMDbSerial(item, MetadataType.MULTI)
 
             if not item.release_date:
                 continue
@@ -84,7 +84,7 @@ class TheMovieDB:
         return scraped_seasons
 
     def __extra_metadata(self, serial: TMDbSerial) -> ExtraMetadata: # This API is dawgshit
-        type = "movie" if serial.type == MetadataType.MOVIE else "tv"
+        type = "movie" if serial.type == MetadataType.SINGLE else "tv"
         metadata = self.http_client.get(self.metadata.format(type, serial.id, self.api_key)).json()
 
         description = None

@@ -7,7 +7,7 @@ quality = "auto"
 # editor = "nano"
 skip_update_checker = false
 
-# [mov-cli.quality] # This will override quality!
+# [mov-cli.quality]
 # resolution = 720
 
 # [mov-cli.ui]

@@ -78,7 +78,7 @@ class VLC(Player):
                 args.append(f"--sub-file={subtitles}")
 
             if self.config.resolution is not None:
-                args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas
+                args.append(f"--adaptive-maxwidth={self.config.resolution.value}") # NOTE: I don't really know if that works ~ Ananas
 
             return subprocess.Popen(args)
 

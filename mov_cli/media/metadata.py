@@ -58,7 +58,7 @@ class ExtraMetadata():
     """Description of Series, Film or TV Station."""
     image_url: Optional[str]
     """Url to high res image cover of Series, Film or TV Station."""
-    alternate_titles: List[str] | Tuple[str, str]
+    alternate_titles: List[str] | Tuple[str, str] | None = field(default = None)
 
     cast: List[str] | None = field(default = None)
     genres: List[str] | None = field(default = None)

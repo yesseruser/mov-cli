@@ -13,7 +13,7 @@ skip_update_checker = false
 test = "mov-cli-test"
 
 [mov-cli.scrapers]
-# default = "films"
+# default = "youtube"
 test = "test.DEFAULT"
 
 # [mov-cli.http] # Don't mess with it if you don't know what you are doing!
@@ -23,5 +23,5 @@ test = "test.DEFAULT"
 # save_path = "~/Downloads"
 # yt_dlp = true
 
-# [mov-cli.quality]
-# resolution = 720
+# [mov-cli.quality] # Check the Wiki for avaliable resolution options
+# resolution = "FHD" 

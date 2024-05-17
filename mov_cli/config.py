@@ -26,6 +26,7 @@ from devgoldyutils import LoggerAdapter
 from . import players, utils
 from .logger import mov_cli_logger
 from .utils import get_appdata_directory
+from .media import Quality
 
 __all__ = ("Config",)
 
@@ -54,7 +55,7 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
-    resolution: int
+    resolution: Quality
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -214,8 +215,13 @@ class Config():
         return self.data.get("http", {}).get("headers", default_headers)
 
     @property
-    def resolution(self) -> Optional[int]:
-        return self.data.get("quality", {}).get("resolution")
+    def resolution(self) -> Optional[Quality]:
+        selected_res = self.data.get("quality", {}).get("resolution", "").upper()
+
+        if Quality.exists(selected_res):
+            return Quality[selected_res]
+
+        return None        
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""

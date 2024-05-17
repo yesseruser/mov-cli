@@ -36,7 +36,8 @@ def mov_cli(
     episode: Optional[str] = typer.Option(None, "--episode", "-ep", help = "Episode and season you wanna scrape. E.g. {episode}:{season} like -> 26:3"), 
     auto_select: Optional[int] = typer.Option(None, "--choice", "-c", help = "Auto select the search results. E.g. Setting it to 1 with query 'nyan cat' will pick " \
         "the first nyan cat video to show up in search results."
-    ), 
+    ),
+    limit: Optional[int] = typer.Option(None, "--limit", "-l", help = "Specify the maximum number of results"),
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
@@ -100,7 +101,7 @@ def mov_cli(
 
         chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
-        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled)
+        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, limit)
 
         if choice is None:
             mov_cli_logger.error("There was no results or you didn't select anything.")

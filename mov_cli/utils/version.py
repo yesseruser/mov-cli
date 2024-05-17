@@ -12,6 +12,7 @@ from devgoldyutils import LoggerAdapter, Colours
 import mov_cli
 from ..plugins import load_plugin
 from ..logger import mov_cli_logger
+from .platform import what_distro
 
 __all__ = (
     "update_available", 
@@ -97,8 +98,16 @@ def update_command(mov_cli_path: Path, package: str | list = "mov-cli"):
 
     if "pipx" in path:
         return "pipx upgrade mov-cli --include-injected"
-    else:
-        if isinstance(package, list):
-            return f"pip install {' '.join(package)} -U"
+    elif "/usr/bin" in path:
+        if what_distro() == "arch":
+            return "yay"
         else:
-            return f"pip install {package} -U"
+            if isinstance(package, list):
+                return f"Use your package manager. Packages to update: {' '.join(package)}"
+            else:
+                return f"Use your package manager. Package to update: {package}"
+    
+    if isinstance(package, list):
+        return f"pip install {' '.join(package)} -U"
+    else:
+        return f"pip install {package} -U"

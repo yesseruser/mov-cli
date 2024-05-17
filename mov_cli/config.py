@@ -26,6 +26,7 @@ from devgoldyutils import LoggerAdapter
 from . import players, utils
 from .logger import mov_cli_logger
 from .utils import get_appdata_directory
+from .media import Quality
 
 __all__ = ("Config",)
 
@@ -43,6 +44,10 @@ class ConfigDownloadsData(TypedDict):
     yt_dlp: bool
 
 @final
+class ConfigQualityData(TypedDict):
+    resolution: int
+
+@final
 class ConfigData(TypedDict):
     version: int
     debug: bool
@@ -54,7 +59,7 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
-    resolution: int
+    quality: ConfigQualityData | str
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -214,8 +219,28 @@ class Config():
         return self.data.get("http", {}).get("headers", default_headers)
 
     @property
-    def resolution(self) -> Optional[int]:
-        return self.data.get("quality", {}).get("resolution")
+    def resolution(self) -> Quality:
+        resolution_pixel = None
+        quality_config = self.data.get("quality", {})
+
+        if isinstance(quality_config, str):
+
+            for quality_format, quality in Quality.__members__.items():
+
+                if quality_format.startswith("_"):
+                    quality_format = quality_format[1:]
+
+                if quality_config.upper() == quality_format:
+                    return quality
+
+            return Quality.AUTO
+
+        resolution_pixel = quality_config.get("resolution")
+
+        if resolution_pixel is None or resolution_pixel not in Quality._value2member_map_:
+            return Quality.AUTO
+
+        return Quality(resolution_pixel)
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""

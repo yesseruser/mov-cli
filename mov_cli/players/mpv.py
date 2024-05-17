@@ -55,7 +55,7 @@ class MPV(Player):
                 args.append(f"--sub-file={media.subtitles}")
 
             if self.config.resolution is not None:
-                args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
+                args.append(f"--hls-bitrate={self.config.resolution.value}") # NOTE: This only works when the file is a m3u8
 
             return subprocess.Popen(args)
 

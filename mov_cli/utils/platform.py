@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 import sys
 import platform
+import csv
 
 __all__ = ("what_platform",)
 
@@ -28,3 +29,22 @@ def what_platform() -> SUPPORTED_PLATFORMS:
         return os
 
     return os
+
+def what_distro() -> str | None:
+    """
+    Returns what linux distro this device is running on.
+
+    E.g. arch, ubuntu, debian
+    """
+    RELEASE_DATA = {}
+
+    if what_platform() == "Linux":
+        with open("/etc/os-release", "r") as f:
+            os_release = csv.reader(f, delimiter="=")
+            for row in os_release:
+                if row:
+                    RELEASE_DATA[row[0]] = row[1]
+
+        return RELEASE_DATA["ID"]    
+        
+    return None

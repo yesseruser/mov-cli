@@ -59,7 +59,7 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
-    quality: ConfigQualityData
+    quality: ConfigQualityData | str
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -220,12 +220,23 @@ class Config():
 
     @property
     def resolution(self) -> Quality:
-        resolution_pixel = self.data.get("quality", {}).get("resolution")
+        quality = None
 
-        if resolution_pixel is None or resolution_pixel not in [x.value for x in Quality]:
-            return Quality.AUTO
+        resolution_pixel = None
+        quality_config = self.data.get("quality", {})
 
-        return Quality(resolution_pixel)
+        if isinstance(quality_config, str) and quality_config.lower() in [x.name.lower() for x in Quality]:
+            quality = Quality[quality_config.lower()]
+
+        else:
+            resolution_pixel = quality_config.get("resolution")
+
+            if resolution_pixel is None or resolution_pixel not in [x.value for x in Quality]:
+                quality = Quality.AUTO
+            else:
+                quality = Quality(resolution_pixel)
+
+        return quality
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""

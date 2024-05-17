@@ -1,10 +1,14 @@
 [mov-cli]
 version = 1
-player = "mpv"
 debug = false
+player = "mpv"
+quality = "auto"
 # parser = "lxml"
 # editor = "nano"
 skip_update_checker = false
+
+# [mov-cli.quality] # This will override quality!
+# resolution = 720
 
 # [mov-cli.ui]
 # fzf = true
@@ -22,6 +26,3 @@ test = "test.DEFAULT"
 # [mov-cli.downloads] # Do not use backslashes use forward slashes
 # save_path = "~/Downloads"
 # yt_dlp = true
-
-# [mov-cli.quality] # Check the Wiki for avaliable resolution options
-# resolution = 720

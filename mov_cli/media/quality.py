@@ -6,7 +6,11 @@ class Quality(Enum):
     SD = 480
     HD = 720
     FHD = 1080
+    QHD = 1440
     UHD = 2160
+
+    _2K = QHD
+    _4K = UHD
 
     AUTO = 0
 

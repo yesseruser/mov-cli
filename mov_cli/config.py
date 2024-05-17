@@ -220,23 +220,27 @@ class Config():
 
     @property
     def resolution(self) -> Quality:
-        quality = None
-
         resolution_pixel = None
         quality_config = self.data.get("quality", {})
 
-        if isinstance(quality_config, str) and quality_config.upper() in [x.name for x in Quality]:
-            quality = Quality[quality_config.upper()]
+        if isinstance(quality_config, str):
 
-        else:
-            resolution_pixel = quality_config.get("resolution")
+            for quality_format, quality in Quality.__members__.items():
 
-            if resolution_pixel is None or resolution_pixel not in [x.value for x in Quality]:
-                quality = Quality.AUTO
-            else:
-                quality = Quality(resolution_pixel)
+                if quality_format.startswith("_"):
+                    quality_format = quality_format[1:]
 
-        return quality
+                if quality_config.upper() == quality_format:
+                    return quality
+
+            return Quality.AUTO
+
+        resolution_pixel = quality_config.get("resolution")
+
+        if resolution_pixel is None or resolution_pixel not in Quality._value2member_map_:
+            return Quality.AUTO
+
+        return Quality(resolution_pixel)
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""

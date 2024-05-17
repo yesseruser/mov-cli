@@ -44,6 +44,10 @@ class ConfigDownloadsData(TypedDict):
     yt_dlp: bool
 
 @final
+class ConfigQualityData(TypedDict):
+    resolution: int
+
+@final
 class ConfigData(TypedDict):
     version: int
     debug: bool
@@ -55,7 +59,7 @@ class ConfigData(TypedDict):
     downloads: ConfigDownloadsData
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
-    resolution: Quality
+    quality: ConfigQualityData
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -215,13 +219,13 @@ class Config():
         return self.data.get("http", {}).get("headers", default_headers)
 
     @property
-    def resolution(self) -> Optional[Quality]:
-        selected_res = self.data.get("quality", {}).get("resolution", "").upper()
+    def resolution(self) -> Quality:
+        resolution_pixel = self.data.get("quality", {}).get("resolution")
 
-        if Quality.exists(selected_res):
-            return Quality[selected_res]
+        if resolution_pixel is None or resolution_pixel not in [x.value for x in Quality]:
+            return Quality.AUTO
 
-        return None        
+        return Quality(resolution_pixel)
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""

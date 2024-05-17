@@ -1,6 +1,6 @@
 from enum import Enum
 
-__all__ = ("Quality", )
+__all__ = ("Quality",)
 
 class Quality(Enum):
     SD = 480
@@ -8,11 +8,11 @@ class Quality(Enum):
     FHD = 1080
     UHD = 2160
 
+    AUTO = 0
+
+    def __init__(self, pixel: int) -> None:
+        ...
+
     def apply_p(self) -> str:
         """Returns that enum but with an ending p."""
         return f"{self.value}p"
-    
-    @classmethod
-    def exists(enum, name: str) -> bool:
-        """Checks if enum exists. Returns bool"""
-        return name in enum.__members__

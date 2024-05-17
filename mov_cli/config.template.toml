@@ -24,4 +24,4 @@ test = "test.DEFAULT"
 # yt_dlp = true
 
 # [mov-cli.quality] # Check the Wiki for avaliable resolution options
-# resolution = "FHD" 
+# resolution = 720

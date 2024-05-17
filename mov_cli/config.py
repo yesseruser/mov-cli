@@ -225,8 +225,8 @@ class Config():
         resolution_pixel = None
         quality_config = self.data.get("quality", {})
 
-        if isinstance(quality_config, str) and quality_config.lower() in [x.name.lower() for x in Quality]:
-            quality = Quality[quality_config.lower()]
+        if isinstance(quality_config, str) and quality_config.upper() in [x.name for x in Quality]:
+            quality = Quality[quality_config.upper()]
 
         else:
             resolution_pixel = quality_config.get("resolution")

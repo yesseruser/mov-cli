@@ -6,6 +6,7 @@ quality = "auto"
 # parser = "lxml"
 # editor = "nano"
 skip_update_checker = false
+hide_ip = true
 
 # [mov-cli.quality]
 # resolution = 720

@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 import typer
 import logging
 from pathlib import Path
-from devgoldyutils import Colours
 
 from .play import play
 from .search import search

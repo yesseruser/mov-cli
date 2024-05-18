@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 
 import httpx
 from devgoldyutils import LoggerAdapter, Colours
-import re
 
 from . import errors
 from .logger import mov_cli_logger

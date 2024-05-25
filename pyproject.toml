@@ -61,6 +61,11 @@ version = { attr = "mov_cli.__version__" }
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+script-files = [
+    "mov_cli/cli/fzf-preview.sh"
+]
+
 [tool.setuptools.packages.find]
 include = ["mov_cli*"]
 

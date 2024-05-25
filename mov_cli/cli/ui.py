@@ -92,7 +92,8 @@ def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Calla
         choice_picked = iterfzf(
             iterable = ((display(choice), choice) for choice in choices), 
             prompt = text + ": ", 
-            ansi = True
+            ansi = True, 
+            preview = "fzf-preview.sh https://cdn.devgoldy.xyz/goldy-exe/0/thumbnail.png" # NOTE: Just testing, remove this in prod.
         )
 
     else:

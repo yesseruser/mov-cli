@@ -1,19 +1,19 @@
 .PHONY: build
 
-pip = pip
-python = python
+PIP = pip
+PYTHON = python
 
 build:
-	${python} -m build
+	${PYTHON} -m build
 
 build-system-packages:
-	${python} -m build --wheel --no-isolation
+	${PYTHON} -m build --wheel --no-isolation
 
 install:
-	${pip} install . -U
+	${PIP} install . -U
 
 install-editable:
-	${pip} install -e .[dev] --config-settings editable_mode=compat -U
+	${PIP} install -e .[dev] --config-settings editable_mode=compat -U
 
 test:
 	ruff check --target-version=py38 .

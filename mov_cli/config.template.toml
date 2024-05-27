@@ -1,3 +1,5 @@
+# Confused? Check out the WIKI on configuration: https://github.com/mov-cli/mov-cli/wiki/Configuration
+
 [mov-cli]
 version = 1
 debug = false

@@ -4,7 +4,7 @@ from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
     from .players import Player
-    from typing import Dict, Literal, Any, Optional
+    from typing import Dict, Literal, Any, Optional, List
 
     SupportedParsersT = Literal["lxml", "html.parser"]
 
@@ -242,9 +242,25 @@ class Config():
 
         return Quality(resolution_pixel)
 
-    def get_env_config(self) -> AutoConfig:
+    def get_envs(self, required: List = None, optional: List = None) -> Dict[str, str]:
         """Returns python decouple config object for mov-cli's appdata .env file."""
-        return AutoConfig(self._env_path)
+        envs = {}
+
+        auto_config = AutoConfig(self._env_path)
+
+        if required is not None:
+            for required_env in required:
+                env = auto_config(required_env)
+
+                envs[required_env] = env
+    
+        if optional is not None:
+            for optinal_env in optional:
+                env = auto_config(optinal_env, default = None)
+
+                envs[optinal_env] = env
+        
+        return envs
 
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""

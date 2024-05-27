@@ -52,8 +52,7 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         temp_directory = Path(os.getenv("TMPDIR"))
 
     elif platform == "iOS":
-        # TODO: Temp directory for "iSH".
-        ...
+        temp_directory = Path("/tmp")
 
     elif platform == "Linux":
         temp_directory = Path("/tmp")

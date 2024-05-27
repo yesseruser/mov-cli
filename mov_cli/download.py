@@ -58,7 +58,7 @@ class Download():
         else:
             logger.info("Downloading via ffmpeg...")
 
-            args = [ # TODO: Check if url is a m3u8 if not use aria2
+            args = [
                 "ffmpeg",
                 "-n",
                 "-headers",

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Dict, Literal, Iterable, Optional
+    from typing import Dict, Literal, Iterable, Optional, List
 
     from .config import Config
     from .utils import EpisodeSelector
@@ -23,10 +23,19 @@ __all__ = (
 
 class Scraper(ABC):
     """A base class for building scrapers from."""
-    def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
+    def __init__(
+            self, 
+            config: Config, 
+            http_client: HTTPClient, 
+            options: Optional[ScraperOptionsT] = None, 
+            required_envs: Optional[List] = None, 
+            optional_envs: Optional[List] = None
+        ) -> None:
+
         self.config = config
         self.http_client = http_client
         self.options = options or {}
+        self.envs = self.config.get_envs(required_envs, optional_envs)
 
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 

@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 import typer
 import logging
 from pathlib import Path
-from devgoldyutils import Colours
 
 from .play import play
 from .search import search
@@ -22,6 +21,7 @@ from ..download import Download
 from ..media import MetadataType
 from ..logger import mov_cli_logger
 from ..http_client import HTTPClient
+from ..utils import hide_ip
 
 __all__ = ("mov_cli",)
 
@@ -131,7 +131,8 @@ def mov_cli(
 
         if download:
             dl = Download(config)
-            mov_cli_logger.debug(f"Downloading from this url -> '{media.url}'")
+
+            mov_cli_logger.debug(f"Downloading from this url -> '{hide_ip(media.url, config)}'")
 
             popen = dl.download(media)
             
@@ -139,25 +140,7 @@ def mov_cli(
                 popen.wait()
 
         else:
-            option = play(media, choice, chosen_scraper, chosen_episode, config)
-
-            if option == "search":
-                query = input(Colours.BLUE.apply("  Enter Query: "))
-
-                mov_cli(
-                    query = [query], 
-                    debug = debug, 
-                    player = player, 
-                    scraper = scraper, 
-                    fzf = fzf,
-                    episode = None,
-                    auto_select = None,
-
-                    version = False,
-                    edit = False,
-                    download = False,
-                    list_plugins = False
-                )
+            play(media, choice, chosen_scraper, chosen_episode, config)
 
 def app():
     uwu_app.command()(mov_cli)

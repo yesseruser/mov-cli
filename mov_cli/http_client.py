@@ -10,6 +10,7 @@ from devgoldyutils import LoggerAdapter, Colours
 
 from . import errors
 from .logger import mov_cli_logger
+from .utils import hide_ip
 
 __all__ = ("HTTPClient",)
 
@@ -33,7 +34,7 @@ class HTTPClient():
             timeout = 15.0,
             cookies = None
         )
-
+        
         super().__init__()
 
     def get(
@@ -45,7 +46,7 @@ class HTTPClient():
         **kwargs
     ) -> Response:
         """Performs a GET request and returns httpx.Response."""
-        self.logger.debug(Colours.GREEN.apply("GET") + f" -> {url}")
+        self.logger.debug(Colours.GREEN.apply("GET") + f" -> {hide_ip(url, self.config)}")
 
         if include_default_headers is True:
             if headers.get("Referer") is None:
@@ -85,7 +86,7 @@ class HTTPClient():
         **kwargs
     ) -> Response:
         """Performs a POST request and returns httpx.Response."""
-        self.logger.debug(Colours.GREEN.apply("POST") + f" -> {url}")
+        self.logger.debug(Colours.GREEN.apply("POST") + f" -> {hide_ip(url, self.config)}")
 
         if include_default_headers is True:
             if headers.get("Referer") is None:

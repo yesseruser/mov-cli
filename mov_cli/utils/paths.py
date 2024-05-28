@@ -52,8 +52,8 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         temp_directory = Path(os.getenv("TMPDIR"))
 
     elif platform == "iOS":
-        # TODO: Temp directory for "iSH".
-        ...
+        # TODO: Add temp directory for "iSH".
+        raise NotImplementedError("Temp directory isn't implemented for iOS!")
 
     elif platform == "Linux":
         temp_directory = Path("/tmp")
@@ -61,7 +61,7 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
     elif platform == "Android":
         temp_directory = Path("$PREFIX/tmp")
 
-    temp_directory = temp_directory.joinpath("mov-cli")
+    temp_directory = temp_directory.joinpath("mov-cli-temp")
     temp_directory.mkdir(exist_ok = True)
 
     return temp_directory

@@ -56,45 +56,46 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
         return None
 
-    option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
+    if config.watch_options:
+        option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
 
-    if option == "next" or option == "previous":
-        popen.kill()
+        if option == "next" or option == "previous":
+            popen.kill()
 
-        media_episodes = scraper.scrape_episodes(metadata)
+            media_episodes = scraper.scrape_episodes(metadata)
 
-        if option == "next":
-            episode.episode += 1
-        else:
-            episode.episode -= 1
+            if option == "next":
+                episode.episode += 1
+            else:
+                episode.episode -= 1
 
-        season_episode_count = media_episodes.get(episode.season)
+            season_episode_count = media_episodes.get(episode.season)
 
-        if season_episode_count is None:
-            mov_cli_logger.info("No more episodes :(")
-            return None
+            if season_episode_count is None:
+                mov_cli_logger.info("No more episodes :(")
+                return None
 
-        result = __handle_next_season(episode, season_episode_count, media_episodes)
+            result = __handle_next_season(episode, season_episode_count, media_episodes)
 
-        if result is False:
-            mov_cli_logger.info("No more episodes :(")
-            return None
+            if result is False:
+                mov_cli_logger.info("No more episodes :(")
+                return None
 
-        media = scrape(metadata, episode, scraper)
+            media = scrape(metadata, episode, scraper)
 
-        return play(media, metadata, scraper, episode, config)
+            return play(media, metadata, scraper, episode, config)
 
-    elif option == "select":
-        popen.kill()
+        elif option == "select":
+            popen.kill()
 
-        episode = handle_episode(None, scraper, metadata, config.fzf_enabled)
+            episode = handle_episode(None, scraper, metadata, config.fzf_enabled)
 
-        if episode is None:
-            return None
+            if episode is None:
+                return None
 
-        media = scrape(metadata, episode, scraper)
+            media = scrape(metadata, episode, scraper)
 
-        return play(media, metadata, scraper, episode, config)
+            return play(media, metadata, scraper, episode, config)
 
     popen.wait()
 

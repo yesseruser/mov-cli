@@ -46,5 +46,5 @@ def what_distro() -> str | None:
                     RELEASE_DATA[row[0]] = row[1]
 
         return RELEASE_DATA["ID"]    
-        
+
     return None

@@ -30,3 +30,6 @@ timeout = 15
 # [mov-cli.downloads] # Do not use backslashes use forward slashes
 # save_path = "~/Downloads"
 # yt_dlp = true
+
+# [mov-cli.subtitles] # See this page: https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+# language = "en"

@@ -13,7 +13,7 @@ install:
 	${pip} install . -U
 
 install-editable:
-	${pip} install -e .[dev] --config-settings="editable_mode=compat" -U
+	${pip} install -e .[dev] --config-settings editable_mode=compat -U
 
 test:
 	ruff check --target-version=py38 .

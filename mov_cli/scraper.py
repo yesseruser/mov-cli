@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Dict, Literal, Iterable, Optional, List
+    from typing import Dict, Literal, Iterable, Optional
 
     from .config import Config
     from .utils import EpisodeSelector

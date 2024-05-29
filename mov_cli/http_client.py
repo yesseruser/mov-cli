@@ -64,12 +64,13 @@ class HTTPClient():
 
             if response.is_error:
                 self.logger.debug(
-                    f"GET Request to '{response.url}' failed! ({response})"
+                    f"GET Request to '{response.url}' {Colours.RED.apply('failed!')} ({response})"
                 )
 
             return response
 
         except httpx.ConnectError as e:
+            # TODO: I think this needs improving. I see people are getting certificate errors that aren't being caught here.
             if "[SSL: CERTIFICATE_VERIFY_FAILED]" in str(e):
                 raise SiteMaybeBlocked(url, e)
 

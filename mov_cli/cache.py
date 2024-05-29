@@ -33,22 +33,22 @@ class Cache():
     def __init__(self, platform: SUPPORTED_PLATFORMS) -> None:
         temp_dir = get_temp_directory(platform)
 
-        self._cache_file = temp_dir.joinpath("osaka_cache") # ◔_◔ https://static.wikia.nocookie.net/parody/images/f/fd/Osaka.png/revision/latest
+        self._basic_cache_file_path = temp_dir.joinpath("osaka_cache") # ◔_◔ https://static.wikia.nocookie.net/parody/images/f/fd/Osaka.png/revision/latest
 
         super().__init__()
 
-    def get_cache(self, cache_name: str) -> Optional[Any]:
-        logger.debug(f"Getting '{cache_name}' cache...")
+    def get_cache(self, id: str) -> Optional[Any]:
+        logger.debug(f"Getting '{id}' cache...")
 
         data: Dict[str, OsakaCacheData] = {}
 
         with self.__get_cache_file("r") as file:
             data = json.load(file)
 
-        return data.get(cache_name, {}).get("value")
+        return data.get(id, {}).get("value")
 
-    def set_cache(self, cache_name: str, value: T, seconds_until_expired: int) -> T:
-        logger.debug(f"Setting '{cache_name}' cache...")
+    def set_cache(self, id: str, value: T, seconds_until_expired: int) -> T:
+        logger.debug(f"Setting '{id}' cache...")
 
         json_data = {}
 
@@ -61,7 +61,7 @@ class Cache():
             data = {
                 **json_data, 
                 **{
-                    cache_name: {
+                    id: {
                         "value": value,
                         "expiring_date": timestamp
                     }
@@ -71,19 +71,31 @@ class Cache():
             json.dump(data, file)
 
         return value
-    
-    def reset_cache()
 
-    def clear_cache(self) -> None:
-        logger.info("Deleting cache file...")
-        self._cache_file.unlink(True)
+    def clear_cache(self, id: str) -> None:
+        logger.debug(f"Removing '{id}' cache...")
+
+        json_data = {}
+
+        with self.__get_cache_file("r") as file:
+            json_data: Dict[str, OsakaCacheData] = json.load(file)
+
+        with self.__get_cache_file("w") as file:
+            json_data.pop(id)
+            json.dump(json_data, file)
+
+        return None
+
+    def clear_all_cache(self) -> None:
+        logger.info("Deleting basic cache file...")
+        self._basic_cache_file_path.unlink(True)
 
     def __get_cache_file(self, mode: str) -> TextIOWrapper:
 
-        if not self._cache_file.exists():
+        if not self._basic_cache_file_path.exists():
             logger.debug("Cache file doesn't exist, creating one...")
 
-            with self._cache_file.open("w") as file:
+            with self._basic_cache_file_path.open("w") as file:
                 file.write("{}")
 
-        return self._cache_file.open(mode, encoding = "utf+8")
+        return self._basic_cache_file_path.open(mode, encoding = "utf+8")

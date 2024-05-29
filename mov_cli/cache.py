@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 
     T = TypeVar("T", Any)
 
-    class OsakaCacheData(TypedDict):
+    class BasicCacheData(TypedDict):
         value: Any
-        timestamp: float
+        expiring_date: float
 
 import json
 from datetime import datetime
@@ -40,10 +40,19 @@ class Cache():
     def get_cache(self, id: str) -> Optional[Any]:
         logger.debug(f"Getting '{id}' cache...")
 
-        data: Dict[str, OsakaCacheData] = {}
+        data: Dict[str, BasicCacheData] = {}
 
         with self.__get_cache_file("r") as file:
             data = json.load(file)
+
+        basic_cache = data.get(id)
+
+        if basic_cache is None:
+            return None
+
+        if datetime.now().timestamp() > basic_cache["expiring_date"]:
+            self.clear_cache(id)
+            return None
 
         return data.get(id, {}).get("value")
 
@@ -53,10 +62,10 @@ class Cache():
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data = json.load(file)
+            json_data: Dict[str, BasicCacheData] = json.load(file)
 
         with self.__get_cache_file("w") as file:
-            timestamp = datetime.now().timestamp() + seconds_until_expired
+            timestamp = datetime.now().timestamp() + float(seconds_until_expired)
 
             data = {
                 **json_data, 
@@ -78,7 +87,7 @@ class Cache():
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data: Dict[str, OsakaCacheData] = json.load(file)
+            json_data: Dict[str, BasicCacheData] = json.load(file)
 
         with self.__get_cache_file("w") as file:
             json_data.pop(id)

@@ -23,10 +23,10 @@ from decouple import AutoConfig
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
 
-from . import players, utils
-from .logger import mov_cli_logger
-from .utils import get_appdata_directory
+from . import players
 from .media import Quality
+from .logger import mov_cli_logger
+from .utils import get_appdata_directory, what_platform
 from .utils.subtitles import Lang
 
 __all__ = ("Config",)
@@ -111,7 +111,7 @@ class Config():
         """Returns the player class that was configured in the config. Defaults to MPV."""
         value = self.data.get("player", "mpv")
 
-        platform = utils.what_platform()
+        platform = what_platform()
 
         if value.lower() == "mpv":
             return players.MPV(platform, self)
@@ -159,7 +159,7 @@ class Config():
     @property
     def skip_update_checker(self) -> bool:
         return self.data.get("skip_update_checker", False)
-    
+
     @property
     def hide_ip(self) -> bool:
         return self.data.get("hide_ip", True)
@@ -271,7 +271,7 @@ class Config():
 
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""
-        platform = utils.what_platform()
+        platform = what_platform()
 
         appdata_folder = get_appdata_directory(platform)
 
@@ -293,7 +293,7 @@ class Config():
 
     def __get_env_file(self) -> Path:
         """Function that returns the path to the mov-cli .env file."""
-        platform = utils.what_platform()
+        platform = what_platform()
 
         appdata_folder = get_appdata_directory(platform)
 

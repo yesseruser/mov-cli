@@ -250,7 +250,10 @@ class Config():
 
         if required is not None:
             for required_env in required:
-                env = auto_config(required_env)
+                env = auto_config(required_env, default = None)
+
+                if env is None:
+                    logger.warning(f"The plugin requires this env: {required_env}, it may not work as expected if not specified")
 
                 envs[required_env] = env
     

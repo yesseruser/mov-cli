@@ -17,7 +17,7 @@ from .episode import handle_episode
 from .watch_options import watch_options
 
 from ..media import MetadataType
-from ..utils import what_platform
+from ..utils import what_platform, hide_ip
 from ..logger import mov_cli_logger
 
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config) -> Optional[Literal["search"]]:
@@ -37,7 +37,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
         f"Playing {episode_details_string}'{Colours.BLUE.apply(media.title)}' " \
             f"with {chosen_player.display_name}..."
     )
-    mov_cli_logger.debug(f"Streaming with this url -> '{media.url}'")
+    mov_cli_logger.debug(f"Streaming with this url -> '{hide_ip(media.url, config)}'")
 
     try:
         popen = chosen_player.play(media)
@@ -56,49 +56,46 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
         return None
 
-    option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
+    if config.watch_options:
+        option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
 
-    if option == "search":
-        popen.kill()
-        return option
+        if option == "next" or option == "previous":
+            popen.kill()
 
-    elif option == "next" or option == "previous":
-        popen.kill()
+            media_episodes = scraper.scrape_episodes(metadata)
 
-        media_episodes = scraper.scrape_episodes(metadata)
+            if option == "next":
+                episode.episode += 1
+            else:
+                episode.episode -= 1
 
-        if option == "next":
-            episode.episode += 1
-        else:
-            episode.episode -= 1
+            season_episode_count = media_episodes.get(episode.season)
 
-        season_episode_count = media_episodes.get(episode.season)
+            if season_episode_count is None:
+                mov_cli_logger.info("No more episodes :(")
+                return None
 
-        if season_episode_count is None:
-            mov_cli_logger.info("No more episodes :(")
-            return None
+            result = __handle_next_season(episode, season_episode_count, media_episodes)
 
-        result = __handle_next_season(episode, season_episode_count, media_episodes)
+            if result is False:
+                mov_cli_logger.info("No more episodes :(")
+                return None
 
-        if result is False:
-            mov_cli_logger.info("No more episodes :(")
-            return None
+            media = scrape(metadata, episode, scraper)
 
-        media = scrape(metadata, episode, scraper)
+            return play(media, metadata, scraper, episode, config)
 
-        return play(media, metadata, scraper, episode, config)
+        elif option == "select":
+            popen.kill()
 
-    elif option == "select":
-        popen.kill()
+            episode = handle_episode(None, scraper, metadata, config.fzf_enabled)
 
-        episode = handle_episode(None, scraper, metadata, config.fzf_enabled)
+            if episode is None:
+                return None
 
-        if episode is None:
-            return None
+            media = scrape(metadata, episode, scraper)
 
-        media = scrape(metadata, episode, scraper)
-
-        return play(media, metadata, scraper, episode, config)
+            return play(media, metadata, scraper, episode, config)
 
     popen.wait()
 

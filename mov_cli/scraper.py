@@ -23,7 +23,13 @@ __all__ = (
 
 class Scraper(ABC):
     """A base class for building scrapers from."""
-    def __init__(self, config: Config, http_client: HTTPClient, options: Optional[ScraperOptionsT] = None) -> None:
+    def __init__(
+            self, 
+            config: Config, 
+            http_client: HTTPClient, 
+            options: Optional[ScraperOptionsT] = None
+        ) -> None:
+
         self.config = config
         self.http_client = http_client
         self.options = options or {}
@@ -49,7 +55,6 @@ class Scraper(ABC):
         """
         ...
 
-    @abstractmethod
     def scrape_episodes(self, metadata: Metadata) -> Dict[int, int] | Dict[None, Literal[1]]:
         """Returns episode count for each season in that Movie/Series."""
-        ...
+        return {None: 1}

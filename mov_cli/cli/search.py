@@ -15,7 +15,7 @@ from .plugins import handle_internal_plugin_error
 
 from ..logger import mov_cli_logger
 
-def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool, limit: int = 20) -> Optional[Metadata]:
+def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool, limit: Optional[int]) -> Optional[Metadata]:
     choice = None
 
     mov_cli_logger.info(f"Searching for '{Colours.ORANGE.apply(query)}'...")

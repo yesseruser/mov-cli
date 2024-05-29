@@ -23,10 +23,11 @@ from decouple import AutoConfig
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
 
-from . import players, utils
-from .logger import mov_cli_logger
-from .utils import get_appdata_directory
+from . import players
 from .media import Quality
+from .logger import mov_cli_logger
+from .utils import get_appdata_directory, what_platform
+from .utils.subtitles import Lang, lang_exists
 
 __all__ = ("Config",)
 
@@ -48,18 +49,26 @@ class ConfigQualityData(TypedDict):
     resolution: int
 
 @final
+class ConfigSubtitleData(TypedDict):
+    language: str
+
+@final
 class ConfigData(TypedDict):
     version: int
     debug: bool
     player: str
     editor: str
     parser: SupportedParsersT
+    skip_update_checker: bool
+    hide_ip: bool
     ui: ConfigUIData
     http: ConfigHTTPData
     downloads: ConfigDownloadsData
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
     quality: ConfigQualityData | str
+    watch_options: bool
+    subtitle: ConfigSubtitleData
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -103,7 +112,7 @@ class Config():
         """Returns the player class that was configured in the config. Defaults to MPV."""
         value = self.data.get("player", "mpv")
 
-        platform = utils.what_platform()
+        platform = what_platform()
 
         if value.lower() == "mpv":
             return players.MPV(platform, self)
@@ -113,6 +122,8 @@ class Config():
             return players.SyncPlay(platform, self)
         elif value.lower() == "iina":
             return players.IINA(platform, self)
+        elif value.lower() in ["tty", "mpv-tty"]:
+            return players.MPV_TTY(platform, self)
 
         return players.CustomPlayer(value)
 
@@ -151,6 +162,10 @@ class Config():
     @property
     def skip_update_checker(self) -> bool:
         return self.data.get("skip_update_checker", False)
+
+    @property
+    def hide_ip(self) -> bool:
+        return self.data.get("hide_ip", True)
 
     @property
     def default_scraper(self) -> Optional[str]:
@@ -208,6 +223,11 @@ class Config():
             return None
 
     @property
+    def http_timeout(self) -> int:
+        """Returns the http timeout delay that should be set."""
+        return self.data.get("http", {}).get("timeout", 15)
+
+    @property
     def http_headers(self) -> HttpHeadersData:
         """Returns http headers."""
         default_headers = {
@@ -241,6 +261,19 @@ class Config():
             return Quality.AUTO
 
         return Quality(resolution_pixel)
+    
+    @property
+    def watch_options(self) -> bool:
+        return self.data.get("ui", {}).get("watch_options", True)
+
+    @property
+    def language(self) -> Lang:
+        language = self.data.get("subtitle", {}).get("language", "en")
+
+        if lang_exists(language):
+            return Lang(language)
+    
+        return Lang("en")
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""
@@ -248,7 +281,7 @@ class Config():
 
     def __get_config_file(self) -> Path:
         """Function that returns the path to the config file with multi platform support."""
-        platform = utils.what_platform()
+        platform = what_platform()
 
         appdata_folder = get_appdata_directory(platform)
 
@@ -258,7 +291,7 @@ class Config():
             logger.debug("The 'config.toml' file doesn't exist so we're creating it...")
             config_file = open(config_path, "w")
 
-            template_config_path = f"{Path(os.path.split(__file__)[0])}{os.sep}config.template.toml"
+            template_config_path = Path(__file__).parent.joinpath("config.template.toml")
 
             with open(template_config_path, "r") as config_template:
                 config_file.write(config_template.read())
@@ -270,7 +303,7 @@ class Config():
 
     def __get_env_file(self) -> Path:
         """Function that returns the path to the mov-cli .env file."""
-        platform = utils.what_platform()
+        platform = what_platform()
 
         appdata_folder = get_appdata_directory(platform)
 

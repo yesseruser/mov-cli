@@ -4,7 +4,7 @@ import os
 
 __all__ = ("Lang",)
 
-iso_file = str(Path(os.path.split(__file__)[0]).joinpath("iso_639.json"))
+iso_file = Path(os.path.split(__file__)[0]).joinpath("iso_639.json")
 
 with open(iso_file, "r", encoding="utf-8") as f:
     iso = json.loads(

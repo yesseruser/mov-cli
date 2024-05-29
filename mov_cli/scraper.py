@@ -27,15 +27,12 @@ class Scraper(ABC):
             self, 
             config: Config, 
             http_client: HTTPClient, 
-            options: Optional[ScraperOptionsT] = None, 
-            required_envs: Optional[List] = None, 
-            optional_envs: Optional[List] = None
+            options: Optional[ScraperOptionsT] = None
         ) -> None:
 
         self.config = config
         self.http_client = http_client
         self.options = options or {}
-        self.envs = self.config.get_envs(required_envs, optional_envs)
 
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 

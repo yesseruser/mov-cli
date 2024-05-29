@@ -67,6 +67,7 @@ class ConfigData(TypedDict):
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
     quality: ConfigQualityData | str
+    watch_options: bool
     subtitle: ConfigSubtitleData
 
 HttpHeadersData = TypedDict(
@@ -121,6 +122,8 @@ class Config():
             return players.SyncPlay(platform, self)
         elif value.lower() == "iina":
             return players.IINA(platform, self)
+        elif value.lower() in ["tty", "mpv-tty"]:
+            return players.MPV_TTY(platform, self)
 
         return players.CustomPlayer(value)
 
@@ -258,6 +261,10 @@ class Config():
             return Quality.AUTO
 
         return Quality(resolution_pixel)
+    
+    @property
+    def watch_options(self) -> bool:
+        return self.data.get("ui", {}).get("watch_options", True)
 
     @property
     def language(self) -> Lang:

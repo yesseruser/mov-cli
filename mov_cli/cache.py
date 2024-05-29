@@ -30,6 +30,7 @@ logger = LoggerAdapter(
 )
 
 class Cache():
+    """An API for caching text based data on mov-cli cross platform respectively."""
     def __init__(self, platform: SUPPORTED_PLATFORMS) -> None:
         temp_dir = get_temp_directory(platform)
 

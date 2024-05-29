@@ -42,7 +42,10 @@ def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
     return appdata_dir
 
 def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
-    """Returns the temporary directory where mov-cli dumps stuff. Files stored here WILL get cleared/deleted."""
+    """
+    Returns the temporary directory where mov-cli can dump stuff. 
+    Files stored here WILL get cleared / deleted automatically by the operating system.
+    """
     temp_directory = None
 
     if platform == "Windows":
@@ -56,7 +59,12 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         raise NotImplementedError("Temp directory isn't implemented for iOS!")
 
     elif platform == "Linux":
-        temp_directory = Path("/tmp")
+        temp_dir_env = os.getenv("TMPDIR") # Respect the TMPDIR environment variable on Linux: https://unix.stackexchange.com/a/362107
+
+        if temp_dir_env is None:
+            temp_directory = Path("/tmp")
+
+        temp_directory = Path(temp_dir_env)
 
     elif platform == "Android":
         temp_directory = Path("$PREFIX/tmp")

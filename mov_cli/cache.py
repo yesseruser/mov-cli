@@ -2,13 +2,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Dict, Any, Optional, TypeVar
+    from typing import Dict, Any, Optional, TypeVar, TypedDict
 
     from io import TextIOWrapper
 
     from .utils.platform import SUPPORTED_PLATFORMS
 
     T = TypeVar("T", Any)
+
+    class OsakaCacheData(TypedDict):
+        value: Any
+        timestamp: float
 
 import json
 from datetime import datetime
@@ -36,12 +40,12 @@ class Cache():
     def get_cache(self, cache_name: str) -> Optional[Any]:
         logger.debug(f"Getting '{cache_name}' cache...")
 
-        data: Dict[str, Any] = {}
+        data: Dict[str, OsakaCacheData] = {}
 
         with self.__get_cache_file("r") as file:
             data = json.load(file)
 
-        return data.get(cache_name)["value"]
+        return data.get(cache_name, {}).get("value")
 
     def set_cache(self, cache_name: str, value: T, seconds_until_expired: int) -> T:
         logger.debug(f"Setting '{cache_name}' cache...")
@@ -67,6 +71,8 @@ class Cache():
             json.dump(data, file)
 
         return value
+    
+    def reset_cache()
 
     def clear_cache(self) -> None:
         logger.info("Deleting cache file...")

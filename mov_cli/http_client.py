@@ -31,7 +31,7 @@ class HTTPClient():
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 
         self.__httpx_client = httpx.Client(
-            timeout = 15.0,
+            timeout = config.http_timeout, 
             cookies = None
         )
         

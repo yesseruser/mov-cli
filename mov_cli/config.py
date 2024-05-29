@@ -27,7 +27,7 @@ from . import players
 from .media import Quality
 from .logger import mov_cli_logger
 from .utils import get_appdata_directory, what_platform
-from .utils.subtitles import Lang
+from .utils.subtitles import Lang, lang_exists
 
 __all__ = ("Config",)
 
@@ -263,7 +263,10 @@ class Config():
     def language(self) -> Lang:
         language = self.data.get("subtitle", {}).get("language", "en")
 
-        return Lang(language)
+        if lang_exists(language):
+            return Lang(language)
+    
+        return Lang("en")
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""
@@ -281,7 +284,7 @@ class Config():
             logger.debug("The 'config.toml' file doesn't exist so we're creating it...")
             config_file = open(config_path, "w")
 
-            template_config_path = f"{Path(os.path.split(__file__)[0])}{os.sep}config.template.toml"
+            template_config_path = Path(__file__).parent.joinpath("config.template.toml")
 
             with open(template_config_path, "r") as config_template:
                 config_file.write(config_template.read())

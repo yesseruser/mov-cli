@@ -217,6 +217,11 @@ class Config():
             return None
 
     @property
+    def http_timeout(self) -> int:
+        """Returns the http timeout delay that should be set."""
+        return self.data.get("http", {}).get("timeout", 15)
+
+    @property
     def http_headers(self) -> HttpHeadersData:
         """Returns http headers."""
         default_headers = {

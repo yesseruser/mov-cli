@@ -31,7 +31,7 @@ class HTTPClient():
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 
         self.__httpx_client = httpx.Client(
-            timeout = 15.0,
+            timeout = config.http_timeout, 
             cookies = None
         )
         
@@ -64,12 +64,13 @@ class HTTPClient():
 
             if response.is_error:
                 self.logger.debug(
-                    f"GET Request to '{response.url}' failed! ({response})"
+                    f"GET Request to '{response.url}' {Colours.RED.apply('failed!')} ({response})"
                 )
 
             return response
 
         except httpx.ConnectError as e:
+            # TODO: I think this needs improving. I see people are getting certificate errors that aren't being caught here.
             if "[SSL: CERTIFICATE_VERIFY_FAILED]" in str(e):
                 raise SiteMaybeBlocked(url, e)
 

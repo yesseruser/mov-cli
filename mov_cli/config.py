@@ -54,6 +54,8 @@ class ConfigData(TypedDict):
     player: str
     editor: str
     parser: SupportedParsersT
+    skip_update_checker: bool
+    hide_ip: bool
     ui: ConfigUIData
     http: ConfigHTTPData
     downloads: ConfigDownloadsData
@@ -151,6 +153,10 @@ class Config():
     @property
     def skip_update_checker(self) -> bool:
         return self.data.get("skip_update_checker", False)
+    
+    @property
+    def hide_ip(self) -> bool:
+        return self.data.get("hide_ip", True)
 
     @property
     def default_scraper(self) -> Optional[str]:
@@ -206,6 +212,11 @@ class Config():
             return {"all://": proxy}
         else:
             return None
+
+    @property
+    def http_timeout(self) -> int:
+        """Returns the http timeout delay that should be set."""
+        return self.data.get("http", {}).get("timeout", 15)
 
     @property
     def http_headers(self) -> HttpHeadersData:

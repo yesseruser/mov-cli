@@ -17,7 +17,7 @@ from .episode import handle_episode
 from .watch_options import watch_options
 
 from ..media import MetadataType
-from ..utils import what_platform
+from ..utils import what_platform, hide_ip
 from ..logger import mov_cli_logger
 
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config) -> Optional[Literal["search"]]:
@@ -37,7 +37,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
         f"Playing {episode_details_string}'{Colours.BLUE.apply(media.title)}' " \
             f"with {chosen_player.display_name}..."
     )
-    mov_cli_logger.debug(f"Streaming with this url -> '{media.url}'")
+    mov_cli_logger.debug(f"Streaming with this url -> '{hide_ip(media.url, config)}'")
 
     try:
         popen = chosen_player.play(media)
@@ -58,11 +58,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
     option = watch_options(popen, chosen_player, platform, media, config.fzf_enabled)
 
-    if option == "search":
-        popen.kill()
-        return option
-
-    elif option == "next" or option == "previous":
+    if option == "next" or option == "previous":
         popen.kill()
 
         media_episodes = scraper.scrape_episodes(metadata)

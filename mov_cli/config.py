@@ -27,6 +27,7 @@ from . import players, utils
 from .logger import mov_cli_logger
 from .utils import get_appdata_directory
 from .media import Quality
+from .utils.subtitles import Lang
 
 __all__ = ("Config",)
 
@@ -48,6 +49,10 @@ class ConfigQualityData(TypedDict):
     resolution: int
 
 @final
+class ConfigSubtitleData(TypedDict):
+    language: str
+
+@final
 class ConfigData(TypedDict):
     version: int
     debug: bool
@@ -62,6 +67,7 @@ class ConfigData(TypedDict):
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
     quality: ConfigQualityData | str
+    subtitle: ConfigSubtitleData
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -247,6 +253,12 @@ class Config():
             return Quality.AUTO
 
         return Quality(resolution_pixel)
+
+    @property
+    def language(self) -> Lang:
+        language = self.data.get("subtitle", {}).get("language", "en")
+
+        return Lang(language)
 
     def get_env_config(self) -> AutoConfig:
         """Returns python decouple config object for mov-cli's appdata .env file."""

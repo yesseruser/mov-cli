@@ -36,6 +36,7 @@ dependencies = [
     "packaging",
     "thefuzz",
     "python-decouple",
+    "iso639-lang",
 
     # Included plugins
     "mov-cli-test>=1.1.0"
@@ -65,7 +66,7 @@ build-backend = "setuptools.build_meta"
 include = ["mov_cli*"]
 
 [tool.setuptools.package-data]
-"mov_cli" = ["config.template.toml", "cli/random_tips.json"]
+"mov_cli" = ["config.template.toml", "cli/random_tips.json", "utils/subtitles/iso_639.json"]
 
 [project.scripts]
 mov-cli = "mov_cli.cli.__main__:app"

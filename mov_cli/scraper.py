@@ -55,7 +55,6 @@ class Scraper(ABC):
         """
         ...
 
-    @abstractmethod
     def scrape_episodes(self, metadata: Metadata) -> Dict[int, int] | Dict[None, Literal[1]]:
         """Returns episode count for each season in that Movie/Series."""
-        ...
+        return {None: 1}

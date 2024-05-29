@@ -3,14 +3,16 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Optional
-    from ..media import Media
+
     from .. import Config
+    from ..media import Media
     from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
 from devgoldyutils import Colours
 
 from .player import Player
+from ..media.quality import Quality
 
 __all__ = ("MPV",)
 
@@ -54,7 +56,7 @@ class MPV(Player):
             if media.subtitles is not None:
                 args.append(f"--sub-file={media.subtitles}")
 
-            if self.config.resolution is not None:
+            if not self.config.resolution == Quality.AUTO:
                 args.append(f"--hls-bitrate={self.config.resolution.value}") # NOTE: This only works when the file is a m3u8
 
             return subprocess.Popen(args)

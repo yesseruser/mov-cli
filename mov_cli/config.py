@@ -116,8 +116,8 @@ class Config():
             return players.SyncPlay(platform, self)
         elif value.lower() == "iina":
             return players.IINA(platform, self)
-        elif value.lower() == "tty":
-            return players.TTY(platform, self)
+        elif value.lower() in ["tty", "mpv-tty"]:
+            return players.MPV_TTY(platform, self)
 
         return players.CustomPlayer(value)
 

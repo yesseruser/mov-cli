@@ -55,7 +55,7 @@
   - Linux
   - Windows
   - Android (via [Termux](https://termux.dev/en/))
-  - *iOS (via [iSH Shell](https://ish.app/))* (unstable, https://github.com/mov-cli/mov-cli/issues/256)
+  - iOS (via [iSH Shell](https://ish.app/))
   - MacOS
 - **[python](https://www.python.org/downloads/)** (**required**, with pip)
 - **[lxml](https://pypi.org/project/lxml/)** (optional, ⚡ faster scraping)

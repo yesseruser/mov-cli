@@ -52,7 +52,7 @@ def mov_cli(
         player = player, 
         scraper = (scraper, ["scrapers", "default"]), 
         fzf = (fzf, ["ui", "fzf"]),
-        limit = limit
+        limit = (limit, ["ui", "limit"])
     )
 
     if config.debug:

@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Optional
     from ..utils import EpisodeSelector
+    from .quality import Quality
 
 from abc import abstractmethod
 
-from .quality import Quality
+from .quality import get_quality
 
 __all__ = (
     "Media", 
@@ -24,7 +25,6 @@ class Media():
         audio_url: Optional[str], 
         referrer: Optional[str], 
         subtitles: Optional[str],
-        quality: Quality
     ) -> None:
         self.url = url
         """The stream-able url of the media."""
@@ -36,14 +36,17 @@ class Media():
         """The required referrer for streaming the media content."""
         self.subtitles = subtitles
         """The url or file path to the subtitles."""
-        self.quality = quality
-        """The selected quality of media."""
 
     @property
     @abstractmethod
     def display_name(self) -> str:
         """The title that should be displayed by the player."""
         ...
+    
+    @property
+    def quality(self) -> Quality | None:
+        """The selected quality of media."""
+        return get_quality(self.url)
 
 class Multi(Media):
     """Represents a media that has multiple episodes like a TV Series, Anime or Cartoon."""
@@ -55,7 +58,6 @@ class Multi(Media):
         audio_url: Optional[str] = None,
         referrer: Optional[str] = None,
         subtitles: Optional[str] = None,
-        quality: Quality = Quality.AUTO
     ) -> None:
         self.episode = episode
         """The episode and season of this series."""
@@ -66,7 +68,6 @@ class Multi(Media):
             audio_url = audio_url, 
             referrer = referrer,
             subtitles = subtitles,
-            quality = quality
         )
 
     @property
@@ -83,7 +84,6 @@ class Single(Media):
         referrer: Optional[str] = None, 
         year: Optional[str] = None, 
         subtitles: Optional[str] = None,
-        quality: Quality = Quality.AUTO
     ) -> None:
         self.year = year
         """The year this film was released."""
@@ -94,7 +94,6 @@ class Single(Media):
             audio_url = audio_url, 
             referrer = referrer,
             subtitles = subtitles,
-            quality = quality
         )
 
     @property

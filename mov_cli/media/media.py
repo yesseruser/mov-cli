@@ -24,7 +24,7 @@ class Media():
         title: str, 
         audio_url: Optional[str], 
         referrer: Optional[str], 
-        subtitles: Optional[str],
+        subtitles: Optional[str]
     ) -> None:
         self.url = url
         """The stream-able url of the media."""
@@ -57,7 +57,7 @@ class Multi(Media):
         episode: EpisodeSelector,
         audio_url: Optional[str] = None,
         referrer: Optional[str] = None,
-        subtitles: Optional[str] = None,
+        subtitles: Optional[str] = None
     ) -> None:
         self.episode = episode
         """The episode and season of this series."""
@@ -67,7 +67,7 @@ class Multi(Media):
             title = title, 
             audio_url = audio_url, 
             referrer = referrer,
-            subtitles = subtitles,
+            subtitles = subtitles
         )
 
     @property
@@ -83,7 +83,7 @@ class Single(Media):
         audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
         year: Optional[str] = None, 
-        subtitles: Optional[str] = None,
+        subtitles: Optional[str] = None
     ) -> None:
         self.year = year
         """The year this film was released."""
@@ -93,7 +93,7 @@ class Single(Media):
             title = title, 
             audio_url = audio_url, 
             referrer = referrer,
-            subtitles = subtitles,
+            subtitles = subtitles
         )
 
     @property

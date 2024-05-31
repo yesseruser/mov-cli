@@ -51,7 +51,7 @@ def get_quality(url: str | Path) -> Quality | None:
     out = str(subprocess.check_output(args), "utf-8")
 
     stream = json.loads(out).get("streams", [])
-    
+
     if stream:
         height = stream[0]["height"]
 

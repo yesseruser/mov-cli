@@ -3,7 +3,7 @@ name = "mov-cli"
 description = "Watch everything from your terminal."
 authors = [
     {name = "Pain", email = "painedposeidon444@gmail.com"},
-    {name = "Ananas", email = "ananas@r3tr0ananas.pro"},
+    {name = "Ananas", email = "ananas@ananas.moe"},
     {name = "Goldy", email = "goldy@devgoldy.xyz"}
 ]
 readme = {file = "README.md", content-type = "text/markdown"}

@@ -267,6 +267,10 @@ class Config():
         return self.data.get("ui", {}).get("watch_options", True)
 
     @property
+    def limit(self) -> int | None:
+        return self.data.get("ui", {}).get("limit")
+
+    @property
     def language(self) -> Lang:
         language = self.data.get("subtitle", {}).get("language", "en")
 

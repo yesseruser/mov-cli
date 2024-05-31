@@ -51,7 +51,8 @@ def mov_cli(
         debug = debug, 
         player = player, 
         scraper = (scraper, ["scrapers", "default"]), 
-        fzf = (fzf, ["ui", "fzf"])
+        fzf = (fzf, ["ui", "fzf"]),
+        limit = limit
     )
 
     if config.debug:
@@ -101,7 +102,7 @@ def mov_cli(
 
         chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
-        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, limit)
+        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, config.limit)
 
         if choice is None:
             mov_cli_logger.error("There was no results or you didn't select anything.")

@@ -7,12 +7,12 @@ if TYPE_CHECKING:
 
 from abc import abstractmethod
 
+from .quality import Quality
+
 __all__ = (
     "Media", 
     "Multi", 
-    "Single", 
-    "Movie", 
-    "Series"
+    "Single"
 )
 
 class Media():
@@ -23,7 +23,8 @@ class Media():
         title: str, 
         audio_url: Optional[str], 
         referrer: Optional[str], 
-        subtitles: Optional[str]
+        subtitles: Optional[str],
+        quality: Quality
     ) -> None:
         self.url = url
         """The stream-able url of the media."""
@@ -35,6 +36,8 @@ class Media():
         """The required referrer for streaming the media content."""
         self.subtitles = subtitles
         """The url or file path to the subtitles."""
+        self.quality = quality
+        """The selected quality of media."""
 
     @property
     @abstractmethod
@@ -45,13 +48,14 @@ class Media():
 class Multi(Media):
     """Represents a media that has multiple episodes like a TV Series, Anime or Cartoon."""
     def __init__(
-        self, 
-        url: str, 
-        title: str, 
-        episode: EpisodeSelector, 
-        audio_url: Optional[str] = None, 
-        referrer: Optional[str] = None, 
-        subtitles: Optional[str] = None
+        self,
+        url: str,
+        title: str,
+        episode: EpisodeSelector,
+        audio_url: Optional[str] = None,
+        referrer: Optional[str] = None,
+        subtitles: Optional[str] = None,
+        quality: Quality = Quality.AUTO
     ) -> None:
         self.episode = episode
         """The episode and season of this series."""
@@ -61,7 +65,8 @@ class Multi(Media):
             title = title, 
             audio_url = audio_url, 
             referrer = referrer,
-            subtitles = subtitles
+            subtitles = subtitles,
+            quality = quality
         )
 
     @property
@@ -77,7 +82,8 @@ class Single(Media):
         audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
         year: Optional[str] = None, 
-        subtitles: Optional[str] = None 
+        subtitles: Optional[str] = None,
+        quality: Quality = Quality.AUTO
     ) -> None:
         self.year = year
         """The year this film was released."""
@@ -87,15 +93,10 @@ class Single(Media):
             title = title, 
             audio_url = audio_url, 
             referrer = referrer,
-            subtitles = subtitles
+            subtitles = subtitles,
+            quality = quality
         )
 
     @property
     def display_name(self) -> str:
         return f"{self.title} ({self.year})" if self.year is not None else self.title
-
-# Backwards compatibility for post v4.3 extensions.
-Series = Multi
-"""DEPRECATED!!! USE 'Multi' INSTEAD! This will be removed after v4.4 and WILL cause hard crashes."""
-Movie = Single
-"""DEPRECATED!!! USE 'Single' INSTEAD! This will be removed after v4.4 and WILL cause hard crashes."""

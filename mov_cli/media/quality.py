@@ -1,6 +1,12 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    ...
+
 from enum import Enum
 
-__all__ = ("Quality",)
+__all__ = ("Quality", )
 
 class Quality(Enum):
     SD = 480

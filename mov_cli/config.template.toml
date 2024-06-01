@@ -13,9 +13,11 @@ hide_ip = true
 # [mov-cli.quality]
 # resolution = 720
 
-# [mov-cli.ui]
+[mov-cli.ui]
 # fzf = true
+# limit = 20
 # watch_options = true
+display_quality = false
 
 [mov-cli.plugins] # E.g: namespace = "package-name"
 test = "mov-cli-test"

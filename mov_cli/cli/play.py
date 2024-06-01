@@ -25,6 +25,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
     chosen_player = config.player
 
+    quality_string = ""
     episode_details_string = ""
 
     if metadata.type == MetadataType.MULTI:
@@ -33,9 +34,15 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
         episode_details_string = f"episode {episode_string} in season {season_string} of " if episode.season > 1 else f"episode {episode_string} of "
 
+    if config.display_quality:
+        quality = media.get_quality()
+
+        if quality is not None:
+            quality_string = f"in {Colours.GREEN.apply(quality.name)} "
+
     mov_cli_logger.info(
         f"Playing {episode_details_string}'{Colours.BLUE.apply(media.title)}' " \
-            f"with {chosen_player.display_name}..."
+            f"{quality_string}with {chosen_player.display_name}..."
     )
     mov_cli_logger.debug(f"Streaming with this url -> '{hide_ip(media.url, config)}'")
 

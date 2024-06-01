@@ -5,14 +5,17 @@ if TYPE_CHECKING:
     from typing import Optional
     from ..utils import EpisodeSelector
 
+import json
+import shutil
+import subprocess
+from .quality import Quality
+
 from abc import abstractmethod
 
 __all__ = (
     "Media", 
     "Multi", 
-    "Single", 
-    "Movie", 
-    "Series"
+    "Single"
 )
 
 class Media():
@@ -26,7 +29,7 @@ class Media():
         subtitles: Optional[str]
     ) -> None:
         self.url = url
-        """The stream-able url of the media."""
+        """The stream-able url of the media (Can also be a path to a file). """
         self.title = title
         """A title to represent this stream-able media."""
         self.audio_url = audio_url
@@ -36,21 +39,67 @@ class Media():
         self.subtitles = subtitles
         """The url or file path to the subtitles."""
 
+        self.__stream_quality: Optional[Quality] = None
+
     @property
     @abstractmethod
     def display_name(self) -> str:
         """The title that should be displayed by the player."""
         ...
 
+    def get_quality(self) -> Optional[Quality]:
+        """Uses ffprode to grab the quality of the stream."""
+
+        if self.__stream_quality is None:
+
+            if shutil.which("ffprobe") is None:
+                return None
+
+            args = [
+                "ffprobe", 
+                "-v", 
+                "error", 
+                "-select_streams", 
+                "v", 
+                "-show_entries", 
+                "stream=width,height", 
+                "-of",
+                "json",
+                self.url
+            ]
+
+            out = str(subprocess.check_output(args), "utf-8")
+
+            stream = json.loads(out).get("streams", [])
+
+            if not stream == []:
+                width = stream[0]["width"]
+                height = stream[0]["height"]
+
+                target_dimension_px = height
+
+                if height > width:
+                    target_dimension_px = width
+
+                heights_lower_than_target_height = [
+                    quality_height for quality_height in Quality._value2member_map_ if target_dimension_px >= quality_height
+                ]
+
+                closest_quality_height = min(heights_lower_than_target_height, key = lambda x: abs(x - target_dimension_px))
+
+                self.__stream_quality = Quality(closest_quality_height)
+
+        return self.__stream_quality
+
 class Multi(Media):
     """Represents a media that has multiple episodes like a TV Series, Anime or Cartoon."""
     def __init__(
-        self, 
-        url: str, 
-        title: str, 
-        episode: EpisodeSelector, 
-        audio_url: Optional[str] = None, 
-        referrer: Optional[str] = None, 
+        self,
+        url: str,
+        title: str,
+        episode: EpisodeSelector,
+        audio_url: Optional[str] = None,
+        referrer: Optional[str] = None,
         subtitles: Optional[str] = None
     ) -> None:
         self.episode = episode
@@ -77,7 +126,7 @@ class Single(Media):
         audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
         year: Optional[str] = None, 
-        subtitles: Optional[str] = None 
+        subtitles: Optional[str] = None
     ) -> None:
         self.year = year
         """The year this film was released."""
@@ -93,9 +142,3 @@ class Single(Media):
     @property
     def display_name(self) -> str:
         return f"{self.title} ({self.year})" if self.year is not None else self.title
-
-# Backwards compatibility for post v4.3 extensions.
-Series = Multi
-"""DEPRECATED!!! USE 'Multi' INSTEAD! This will be removed after v4.4 and WILL cause hard crashes."""
-Movie = Single
-"""DEPRECATED!!! USE 'Single' INSTEAD! This will be removed after v4.4 and WILL cause hard crashes."""

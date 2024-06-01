@@ -34,6 +34,9 @@ __all__ = ("Config",)
 @final
 class ConfigUIData(TypedDict):
     fzf: bool
+    watch_options: bool
+    limit: int
+    display_quality: bool
 
 @final
 class ConfigHTTPData(TypedDict):
@@ -67,7 +70,6 @@ class ConfigData(TypedDict):
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
     quality: ConfigQualityData | str
-    watch_options: bool
     subtitle: ConfigSubtitleData
 
 HttpHeadersData = TypedDict(
@@ -265,6 +267,14 @@ class Config():
     @property
     def watch_options(self) -> bool:
         return self.data.get("ui", {}).get("watch_options", True)
+
+    @property
+    def limit(self) -> int | None:
+        return self.data.get("ui", {}).get("limit")
+
+    @property
+    def display_quality(self) -> int | None:
+        return self.data.get("ui", {}).get("display_quality", False)
 
     @property
     def language(self) -> Lang:

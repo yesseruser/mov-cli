@@ -42,7 +42,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
     mov_cli_logger.info(
         f"Playing {episode_details_string}'{Colours.BLUE.apply(media.title)}' " \
-            f"{quality_string} with {chosen_player.display_name}..."
+            f"{quality_string}with {chosen_player.display_name}..."
     )
     mov_cli_logger.debug(f"Streaming with this url -> '{hide_ip(media.url, config)}'")
 

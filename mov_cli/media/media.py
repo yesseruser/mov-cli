@@ -52,7 +52,7 @@ class Media():
 
         if self.__stream_quality is None:
 
-            if not shutil.which("ffprobe"):
+            if shutil.which("ffprobe") is None:
                 return None
 
             args = [
@@ -72,15 +72,17 @@ class Media():
 
             stream = json.loads(out).get("streams", [])
 
-            if stream:
+            if not stream == []:
                 height = stream[0]["height"]
-                width = stream[0]["width"]
+                # width = stream[0]["width"]
 
-                if height in Quality._value2member_map_:
-                    self.__stream_quality = Quality(height)
+                heights_lower_than_target_height = [
+                    quality_height for quality_height in Quality._value2member_map_ if height >= quality_height
+                ]
 
-                if width in Quality._value2member_map_:
-                    self.__stream_quality = Quality(width)
+                closest_quality_height = min(heights_lower_than_target_height, key = lambda x: abs(x - height))
+
+                self.__stream_quality = Quality(closest_quality_height)
 
         return self.__stream_quality
 

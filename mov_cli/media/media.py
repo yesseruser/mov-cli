@@ -4,11 +4,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Optional
     from ..utils import EpisodeSelector
-    from .quality import Quality
+
+import json
+import shutil
+import subprocess
+from .quality import Quality
 
 from abc import abstractmethod
-
-from .quality import get_quality
 
 __all__ = (
     "Media", 
@@ -27,7 +29,7 @@ class Media():
         subtitles: Optional[str]
     ) -> None:
         self.url = url
-        """The stream-able url of the media."""
+        """The stream-able url of the media (Can also be a path to a file). """
         self.title = title
         """A title to represent this stream-able media."""
         self.audio_url = audio_url
@@ -37,16 +39,50 @@ class Media():
         self.subtitles = subtitles
         """The url or file path to the subtitles."""
 
+        self.__stream_quality: Optional[Quality] = None
+
     @property
     @abstractmethod
     def display_name(self) -> str:
         """The title that should be displayed by the player."""
         ...
-    
-    @property
-    def quality(self) -> Quality | None:
-        """The selected quality of media."""
-        return get_quality(self.url)
+
+    def get_quality(self) -> Optional[Quality]:
+        """Uses ffprode to grab the quality of the stream."""
+
+        if self.__stream_quality is None:
+
+            if not shutil.which("ffprobe"):
+                return None
+
+            args = [
+                "ffprobe", 
+                "-v", 
+                "error", 
+                "-select_streams", 
+                "v", 
+                "-show_entries", 
+                "stream=width,height", 
+                "-of",
+                "json",
+                self.url
+            ]
+
+            out = str(subprocess.check_output(args), "utf-8")
+
+            stream = json.loads(out).get("streams", [])
+
+            if stream:
+                height = stream[0]["height"]
+                width = stream[0]["width"]
+
+                if height in Quality._value2member_map_:
+                    self.__stream_quality = Quality(height)
+
+                if width in Quality._value2member_map_:
+                    self.__stream_quality = Quality(width)
+
+        return self.__stream_quality
 
 class Multi(Media):
     """Represents a media that has multiple episodes like a TV Series, Anime or Cartoon."""

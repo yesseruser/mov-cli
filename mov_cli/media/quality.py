@@ -2,15 +2,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    ...
 
 from enum import Enum
-import subprocess
-import shutil
-import json
 
-
-__all__ = ("Quality", "get_quality",)
+__all__ = ("Quality", )
 
 class Quality(Enum):
     SD = 480
@@ -30,36 +26,3 @@ class Quality(Enum):
     def apply_p(self) -> str:
         """Returns that enum but with an ending p."""
         return f"{self.value}p"
-
-def get_quality(url: str | Path) -> Quality | None:
-    if not shutil.which("ffprobe"):
-        return None
-
-    args = [
-        "ffprobe", 
-        "-v", 
-        "error", 
-        "-select_streams", 
-        "v", 
-        "-show_entries", 
-        "stream=width,height", 
-        "-of",
-        "json",
-        url
-    ]
-
-    out = str(subprocess.check_output(args), "utf-8")
-
-    stream = json.loads(out).get("streams", [])
-
-    if stream:
-        height = stream[0]["height"]
-        width = stream[0]["width"]
-
-        if height in Quality._value2member_map_:
-            return Quality(height)
-        
-        if width in Quality._value2member_map_:
-            return Quality(width)
-
-    return None

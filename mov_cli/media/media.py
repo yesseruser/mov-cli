@@ -73,14 +73,19 @@ class Media():
             stream = json.loads(out).get("streams", [])
 
             if not stream == []:
+                width = stream[0]["width"]
                 height = stream[0]["height"]
-                # width = stream[0]["width"]
+
+                target_dimension_px = height
+
+                if height > width:
+                    target_dimension_px = width
 
                 heights_lower_than_target_height = [
-                    quality_height for quality_height in Quality._value2member_map_ if height >= quality_height
+                    quality_height for quality_height in Quality._value2member_map_ if target_dimension_px >= quality_height
                 ]
 
-                closest_quality_height = min(heights_lower_than_target_height, key = lambda x: abs(x - height))
+                closest_quality_height = min(heights_lower_than_target_height, key = lambda x: abs(x - target_dimension_px))
 
                 self.__stream_quality = Quality(closest_quality_height)
 

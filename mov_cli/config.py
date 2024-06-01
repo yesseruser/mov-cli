@@ -36,7 +36,7 @@ class ConfigUIData(TypedDict):
     fzf: bool
     watch_options: bool
     limit: int
-    print_quality: bool
+    display_quality: bool
 
 @final
 class ConfigHTTPData(TypedDict):
@@ -273,8 +273,8 @@ class Config():
         return self.data.get("ui", {}).get("limit")
 
     @property
-    def print_quality(self) -> int | None:
-        return self.data.get("ui", {}).get("print_quality", True if shutil.which("ffprobe") is not None else False)
+    def display_quality(self) -> int | None:
+        return self.data.get("ui", {}).get("display_quality", False)
 
     @property
     def language(self) -> Lang:

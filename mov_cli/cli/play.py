@@ -34,7 +34,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
         episode_details_string = f"episode {episode_string} in season {season_string} of " if episode.season > 1 else f"episode {episode_string} of "
 
-    if config.print_quality:
+    if config.display_quality:
         quality = media.get_quality()
 
         if quality is not None:

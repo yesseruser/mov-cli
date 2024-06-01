@@ -54,8 +54,12 @@ def get_quality(url: str | Path) -> Quality | None:
 
     if stream:
         height = stream[0]["height"]
+        width = stream[0]["width"]
 
         if height in Quality._value2member_map_:
             return Quality(height)
+        
+        if width in Quality._value2member_map_:
+            return Quality(width)
 
     return None

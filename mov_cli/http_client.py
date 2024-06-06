@@ -46,7 +46,9 @@ class HTTPClient():
         **kwargs
     ) -> Response:
         """Performs a GET request and returns httpx.Response."""
-        self.logger.debug(Colours.GREEN.apply("GET") + f" -> {hide_ip(url, self.config)}")
+        self.logger.debug(
+            Colours.GREEN.apply("GET") + f" -> {hide_ip(url, self.config.hide_ip)}"
+        )
 
         if include_default_headers is True:
             if headers.get("Referer") is None:
@@ -87,7 +89,7 @@ class HTTPClient():
         **kwargs
     ) -> Response:
         """Performs a POST request and returns httpx.Response."""
-        self.logger.debug(Colours.GREEN.apply("POST") + f" -> {hide_ip(url, self.config)}")
+        self.logger.debug(Colours.GREEN.apply("POST") + f" -> {hide_ip(url, self.config.hide_ip)}")
 
         if include_default_headers is True:
             if headers.get("Referer") is None:

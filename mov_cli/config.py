@@ -55,10 +55,12 @@ class ConfigQualityData(TypedDict):
 class ConfigSubtitleData(TypedDict):
     language: str
 
+ConfigDebugData = TypedDict("ConfigDebugData", {"global": bool, "player": bool})
+
 @final
 class ConfigData(TypedDict):
     version: int
-    debug: bool
+    debug: bool | ConfigDebugData
     player: str
     editor: str
     parser: SupportedParsersT
@@ -198,7 +200,22 @@ class Config():
     @property
     def debug(self) -> bool:
         """Returns whether debug should be enabled or not."""
-        return self.data.get("debug", False)
+        debug: dict | bool = self.data.get("debug", False)
+
+        if isinstance(debug, dict):
+            return debug.get("global", False)
+
+        return debug
+
+    @property
+    def debug_player(self) -> bool:
+        """Returns whether debug for the player should be enabled or not."""
+        debug: dict | bool = self.data.get("debug", {})
+
+        if isinstance(debug, bool):
+            return False
+
+        return debug.get("player", False)
 
     @property
     def proxy(self) -> dict | None:

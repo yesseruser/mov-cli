@@ -133,7 +133,7 @@ def mov_cli(
         if download:
             dl = Download(config)
 
-            mov_cli_logger.debug(f"Downloading from this url -> '{hide_ip(media.url, config)}'")
+            mov_cli_logger.debug(f"Downloading from this url -> '{hide_ip(media.url, config.hide_ip)}'")
 
             popen = dl.download(media)
             

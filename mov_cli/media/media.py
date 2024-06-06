@@ -2,12 +2,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
+
     from ..utils import EpisodeSelector
 
 import json
 import shutil
 import subprocess
+
 from .quality import Quality
 
 from abc import abstractmethod
@@ -26,7 +28,7 @@ class Media():
         title: str, 
         audio_url: Optional[str], 
         referrer: Optional[str], 
-        subtitles: Optional[str]
+        subtitles: Optional[List[str]]
     ) -> None:
         self.url = url
         """The stream-able url of the media (Can also be a path to a file). """
@@ -37,7 +39,7 @@ class Media():
         self.referrer = referrer
         """The required referrer for streaming the media content."""
         self.subtitles = subtitles
-        """The url or file path to the subtitles."""
+        """A tuple of urls or file paths to subtitles."""
 
         self.__stream_quality: Optional[Quality] = None
 
@@ -100,7 +102,7 @@ class Multi(Media):
         episode: EpisodeSelector,
         audio_url: Optional[str] = None,
         referrer: Optional[str] = None,
-        subtitles: Optional[str] = None
+        subtitles: Optional[List[str]] = None
     ) -> None:
         self.episode = episode
         """The episode and season of this series."""
@@ -126,7 +128,7 @@ class Single(Media):
         audio_url: Optional[str] = None, 
         referrer: Optional[str] = None, 
         year: Optional[str] = None, 
-        subtitles: Optional[str] = None
+        subtitles: Optional[List[str]] = None
     ) -> None:
         self.year = year
         """The year this film was released."""

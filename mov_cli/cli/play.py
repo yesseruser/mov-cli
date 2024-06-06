@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from ..scraper import Scraper
     from ..media import Media, Metadata
 
-    from utils.episode_selector import EpisodeSelector
+    from ..utils.episode_selector import EpisodeSelector
 
 from devgoldyutils import Colours
 
@@ -44,10 +44,11 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
         f"Playing {episode_details_string}'{Colours.BLUE.apply(media.title)}' " \
             f"{quality_string}with {chosen_player.display_name}..."
     )
-    mov_cli_logger.debug(f"Streaming with this url -> '{hide_ip(media.url, config)}'")
 
     try:
         popen = chosen_player.play(media)
+
+        mov_cli_logger.debug(f"Called player with these args -> '{hide_ip(' '.join(popen.args), config.hide_ip)}'")
     except FileNotFoundError as e:
         mov_cli_logger.error(
             f"The player '{chosen_player.display_name}' was not found! " \

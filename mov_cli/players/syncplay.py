@@ -38,7 +38,9 @@ class SyncPlay(Player):
                 args.append(f"--audio-file={media.audio_url}")
 
             if media.subtitles is not None:
-                args.append(f"--sub-file={media.subtitles}")
+
+                for subtitle in media.subtitles:
+                    args.append(f"--sub-file={subtitle}")
 
             if self.config.resolution is not None:
                 args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: Only M3U8
@@ -56,14 +58,19 @@ class SyncPlay(Player):
             if media.referrer is not None:
                 args.append(f"--mpv-referrer={media.referrer}")
 
-            if media.audio_url is not None: # TODO: This will need testing.
+            if media.audio_url is not None: # NOTE: Let us know if this works.
                 args.append(f"--mpv-audio-file={media.audio_url}")
 
-            if media.subtitles is not None: # TODO: This will need testing.
-                args.append(f"--mpv-sub-file={media.subtitles}")
+            if media.subtitles is not None: # NOTE: Let us know if this works.
 
-            if self.config.resolution is not None: # TODO: This will need testing.
+                for subtitle in media.subtitles:
+                    args.append(f"--mpv-sub-file={media.subtitles}")
+
+            if self.config.resolution is not None: # NOTE: Let us know if this works.
                 args.append(f"--mpv-hls-bitrate={self.config.resolution}")
+
+            if self.config.debug_player is False: # NOTE: Needs testing.
+                args.append("--mpv-no-terminal")
 
             return subprocess.Popen(args)
 

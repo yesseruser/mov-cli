@@ -36,6 +36,8 @@ class Metadata:
     """Title of the Series, Film or TV Station."""
     type: MetadataType
     """The type of metadata. Is it a Series, Film or LIVE TV Station?"""
+    image_url: Optional[str] = field(default = None)
+    """Image URL to a banner, cover or thumbnail of this media."""
     year: Optional[str] = field(default = None)
     """Year the Series or Film was released."""
 
@@ -56,11 +58,8 @@ class ExtraMetadata():
     """More in-depth metadata about media."""
     description: Optional[str]
     """Description of Series, Film or TV Station."""
-    image_url: Optional[str]
-    """Url to high res image cover of Series, Film or TV Station."""
     alternate_titles: List[str] | Tuple[str, str] | None = field(default = None)
 
     cast: List[str] | None = field(default = None)
     genres: List[str] | None = field(default = None)
-
     airing: AiringType | None = field(default = None)

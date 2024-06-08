@@ -10,17 +10,15 @@ __all__ = ()
 
 app = typer.Typer(
     pretty_exceptions_enable = False, 
-    help = "A developer only command to assist with testing and development of mov-cli plugins."
+    help = "Developer only commands to be executed from scripts and assist with testing and development of mov-cli plugins."
 )
 
-test_app = typer.Typer(name = "test", help = "Run tests on varies mov-cli functionalities.")
+test_app = typer.Typer(name = "test", help = "Run tests on plugins varies mov-cli functionalities.")
+preview_app = typer.Typer(name = "preview", help = "Dev command used by stuff like fzf to display images from mov-cli in the terminal.")
 
 app.add_typer(test_app)
+app.add_typer(preview_app)
 
-@test_app.command(help = "Automatically tests the **entire** plugin for faults.")
-def plugin(
-    plugin_name: str = typer.Argument(help = "The name of the plugin to test."), 
-    query: str = typer.Argument("*", help = "The query to use if searching is being tested.")
-):
-    # NOTE: I'll be using a series of pytest tests here.
+@preview_app.command(help = "Preview image from mov-cli cache to terminal.")
+def image(id: str):
     ...

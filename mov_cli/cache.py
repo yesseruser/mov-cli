@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
     class BasicCacheData(TypedDict):
         value: Any
-        expiring_date: float
+        expiring_date: Optional[float]
 
 import json
 from datetime import datetime
@@ -51,13 +51,15 @@ class Cache():
         if basic_cache is None:
             return None
 
-        if datetime.now().timestamp() > basic_cache["expiring_date"]:
+        expiring_data = basic_cache["expiring_date"]
+
+        if expiring_data is not None and datetime.now().timestamp() > expiring_data:
             self.clear_cache(id)
             return None
 
         return data.get(id, {}).get("value")
 
-    def set_cache(self, id: str, value: T, seconds_until_expired: int) -> T:
+    def set_cache(self, id: str, value: T, seconds_until_expired: Optional[int] = None) -> T:
         logger.debug(f"Setting '{id}' cache...")
 
         json_data = {}
@@ -66,7 +68,10 @@ class Cache():
             json_data: Dict[str, BasicCacheData] = json.load(file)
 
         with self.__get_cache_file("w") as file:
-            timestamp = datetime.now().timestamp() + float(seconds_until_expired)
+            timestamp = None
+
+            if seconds_until_expired is not None:
+                timestamp = datetime.now().timestamp() + float(seconds_until_expired)
 
             data = {
                 **json_data, 
@@ -97,7 +102,7 @@ class Cache():
         return None
 
     def clear_all_cache(self) -> None:
-        logger.info("Deleting basic cache file...")
+        logger.info(f"Deleting basic cache file ({self._basic_cache_file_path.name})...")
         self._basic_cache_file_path.unlink(True)
 
     def __get_cache_file(self, mode: str) -> TextIOWrapper:

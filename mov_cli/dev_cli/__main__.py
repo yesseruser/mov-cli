@@ -5,6 +5,10 @@ if TYPE_CHECKING:
     ...
 
 import typer
+from subprocess import call
+
+from ..cache import Cache
+from ..utils import what_platform
 
 __all__ = ()
 
@@ -21,4 +25,14 @@ app.add_typer(preview_app)
 
 @preview_app.command(help = "Preview image from mov-cli cache to terminal.")
 def image(id: str):
-    ...
+    cache = Cache(
+        platform = what_platform(), 
+        section = "image_urls"
+    )
+
+    image_url = cache.get_cache(id)
+
+    if image_url is None:
+        print("No Image :(")
+    else:
+        call(["fzf-preview.sh", image_url])

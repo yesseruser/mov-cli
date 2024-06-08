@@ -14,17 +14,10 @@ from .auto_select import auto_select_choice
 from .plugins import handle_internal_plugin_error
 
 from ..cache import Cache
+from ..utils import what_platform
 from ..logger import mov_cli_logger
-from ..utils import what_platform, get_temp_directory
 
-class ImageURLCache(Cache):
-    def __init__(self) -> None:
-        platform = what_platform()
-        temp_dir = get_temp_directory(platform)
-
-        self._basic_cache_file_path = temp_dir.joinpath("image_url_cache")
-
-def cache_image_for_preview(cache: ImageURLCache) -> Callable[[Metadata], Metadata]:
+def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
 
     def before_display_callable(metadata: Metadata) -> Metadata:
         cache.set_cache(metadata.title, metadata.image_url)
@@ -35,7 +28,8 @@ def cache_image_for_preview(cache: ImageURLCache) -> Callable[[Metadata], Metada
 
 def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool, limit: Optional[int]) -> Optional[Metadata]:
     choice = None
-    cache = ImageURLCache()
+
+    cache = Cache(what_platform(), section = "image_urls")
 
     mov_cli_logger.info(f"Searching for '{Colours.ORANGE.apply(query)}'...")
 
@@ -52,7 +46,8 @@ def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled
             choices = (choice for choice in search_results), 
             display = lambda x: x.display_name, 
             fzf_enabled = fzf_enabled,
-            before_display = cache_image_for_preview(cache)
+            before_display = cache_image_for_preview(cache),
+            preview = "mov-cli-dev preview image {}"
         )
 
     cache.clear_all_cache()

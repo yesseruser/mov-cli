@@ -74,7 +74,8 @@ def prompt(
     choices: List[T] | Generator[T, Any, None], 
     display: Callable[[T], str], 
     fzf_enabled: bool, 
-    before_display: Optional[Callable[[T], T]] = None
+    before_display: Optional[Callable[[T], T]] = None, 
+    preview: Optional[str] = None
 ) -> T | None:
     """Prompt the user to pick from a list choices."""
     choice_picked = None
@@ -100,7 +101,7 @@ def prompt(
             iterable = ((display(before_display(choice)), choice) for choice in choices), 
             prompt = text + ": ", 
             ansi = True, 
-            preview = "fzf-preview.sh https://cdn.devgoldy.xyz/goldy-exe/0/thumbnail.png" # NOTE: Just testing, remove this in prod.
+            preview = preview
         )
 
     else:

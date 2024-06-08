@@ -4,7 +4,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     ...
 
+import os
 import typer
+import shutil
 from subprocess import call
 
 from ..cache import Cache
@@ -34,5 +36,27 @@ def image(id: str):
 
     if image_url is None:
         print("No Image :(")
-    else:
-        call(["fzf-preview.sh", image_url])
+        return False
+
+    fzf_preview_lines = os.environ["FZF_PREVIEW_LINES"]
+    fzf_preview_columns = os.environ["FZF_PREVIEW_COLUMNS"]
+
+    if "KITTY_WINDOW_ID" in os.environ:
+        call([
+            "kitty", 
+            "icat", 
+            "--clear", 
+            "--transfer-mode=memory", 
+            "--unicode-placeholder", 
+            "--stdin=no", 
+            f"--place={fzf_preview_columns}x{fzf_preview_lines}@0x0", 
+            image_url
+        ])
+
+    elif shutil.which("imgcat") is not None: # NOTE: imgcat doesn't work for some reason.
+        call([
+            "imgcat", f"{image_url}'"
+        ])
+
+    # else:
+    #    call(["fzf-preview.sh", image_url])

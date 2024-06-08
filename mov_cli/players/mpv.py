@@ -44,7 +44,6 @@ class MPV(Player):
                 "mpv",
                 media.url,
                 f"--force-media-title={media.display_name}",
-                "--no-terminal",
             ]
 
             if media.referrer is not None:
@@ -54,10 +53,15 @@ class MPV(Player):
                 args.append(f"--audio-file={media.audio_url}")
 
             if media.subtitles is not None:
-                args.append(f"--sub-file={media.subtitles}")
+
+                for subtitle in media.subtitles:
+                    args.append(f"--sub-file={subtitle}")
 
             if not self.config.resolution == Quality.AUTO:
                 args.append(f"--hls-bitrate={self.config.resolution.value}") # NOTE: This only works when the file is a m3u8
+
+            if self.config.debug_player is False:
+                args.append("--no-terminal")
 
             return subprocess.Popen(args)
 

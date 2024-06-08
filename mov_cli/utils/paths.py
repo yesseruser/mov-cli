@@ -54,7 +54,7 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
     elif platform == "Darwin": # NOTE: Path maybe incorrect
         temp_directory = Path(os.getenv("TMPDIR"))
 
-    elif platform == "Linux" and platform == "iOS":
+    elif platform == "Linux" or platform == "iOS":
         linux_temp_dir = os.getenv("TMPDIR") # Respect the TMPDIR environment variable on Linux: https://unix.stackexchange.com/a/362107
 
         if linux_temp_dir is None:

@@ -27,7 +27,6 @@ class IINA(Player):
         if self.platform == "Darwin":
             args = [
                 "iina",
-                "--no-stdin",
                 "--keep-running",
                 media.url,
                 f"--mpv-force-media-title={media.display_name}",
@@ -40,10 +39,15 @@ class IINA(Player):
                 args.append(f"--mpv-audio-file={media.audio_url}")
 
             if media.subtitles is not None: # TODO: This will need testing.
-                args.append(f"--mpv-sub-file={media.subtitles}")
+
+                for subtitle in media.subtitles:
+                    args.append(f"--mpv-sub-file={subtitle}")
 
             if self.config.resolution is not None:
                 args.append(f"--mpv-hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
+
+            if self.config.debug_player is False:
+                args.append("--no-stdin")
 
             return subprocess.Popen(args)
 

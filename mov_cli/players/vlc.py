@@ -58,8 +58,7 @@ class VLC(Player):
             args = [
                 "vlc", 
                 f'--meta-title="{media.display_name}"', 
-                media.url, 
-                "--quiet"
+                media.url
             ]
 
             if media.referrer is not None:
@@ -69,16 +68,20 @@ class VLC(Player):
                 args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
 
             if media.subtitles is not None:
-                subtitles = media.subtitles
 
-                if subtitles.startswith("https://"):
-                    logger.debug("Subtitles detected as a url.")
-                    subtitles = str(self.__url_subtitles_to_file(media, subtitles))
+                for subtitle in media.subtitles:
 
-                args.append(f"--sub-file={subtitles}")
+                    if subtitle.startswith("https://"):
+                        logger.debug("Subtitles detected as a url.")
+                        subtitle = str(self.__url_subtitles_to_file(media, subtitle))
+
+                    args.append(f"--sub-file={subtitle}")
 
             if self.config.resolution is not None:
                 args.append(f"--adaptive-maxwidth={self.config.resolution.value}") # NOTE: I don't really know if that works ~ Ananas
+
+            if self.config.debug_player is False:
+                args.append("--quiet")
 
             return subprocess.Popen(args)
 

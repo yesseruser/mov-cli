@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
 
     from ..media import Media
 
@@ -14,7 +14,8 @@ __all__ = ("Player",)
 
 class Player(ABC):
     """A base class for all players in mov-cli."""
-    def __init__(self, display_name: Optional[str] = None, **kwargs) -> None:
+    def __init__(self, display_name: Optional[str] = None, player_args: Optional[List[str]] = None, **kwargs) -> None:
+        self.player_args = player_args
         self.display_name = display_name or Colours.PINK_GREY.apply(self.__class__.__name__)
 
         super().__init__()

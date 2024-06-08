@@ -34,6 +34,9 @@ __all__ = ("Config",)
 @final
 class ConfigUIData(TypedDict):
     fzf: bool
+    watch_options: bool
+    limit: int
+    display_quality: bool
 
 @final
 class ConfigHTTPData(TypedDict):
@@ -52,10 +55,12 @@ class ConfigQualityData(TypedDict):
 class ConfigSubtitleData(TypedDict):
     language: str
 
+ConfigDebugData = TypedDict("ConfigDebugData", {"global": bool, "player": bool})
+
 @final
 class ConfigData(TypedDict):
     version: int
-    debug: bool
+    debug: bool | ConfigDebugData
     player: str
     editor: str
     parser: SupportedParsersT
@@ -67,7 +72,6 @@ class ConfigData(TypedDict):
     scrapers: ScrapersConfigT | Dict[str, str]
     plugins: Dict[str, str]
     quality: ConfigQualityData | str
-    watch_options: bool
     subtitle: ConfigSubtitleData
 
 HttpHeadersData = TypedDict(
@@ -196,7 +200,22 @@ class Config():
     @property
     def debug(self) -> bool:
         """Returns whether debug should be enabled or not."""
-        return self.data.get("debug", False)
+        debug: dict | bool = self.data.get("debug", False)
+
+        if isinstance(debug, dict):
+            return debug.get("global", False)
+
+        return debug
+
+    @property
+    def debug_player(self) -> bool:
+        """Returns whether debug for the player should be enabled or not."""
+        debug: dict | bool = self.data.get("debug", {})
+
+        if isinstance(debug, bool):
+            return False
+
+        return debug.get("player", False)
 
     @property
     def proxy(self) -> dict | None:
@@ -265,6 +284,14 @@ class Config():
     @property
     def watch_options(self) -> bool:
         return self.data.get("ui", {}).get("watch_options", True)
+
+    @property
+    def limit(self) -> int | None:
+        return self.data.get("ui", {}).get("limit")
+
+    @property
+    def display_quality(self) -> int | None:
+        return self.data.get("ui", {}).get("display_quality", False)
 
     @property
     def language(self) -> Lang:

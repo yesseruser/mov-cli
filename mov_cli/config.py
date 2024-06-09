@@ -177,11 +177,6 @@ class Config():
         return self.data.get("scrapers", {}).get("default", None)
 
     @property
-    def fzf_enabled(self) -> bool:
-        """Returns whether fzf is allowed to be used. Defaults to True of fzf is available."""
-        return self.data.get("ui", {}).get("fzf", True if shutil.which("fzf") is not None else False)
-
-    @property
     def parser(self) -> SupportedParsersT | Any:
         """Returns the parser type configured by the user else it just returns the default."""
         default_parser = "lxml" if find_spec("lxml") else "html.parser"
@@ -280,7 +275,16 @@ class Config():
             return Quality.AUTO
 
         return Quality(resolution_pixel)
-    
+
+    @property
+    def fzf_preview(self) -> int | None:
+        return self.data.get("ui", {}).get("fzf_preview", False)
+
+    @property
+    def fzf_enabled(self) -> bool:
+        """Returns whether fzf is allowed to be used. Defaults to True of fzf is available."""
+        return self.data.get("ui", {}).get("fzf", True if shutil.which("fzf") is not None else False)
+
     @property
     def watch_options(self) -> bool:
         return self.data.get("ui", {}).get("watch_options", True)

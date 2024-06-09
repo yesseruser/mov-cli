@@ -139,7 +139,9 @@ class Cache():
             json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
 
         if self.section is not None:
-            json_data.pop(self.section)
+
+            if self.section in json_data:
+                json_data.pop(self.section)
         else:
             json_data = {}
 

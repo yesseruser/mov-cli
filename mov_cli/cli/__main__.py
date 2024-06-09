@@ -33,6 +33,7 @@ def mov_cli(
     player: Optional[str] = typer.Option(None, "--player", "-p", help = "Player you would like to stream with. E.g. mpv, vlc"), 
     scraper: Optional[str] = typer.Option(None, "--scraper", "-s", help = "Scraper you would like to scrape with. E.g. remote_stream, sflix"), 
     fzf: Optional[bool] = typer.Option(None, help = "Toggle fzf on/off for all user selection prompts."), 
+    preview: Optional[bool] = typer.Option(None, help = "Toggle fzf's preview (image preview, etc) on/off for fzf prompts."), 
     episode: Optional[str] = typer.Option(None, "--episode", "-ep", help = "Episode and season you wanna scrape. E.g. {episode}:{season} like -> 26:3"), 
     auto_select: Optional[int] = typer.Option(None, "--choice", "-c", help = "Auto select the search results. E.g. Setting it to 1 with query 'nyan cat' will pick " \
         "the first nyan cat video to show up in search results."
@@ -51,7 +52,8 @@ def mov_cli(
         debug = debug, 
         player = player, 
         scraper = (scraper, ["scrapers", "default"]), 
-        fzf = (fzf, ["ui", "fzf"]),
+        fzf = (fzf, ["ui", "fzf"]), 
+        fzf_preview = (preview, ["ui", "fzf_preview"]), 
         limit = (limit, ["ui", "limit"])
     )
 
@@ -102,7 +104,7 @@ def mov_cli(
 
         chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
-        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, config.limit)
+        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, config.fzf_preview, config.limit)
 
         if choice is None:
             mov_cli_logger.error("There was no results or you didn't select anything.")

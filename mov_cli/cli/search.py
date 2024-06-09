@@ -26,7 +26,7 @@ def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
 
     return before_display_callable
 
-def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool, limit: Optional[int]) -> Optional[Metadata]:
+def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool, fzf_image_preview: bool, limit: Optional[int]) -> Optional[Metadata]:
     choice = None
 
     cache = Cache(what_platform(), section = "image_urls")
@@ -47,7 +47,7 @@ def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled
             display = lambda x: x.display_name, 
             fzf_enabled = fzf_enabled,
             before_display = cache_image_for_preview(cache),
-            preview = "mov-cli-dev preview image {}"
+            preview = "mov-cli-dev preview image {}" if fzf_image_preview else None
         )
 
     cache.clear_all_cache()

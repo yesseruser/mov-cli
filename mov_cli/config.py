@@ -277,8 +277,8 @@ class Config():
         return Quality(resolution_pixel)
 
     @property
-    def fzf_preview(self) -> int | None:
-        return self.data.get("ui", {}).get("fzf_preview", False)
+    def preview(self) -> int | None:
+        return self.data.get("ui", {}).get("preview", False)
 
     @property
     def fzf_enabled(self) -> bool:

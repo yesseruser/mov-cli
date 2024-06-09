@@ -16,7 +16,7 @@ hide_ip = true
 [mov-cli.ui]
 # fzf = true
 # limit = 20
-fzf_preview = false
+preview = false
 watch_options = true
 display_quality = false
 

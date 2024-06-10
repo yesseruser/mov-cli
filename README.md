@@ -39,11 +39,6 @@
 
   <img width="800px" src="https://github.com/mov-cli/mov-cli/assets/66202304/fa78b38c-0df0-464a-a78e-cb8a04cdc885">
 
-  <details>
-    <summary>Showcase Video</summary>
-    <video width="800px" src="https://github.com/mov-cli/mov-cli/assets/132799819/d924c3f5-775c-46a3-97f5-ff27433b69dd"/>
-  </details>
-
 </div>
 
 **mov-cli** is a command line tool with plugin support that streamlines the process of streaming media from the comfort of your terminal; ~~*so you can show off to your friends the superiority of the command line.*~~ 💪 The tool is sort of a framework that handles metadata, configuration and scraping of the media to be streamed in your media player of choice.
@@ -77,6 +72,8 @@ pip install mov-cli -U
 > Check out the [wiki on installation](https://github.com/mov-cli/mov-cli/wiki/Installation) for more in-depth guidance on installing mov-cli.
 
 ## Usage 🖱️
+<video src="https://github.com/mov-cli/mov-cli/assets/132799819/d924c3f5-775c-46a3-97f5-ff27433b69dd"/>
+
 mov-cli comes packaged with a CLI interface via the `mov-cli` command you can use in your respective terminal. 
 
 > [!NOTE]

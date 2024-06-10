@@ -29,7 +29,6 @@ class SiteMaybeBlocked(errors.MovCliException):
 
 class HTTPClient():
     def __init__(self, config: Config) -> None:
-        """A base class for building scrapers from."""
         self.config = config
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 

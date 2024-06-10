@@ -72,7 +72,7 @@ pip install mov-cli -U
 > Check out the [wiki on installation](https://github.com/mov-cli/mov-cli/wiki/Installation) for more in-depth guidance on installing mov-cli.
 
 ## Usage 🖱️
-<video src="https://github.com/mov-cli/mov-cli/assets/132799819/d924c3f5-775c-46a3-97f5-ff27433b69dd"/>
+[!showcase video](https://github.com/mov-cli/mov-cli/assets/132799819/d924c3f5-775c-46a3-97f5-ff27433b69dd)
 
 mov-cli comes packaged with a CLI interface via the `mov-cli` command you can use in your respective terminal. 
 

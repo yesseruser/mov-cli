@@ -10,7 +10,7 @@ import shutil
 from subprocess import call
 
 from ..cache import Cache
-from ..utils import what_platform
+from ..utils import what_platform, save
 
 __all__ = ()
 
@@ -53,9 +53,12 @@ def image(id: str):
             image_url
         ])
 
-    elif shutil.which("imgcat") is not None: # NOTE: imgcat doesn't work for some reason.
+    elif shutil.which("chafa") is not None:
+        file = save(image_url, id).resolve()
+
         call([
-            "imgcat", f"{image_url}'"
+            "chafa",
+            file
         ])
 
     # else:

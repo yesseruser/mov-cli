@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import (
-        Any, Dict, List, Tuple, 
+        Any, Dict, List, Tuple, Optional,
         TypeVar, Literal, Iterable, Callable, Generator
     )
 
-    T = TypeVar('T')
+    T = TypeVar("T")
 
 import re
 import os
@@ -69,9 +69,17 @@ def is_it_just_one_choice(choices: Iterable[T]) -> Tuple[bool, List[T] | Generat
 
     return False, choices
 
-def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Callable[[T], str], fzf_enabled: bool) -> T | None:
+def prompt(
+    text: str, 
+    choices: List[T] | Generator[T, Any, None], 
+    display: Callable[[T], str], 
+    fzf_enabled: bool, 
+    before_display: Optional[Callable[[T], T]] = None, 
+    preview: Optional[str] = None
+) -> T | None:
     """Prompt the user to pick from a list choices."""
     choice_picked = None
+    before_display = before_display or (lambda x: x)
 
     is_just_one, choices = is_it_just_one_choice(choices)
 
@@ -90,15 +98,18 @@ def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Calla
         # We pass this in as a generator to take advantage of iterfzf's streaming capabilities.
         # You can find that explained as the second bullet point here: https://github.com/dahlia/iterfzf#key-features
         choice_picked = iterfzf(
-            iterable = ((display(choice), choice) for choice in choices), 
+            iterable = ((display(before_display(choice)), choice) for choice in choices), 
             prompt = text + ": ", 
-            ansi = True
+            ansi = True, 
+            preview = preview
         )
 
     else:
         logger.debug("Launching inquirer (fallback ui)...")
         inquirer_result = inquirer.prompt(
-            questions = [inquirer.List("choices", message = text, choices = [display(x) for x in choices])], 
+            questions = [
+                inquirer.List("choices", message = text, choices = [display(before_display(x)) for x in choices])
+            ], 
             theme = MovCliTheme()
         )
 

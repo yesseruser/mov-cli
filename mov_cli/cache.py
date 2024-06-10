@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
     class BasicCacheData(TypedDict):
         value: Any
-        expiring_date: float
+        expiring_date: Optional[float]
 
 import json
 from datetime import datetime
@@ -31,7 +31,9 @@ logger = LoggerAdapter(
 
 class Cache():
     """An API for caching text based data on mov-cli cross platform respectively."""
-    def __init__(self, platform: SUPPORTED_PLATFORMS) -> None:
+    def __init__(self, platform: SUPPORTED_PLATFORMS, section: Optional[str] = None) -> None:
+        self.section = section
+
         temp_dir = get_temp_directory(platform)
 
         self._basic_cache_file_path = temp_dir.joinpath("osaka_cache") # ◔_◔ https://static.wikia.nocookie.net/parody/images/f/fd/Osaka.png/revision/latest
@@ -39,65 +41,117 @@ class Cache():
         super().__init__()
 
     def get_cache(self, id: str) -> Optional[Any]:
-        logger.debug(f"Getting '{id}' cache...")
+        logger.debug(
+            f"Getting '{id}' cache" + ("..." if self.section is None else f"from '{self.section}' section...")
+        )
 
-        data: Dict[str, BasicCacheData] = {}
+        data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = {}
 
         with self.__get_cache_file("r") as file:
             data = json.load(file)
+
+        if self.section is not None:
+            data = data.get(self.section, {})
 
         basic_cache = data.get(id)
 
         if basic_cache is None:
             return None
 
-        if datetime.now().timestamp() > basic_cache["expiring_date"]:
+        value = basic_cache["value"]
+        expiring_data = basic_cache["expiring_date"]
+
+        if expiring_data is not None and datetime.now().timestamp() > expiring_data:
             self.clear_cache(id)
             return None
 
-        return data.get(id, {}).get("value")
+        return value
 
-    def set_cache(self, id: str, value: T, seconds_until_expired: int) -> T:
-        logger.debug(f"Setting '{id}' cache...")
+    def set_cache(
+        self, 
+        id: str, 
+        value: T, 
+        seconds_until_expired: Optional[int] = None
+    ) -> T:
+        logger.debug(
+            f"Setting '{id}' cache" + ("..." if self.section is None else f"in '{self.section}' section...")
+        )
 
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data: Dict[str, BasicCacheData] = json.load(file)
+            json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
 
         with self.__get_cache_file("w") as file:
-            timestamp = datetime.now().timestamp() + float(seconds_until_expired)
+            timestamp = None
 
-            data = {
-                **json_data, 
-                **{
-                    id: {
-                        "value": value,
-                        "expiring_date": timestamp
+            if seconds_until_expired is not None:
+                timestamp = datetime.now().timestamp() + float(seconds_until_expired)
+
+            if self.section is not None:
+                section_data = json_data.get(self.section, {})
+
+                json_data[self.section] = {
+                    **section_data, 
+                    **{
+                        id: {
+                            "value": value,
+                            "expiring_date": timestamp
+                        }
                     }
                 }
-            }
 
-            json.dump(data, file)
+            else:
+                json_data[id] = {
+                    "value": value, "expiring_date": timestamp
+                }
+
+            json.dump(json_data, file)
 
         return value
 
     def clear_cache(self, id: str) -> None:
-        logger.debug(f"Removing '{id}' cache...")
+        logger.debug(
+            f"Clearing '{id}' cache" + ("..." if self.section is None else f"from '{self.section}' section...")
+        )
 
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data: Dict[str, BasicCacheData] = json.load(file)
+            json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
+
+        if self.section is not None:
+            json_data[self.section].pop(id)
+        else:
+            json_data.pop(id)
 
         with self.__get_cache_file("w") as file:
-            json_data.pop(id)
             json.dump(json_data, file)
 
         return None
 
     def clear_all_cache(self) -> None:
-        logger.info("Deleting basic cache file...")
+        logger.debug("Clearing all cache in file or section...")
+
+        json_data = {}
+
+        with self.__get_cache_file("r") as file:
+            json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
+
+        if self.section is not None:
+
+            if self.section in json_data:
+                json_data.pop(self.section)
+        else:
+            json_data = {}
+
+        with self.__get_cache_file("w") as file:
+            json.dump(json_data, file)
+
+        return None
+
+    def delete_cache_file(self) -> None:
+        logger.info(f"Deleting basic cache file ({self._basic_cache_file_path.name})...")
         self._basic_cache_file_path.unlink(True)
 
     def __get_cache_file(self, mode: str) -> TextIOWrapper:

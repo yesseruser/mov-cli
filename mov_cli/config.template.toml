@@ -16,7 +16,8 @@ hide_ip = true
 [mov-cli.ui]
 # fzf = true
 # limit = 20
-# watch_options = true
+preview = false
+watch_options = true
 display_quality = false
 
 [mov-cli.plugins] # E.g: namespace = "package-name"

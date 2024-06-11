@@ -2,15 +2,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    ...
+    from typing import Optional
 
 import os
 import typer
+import httpx
 import shutil
+from pathlib import Path
 from subprocess import call
 
 from ..cache import Cache
-from ..utils import what_platform, save
+from ..utils import what_platform, get_temp_directory
 
 __all__ = ()
 
@@ -27,8 +29,10 @@ app.add_typer(preview_app)
 
 @preview_app.command(help = "Preview image from mov-cli cache to terminal.")
 def image(id: str):
+    platform = what_platform()
+
     cache = Cache(
-        platform = what_platform(), 
+        platform = platform, 
         section = "image_urls"
     )
 
@@ -54,7 +58,7 @@ def image(id: str):
         ])
 
     elif shutil.which("chafa") is not None:
-        file = save(image_url, id).resolve()
+        file = image_url_to_file(image_url, id, platform).resolve()
 
         call([
             "chafa",
@@ -63,3 +67,21 @@ def image(id: str):
 
     # else:
     #    call(["fzf-preview.sh", image_url])
+
+
+def image_url_to_file(image_url: str, id: str, platform: str) -> Optional[Path]:
+    temp = get_temp_directory(platform)
+    file = temp.joinpath(f"{id}")
+
+    request = httpx.get(image_url)
+
+    if request.is_error:
+        return None
+    
+    if file.exists():
+        return file
+    
+    with file.open("wb") as f:
+        f.write(request.content)
+    
+    return file

@@ -63,7 +63,7 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         temp_directory = Path(linux_temp_dir)
 
     elif platform == "Android":
-        temp_directory = Path("$PREFIX/tmp")
+        temp_directory = Path(f"{os.getenv('PREFIX')}/tmp")
 
     temp_directory = temp_directory.joinpath("mov-cli-temp")
     temp_directory.mkdir(exist_ok = True)

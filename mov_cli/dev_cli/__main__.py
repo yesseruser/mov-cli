@@ -31,6 +31,10 @@ app.add_typer(preview_app)
 def image(id: str):
     platform = what_platform()
 
+    if not platform == "Linux":
+        print("Image preview only works on Linux atm.")
+        return False
+
     cache = Cache(
         platform = platform, 
         section = "image_urls"
@@ -42,8 +46,10 @@ def image(id: str):
         print("No Image :(")
         return False
 
-    fzf_preview_lines = os.environ["FZF_PREVIEW_LINES"]
-    fzf_preview_columns = os.environ["FZF_PREVIEW_COLUMNS"]
+    fzf_preview_lines = os.environ["FZF_PREVIEW_LINES"] # height
+    fzf_preview_columns = os.environ["FZF_PREVIEW_COLUMNS"] # width
+
+    os.system("clear")
 
     if "KITTY_WINDOW_ID" in os.environ:
         call([
@@ -61,12 +67,14 @@ def image(id: str):
         file = image_url_to_file(image_url, id, platform).resolve()
 
         call([
-            "chafa",
-            file
+            "chafa", 
+            file, 
+            f"--size={fzf_preview_columns}x{fzf_preview_lines}"
         ])
 
-    # else:
-    #    call(["fzf-preview.sh", image_url])
+    else:
+        print("'chafa' was not found! :( Please install it: https://github.com/hpjansson/chafa")
+        return False
 
 
 def image_url_to_file(image_url: str, id: str, platform: str) -> Optional[Path]:

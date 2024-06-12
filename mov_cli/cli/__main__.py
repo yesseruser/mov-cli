@@ -21,7 +21,8 @@ from ..download import Download
 from ..media import MetadataType
 from ..logger import mov_cli_logger
 from ..http_client import HTTPClient
-from ..utils import hide_ip
+from ..utils import hide_ip, what_platform
+from .. import Cache
 
 __all__ = ("mov_cli",)
 
@@ -44,6 +45,7 @@ def mov_cli(
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
     download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."),
     list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."),
+    delete_cache: bool = typer.Option(False, "--clear-cache", help = "Clears the mov-cli's temp folder.")
 ):
     config = Config()
 
@@ -59,6 +61,11 @@ def mov_cli(
 
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
+    
+    if delete_cache:
+        Cache(
+            what_platform()
+        ).delete_entire_folder()
 
     mov_cli_logger.debug(f"Config -> {config.data}")
 

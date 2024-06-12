@@ -156,7 +156,7 @@ class Cache():
         self._basic_cache_file_path.unlink(True)
     
     def delete_entire_folder(self) -> None:
-        logger.info(f"Deleting mov-cli's temp folder...")
+        logger.info("Deleting mov-cli's temp folder...")
         shutil.rmtree(self.temp_dir)
 
     def __get_cache_file(self, mode: str) -> TextIOWrapper:

@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Any, Generator, Dict, Literal
+    from typing import List, Any, Generator, Dict, Literal, Optional
     from ...http_client import HTTPClient
 
 from ...media import Metadata, MetadataType, ExtraMetadata, AiringType
@@ -17,16 +17,17 @@ class TMDbSerial:
     def __init__(self, data, type: MetadataType):
         self.id: int = data.get("id")
         self.title: str = self.__extract_title(data)
-        self.release_date: str = data.get("release_date") or data.get("first_air_date")
-        self.year: str = self.release_date[:4] if self.release_date else None
+        self.release_date: Optional[str] = data.get("release_date") or data.get("first_air_date")
+        self.year: Optional[str] = self.release_date[:4] if self.release_date else None
         self.type: MetadataType = type
+        self.image_url: Optional[str] = "https://image.tmdb.org/t/p/w600_and_h900_bestv2" + data.get("poster_path") if data.get("poster_path") else None
     
     def __extract_title(self, data):
         title_fields = ["title", "name", "original_title", "original_name"]
         for field in title_fields:
             if field in data:
                 return data[field]
-        return ""  # If none of the fields are found, return an empty string
+        return ""
 
 class TheMovieDB:
     """API-Wrapper for themoviedb.org"""
@@ -39,7 +40,9 @@ class TheMovieDB:
         self.search_url = "https://api.themoviedb.org/3/search/{}?query={}&include_adult=false&language=en-US&page=1&api_key={}"
 
 
-    def search(self, query: str, limit: int = 10) -> Generator[Metadata, Any, None]:
+    def search(self, query: str, limit: Optional[int]) -> Generator[Metadata, Any, None]:
+        max_metadata = 20 if limit is None else limit
+
         serial_list: List[TMDbSerial] = []
 
         movie = self.http_client.get(self.search_url.format("movie", query, self.api_key)).json()["results"]
@@ -60,12 +63,15 @@ class TheMovieDB:
                 continue
 
             serial_list.append(item)
+        
+        serial_list = serial_list[:max_metadata]
 
         for item in serial_list:
             yield Metadata(
                 id = item.id,
                 title = item.title,
                 type = item.type,
+                image_url = item.image_url,
                 year = item.year,
                 extra_func = lambda: self.__extra_metadata(item)
             )
@@ -88,7 +94,6 @@ class TheMovieDB:
         metadata = self.http_client.get(self.metadata.format(type, serial.id, self.api_key)).json()
 
         description = None
-        image_url = None
         cast = None
         alternate_titles = None
         genres = None
@@ -96,9 +101,6 @@ class TheMovieDB:
 
         if metadata.get("overview"):
             description = metadata.get("overview")
-
-        if metadata.get("poster_path"):
-            image_url = metadata.get("poster_path")
 
         if metadata["credits"]["cast"]:
             cast = [i.get("name") or i.get("original_name") for i in metadata["credits"]["cast"]]
@@ -128,7 +130,6 @@ class TheMovieDB:
 
         return ExtraMetadata(
             description = description,
-            image_url = image_url,
             cast = cast,
             alternate_titles = alternate_titles,
             genres = genres,

@@ -20,7 +20,7 @@ def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         user_profile = Path(os.getenv("USERPROFILE"))
         appdata_dir = user_profile.joinpath("AppData", "Local")
 
-    elif platform == "Darwin": # NOTE: Path maybe incorrect
+    elif platform == "Darwin":
         user_profile = Path.home()
         appdata_dir = user_profile.joinpath("Library", "Application Support")
 

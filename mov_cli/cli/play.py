@@ -5,8 +5,8 @@ if TYPE_CHECKING:
     from typing import Optional, Literal
 
     from ..config import Config
-    from ..scraper import Scraper
     from ..media import Media, Metadata
+    from ..scraper import Scraper, ScrapeEpisodesT
 
     from ..utils.episode_selector import EpisodeSelector
 
@@ -109,7 +109,7 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
 
     return None
 
-def __handle_next_season(episode: EpisodeSelector, season_episode_count: int, media_episodes: dict) -> bool:
+def __handle_next_season(episode: EpisodeSelector, season_episode_count: int, media_episodes: ScrapeEpisodesT) -> bool:
 
     if episode.episode > season_episode_count:
         next_season = episode.season + 1
@@ -124,6 +124,6 @@ def __handle_next_season(episode: EpisodeSelector, season_episode_count: int, me
         if episode.season <= 1:
             return False
 
-        episode._previous_season()
+        episode._previous_season(media_episodes)
 
     return True

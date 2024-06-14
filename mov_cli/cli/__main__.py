@@ -96,7 +96,11 @@ def mov_cli(
 
         query: str = " ".join(query)
 
-        http_client = HTTPClient(config)
+        http_client = HTTPClient(
+            headers = config.http_headers, 
+            timeout = config.http_timeout, 
+            hide_ip = config.hide_ip
+        )
 
         selected_scraper = select_scraper(plugins, config.scrapers, config.fzf_enabled, config.default_scraper)
 

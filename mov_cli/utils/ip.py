@@ -2,7 +2,7 @@ import re
 
 __all__ = ("hide_ip",)
 
-def hide_ip(text: str, hide_it: bool):
+def hide_ip(text: str, hide_it: bool) -> str:
     ipv4_re = "\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
     ipv6_re = "([a-f0-9:]+:+)+[a-f0-9]+"
 

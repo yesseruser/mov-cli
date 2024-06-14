@@ -28,15 +28,22 @@ class SiteMaybeBlocked(errors.MovCliException):
         )
 
 class HTTPClient():
-    def __init__(self, config: Config) -> None:
-        self.config = config
+    def __init__(
+        self, 
+        headers: Optional[Dict[str, str]] = None, 
+        timeout: int = 15, 
+        hide_ip: bool = True
+    ) -> None:
+        self.hide_ip = hide_ip
+        self.headers = headers or {}
+
         self.logger = LoggerAdapter(mov_cli_logger, prefix = self.__class__.__name__)
 
         self.__httpx_client = httpx.Client(
-            timeout = config.http_timeout, 
+            timeout = timeout, 
             cookies = None
         )
-        
+
         super().__init__()
 
     def request(
@@ -58,11 +65,11 @@ class HTTPClient():
             if headers.get("Referer") is None:
                 headers.update({"Referer": url})
 
-            headers.update(self.config.http_headers)
+            headers.update(self.headers)
 
         try:
             self.logger.debug(
-                Colours.ORANGE.apply(method.upper()) + f" -> {hide_ip(url, self.config.hide_ip)}"
+                Colours.ORANGE.apply(method.upper()) + f" -> {hide_ip(url, self.hide_ip)}"
             )
 
             response = self.__httpx_client.request(

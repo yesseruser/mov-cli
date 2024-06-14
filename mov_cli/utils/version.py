@@ -93,7 +93,7 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
 
     return False, []
 
-def update_command(mov_cli_path: Path, package: str | list = "mov-cli"):
+def update_command(mov_cli_path: Path, package: str | list = "mov-cli") -> str:
     path = str(mov_cli_path)
 
     if "pipx" in path:

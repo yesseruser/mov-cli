@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from .media import Metadata, Multi, Single
 
     ScraperOptionsT = Dict[str, str | bool]
+    ScrapeEpisodesT = Dict[int, int] | Dict[None, Literal[1]]
 
 from bs4 import BeautifulSoup
 from abc import ABC, abstractmethod
@@ -55,6 +56,6 @@ class Scraper(ABC):
         """
         ...
 
-    def scrape_episodes(self, metadata: Metadata) -> Dict[int, int] | Dict[None, Literal[1]]:
+    def scrape_episodes(self, metadata: Metadata) -> ScrapeEpisodesT:
         """Returns episode count for each season in that Media."""
         return {None: 1}

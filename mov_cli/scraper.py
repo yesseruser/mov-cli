@@ -43,7 +43,7 @@ class Scraper(ABC):
         return BeautifulSoup(html, self.config.parser, **kwargs)
 
     @abstractmethod
-    def search(self, query: str, limit: int = 20) -> Iterable[Metadata]:
+    def search(self, query: str, limit: Optional[int] = None) -> Iterable[Metadata]:
         """Where your searching for media should be done. Should return or yield Metadata."""
         ...
 
@@ -51,10 +51,10 @@ class Scraper(ABC):
     def scrape(self, metadata: Metadata, episode: EpisodeSelector) -> Optional[Multi | Single]:
         """
         Where your scraping for the media should be performed. 
-        Should return or yield an instance of Media.
+        Should return an instance of `Media()` but return `None` if the media is unavailable.
         """
         ...
 
     def scrape_episodes(self, metadata: Metadata) -> Dict[int, int] | Dict[None, Literal[1]]:
-        """Returns episode count for each season in that Movie/Series."""
+        """Returns episode count for each season in that Media."""
         return {None: 1}

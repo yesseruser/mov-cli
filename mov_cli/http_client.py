@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from typing import Literal, Dict, Optional
 
     from httpx import Response
-    from .config import Config
 
 import httpx
 from deprecation import deprecated

@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 
     T = TypeVar("T")
 
+    from ..utils.platform import SUPPORTED_PLATFORMS
+
 import re
 import os
 import json
@@ -25,6 +27,7 @@ from devgoldyutils import Colours, LoggerAdapter
 
 import mov_cli
 
+from ..cache import Cache
 from ..iterfzf import iterfzf
 from ..logger import mov_cli_logger
 from ..utils import  what_platform, update_available, plugin_update_available, update_command
@@ -169,6 +172,7 @@ def greetings() -> Tuple[Literal["Good Morning", "Good Afternoon", "Good Evening
 # This function below is inspired by animdl: https://github.com/justfoolingaround/animdl
 def welcome_msg(
     plugins: Dict[str, str], 
+    platform: SUPPORTED_PLATFORMS, 
     check_for_updates: bool = False, 
     display_tip: bool = False, 
     display_version: bool = False
@@ -205,12 +209,13 @@ def welcome_msg(
         text += f"\n\n{Colours.CLAY}-> {Colours.RESET}Version: {Colours.BLUE}{mov_cli.__version__}{Colours.RESET}"
 
     if check_for_updates:
+        cache = Cache(platform, section = "update_checker")
 
-        if update_available():
+        if update_available(cache):
             update = update_command(mov_cli_path)
             text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}{update}"
 
-        plugin_needs_updating, plugins_to_update = plugin_update_available(plugins)
+        plugin_needs_updating, plugins_to_update = plugin_update_available(cache, plugins)
 
         if plugin_needs_updating:
             update = update_command(mov_cli_path, plugins_to_update)

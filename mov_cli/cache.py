@@ -16,11 +16,10 @@ if TYPE_CHECKING:
 
 import json
 from datetime import datetime
-import shutil
 from devgoldyutils import LoggerAdapter, Colours
 
 from .logger import mov_cli_logger
-from .utils import get_temp_directory, get_cache_directory
+from .utils import get_cache_directory
 
 __all__ = (
     "Cache",
@@ -43,7 +42,7 @@ class Cache():
 
     def get_cache(self, id: str) -> Optional[Any]:
         logger.debug(
-            f"Getting '{id}' cache" + ("..." if self.section is None else f"from '{self.section}' section...")
+            f"Getting '{id}' cache" + ("..." if self.section is None else f" from '{self.section}' section...")
         )
 
         data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = {}
@@ -75,7 +74,7 @@ class Cache():
         seconds_until_expired: Optional[int] = None
     ) -> T:
         logger.debug(
-            f"Setting '{id}' cache" + ("..." if self.section is None else f"in '{self.section}' section...")
+            f"Setting '{id}' cache" + ("..." if self.section is None else f" in '{self.section}' section...")
         )
 
         json_data = {}
@@ -113,7 +112,7 @@ class Cache():
 
     def clear_cache(self, id: str) -> None:
         logger.debug(
-            f"Clearing '{id}' cache" + ("..." if self.section is None else f"from '{self.section}' section...")
+            f"Clearing '{id}' cache" + ("..." if self.section is None else f" from '{self.section}' section...")
         )
 
         json_data = {}

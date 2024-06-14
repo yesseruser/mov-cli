@@ -68,7 +68,8 @@ def mov_cli(
         shutil.rmtree(get_temp_directory(platform))
         shutil.rmtree(get_cache_directory(platform))
 
-        if query is None:
+        # return right away after clearing cache if only --clear-cache or --no-cache is passed.
+        if query is None: 
             return None
 
     mov_cli_logger.debug(f"Config -> {config.data}")
@@ -86,6 +87,7 @@ def mov_cli(
 
     welcome_message = welcome_msg(
         plugins = plugins, 
+        platform = platform, 
         check_for_updates = True if query is None and config.skip_update_checker is False else False, 
         display_tip = True if query is None else False, 
         display_version = version

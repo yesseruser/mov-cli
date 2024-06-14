@@ -68,6 +68,9 @@ def mov_cli(
         shutil.rmtree(get_temp_directory(platform))
         shutil.rmtree(get_cache_directory(platform))
 
+        if query is None:
+            return None
+
     mov_cli_logger.debug(f"Config -> {config.data}")
 
     if edit:

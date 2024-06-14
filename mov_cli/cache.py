@@ -20,7 +20,7 @@ import shutil
 from devgoldyutils import LoggerAdapter, Colours
 
 from .logger import mov_cli_logger
-from .utils import get_temp_directory
+from .utils import get_temp_directory, get_cache_directory
 
 __all__ = (
     "Cache",
@@ -35,9 +35,9 @@ class Cache():
     def __init__(self, platform: SUPPORTED_PLATFORMS, section: Optional[str] = None) -> None:
         self.section = section
 
-        self.temp_dir = get_temp_directory(platform)
+        cache_dir = get_cache_directory(platform)
 
-        self._basic_cache_file_path = self.temp_dir.joinpath("osaka_cache") # ◔_◔ https://static.wikia.nocookie.net/parody/images/f/fd/Osaka.png/revision/latest
+        self._basic_cache_file_path = cache_dir.joinpath("osaka_cache") # ◔_◔ https://static.wikia.nocookie.net/parody/images/f/fd/Osaka.png/revision/latest
 
         super().__init__()
 
@@ -154,10 +154,6 @@ class Cache():
     def delete_cache_file(self) -> None:
         logger.info(f"Deleting basic cache file ({self._basic_cache_file_path.name})...")
         self._basic_cache_file_path.unlink(True)
-    
-    def delete_entire_folder(self) -> None:
-        logger.info("Deleting mov-cli's temp folder...")
-        shutil.rmtree(self.temp_dir)
 
     def __get_cache_file(self, mode: str) -> TextIOWrapper:
 

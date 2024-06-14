@@ -9,7 +9,8 @@ from pathlib import Path
 
 __all__ = (
     "get_appdata_directory", 
-    "get_temp_directory"
+    "get_temp_directory", 
+    "get_cache_directory"
 )
 
 def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
@@ -69,3 +70,27 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
     temp_directory.mkdir(exist_ok = True)
 
     return temp_directory
+
+def get_cache_directory(platform: SUPPORTED_PLATFORMS) -> Path:
+    """
+    Returns the cache directory where mov-cli can dump longer lived cache.
+    """
+    cache_directory = None
+
+    if platform == "Windows":
+        cache_directory = Path(os.getenv("LOCALAPPDATA"))
+
+    elif platform == "Darwin": # NOTE: Path maybe incorrect
+        user_profile = Path.home()
+        cache_directory = user_profile.joinpath("Library", "Caches")
+
+    elif platform == "Linux" or platform == "Android" or platform == "iOS":
+        user_profile = Path(os.getenv("HOME"))
+        cache_directory = user_profile.joinpath(".cache")
+
+        cache_directory.mkdir(exist_ok = True) # on android the .cache file may not exist.
+
+    cache_directory = cache_directory.joinpath("mov-cli")
+    cache_directory.mkdir(exist_ok = True)
+
+    return cache_directory

@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     ...
 
 import typer
+import shutil
 import logging
 from pathlib import Path
 
@@ -21,8 +22,7 @@ from ..download import Download
 from ..media import MetadataType
 from ..logger import mov_cli_logger
 from ..http_client import HTTPClient
-from ..utils import hide_ip, what_platform
-from .. import Cache
+from ..utils import hide_ip, get_temp_directory, what_platform, get_cache_directory
 
 __all__ = ("mov_cli",)
 
@@ -32,22 +32,23 @@ def mov_cli(
     query: Optional[List[str]] = typer.Argument(None, help = "A film, tv show or anime you would like to Query."), 
     debug: Optional[bool] = typer.Option(None, help = "Enable extra logging details. Useful for bug reporting."), 
     player: Optional[str] = typer.Option(None, "--player", "-p", help = "Player you would like to stream with. E.g. mpv, vlc"), 
-    scraper: Optional[str] = typer.Option(None, "--scraper", "-s", help = "Scraper you would like to scrape with. E.g. remote_stream, sflix"), 
+    scraper: Optional[str] = typer.Option(None, "--scraper", "-s", help = "Scraper you would like to scrape with. E.g. test, youtube, jellyplex"), 
     fzf: Optional[bool] = typer.Option(None, help = "Toggle fzf on/off for all user selection prompts."), 
     preview: Optional[bool] = typer.Option(None, help = "Toggle fzf's preview (image preview, etc) on/off for fzf prompts."), 
     episode: Optional[str] = typer.Option(None, "--episode", "-ep", help = "Episode and season you wanna scrape. E.g. {episode}:{season} like -> 26:3"), 
     auto_select: Optional[int] = typer.Option(None, "--choice", "-c", help = "Auto select the search results. E.g. Setting it to 1 with query 'nyan cat' will pick " \
         "the first nyan cat video to show up in search results."
-    ),
-    limit: Optional[int] = typer.Option(None, "--limit", "-l", help = "Specify the maximum number of results"),
+    ), 
+    limit: Optional[int] = typer.Option(None, "--limit", "-l", help = "Specify the maximum number of results"), 
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
-    download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."),
-    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."),
-    clear_cache: bool = typer.Option(False, "--clear-cache", help = "Clears the mov-cli's temp folder.")
+    download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."), 
+    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."), 
+    clear_cache: bool = typer.Option(False, "--no-cache", "--clear-cache", help = "Clears ALL cache stored by mov-cli, including the temp directory cache.")
 ):
     config = Config()
+    platform = what_platform()
 
     config = set_cli_config(
         config, 
@@ -61,11 +62,11 @@ def mov_cli(
 
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
-    
+
     if clear_cache:
-        Cache(
-            what_platform()
-        ).delete_entire_folder()
+        mov_cli_logger.info("Clearing cache...")
+        shutil.rmtree(get_temp_directory(platform))
+        shutil.rmtree(get_cache_directory(platform))
 
     mov_cli_logger.debug(f"Config -> {config.data}")
 

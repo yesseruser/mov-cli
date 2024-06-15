@@ -50,6 +50,6 @@ WARNING: This may leak sensative information such as IPs and potential confident
 - [ ] I have added logs.
 - [ ] I have added my platform.
 - [ ] I have added a version number.
-- [ ] I am sure that this issue is not a plugin issue.
+- [ ] I am sure that this issue is not related to a plugin.
 
-<!-- NOTE: If you don't use this issue template, we will close your issue. -->
+<!-- NOTE: If you do not use this issue template, we will close your issue. -->

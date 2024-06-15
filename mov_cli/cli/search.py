@@ -20,7 +20,10 @@ from ..logger import mov_cli_logger
 def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
 
     def before_display_callable(metadata: Metadata) -> Metadata:
-        cache.set_cache(metadata.display_name, metadata.image_url)
+        year = f" ({metadata.year})" if metadata.year else ""
+        name = metadata.title + year
+
+        cache.set_cache(name, metadata.image_url)
 
         return metadata
 

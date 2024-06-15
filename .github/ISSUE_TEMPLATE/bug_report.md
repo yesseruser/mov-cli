@@ -45,3 +45,11 @@ WARNING: This may leak sensative information such as IPs and potential confident
 
 **Version**
 <!-- If you don't use the latest Version and create a Bug-Report, it may be closed or left unanswered. -->
+
+**Checklist**
+- [ ] I have added logs.
+- [ ] I have added my platform.
+- [ ] I have added a version number.
+- [ ] I am sure that this issue is not a plugin issue.
+
+<!-- NOTE: If you don't use this issue template, we will close your issue. -->

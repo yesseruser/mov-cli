@@ -10,14 +10,11 @@ from .mpv import *
 from .vlc import *
 from .iina import *
 from .syncplay import *
-from .mpv_tty import *
 from .custom_player import *
 
 PLAYER_TABLE: Dict[str, Type[Player]] = {
     "mpv": MPV, 
     "vlc": VLC, 
     "syncplay": SyncPlay, 
-    "iina": IINA, 
-    "tty": MPV_TTY, 
-    "mpv-tty": MPV_TTY
+    "iina": IINA
 }

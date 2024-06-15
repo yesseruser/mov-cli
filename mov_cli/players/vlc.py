@@ -25,14 +25,16 @@ class VLC(Player):
     def __init__(
         self, 
         platform: SUPPORTED_PLATFORMS, 
-        player_args: Optional[List[str]] = None, 
+        args: Optional[List[str]] = None, 
+        args_override: bool = False, 
         debug: bool = False, 
         **kwargs
     ) -> None:
         super().__init__(
             platform = platform, 
-            player_args = player_args,
-            debug = debug
+            args = args, 
+            debug = debug, 
+            args_override = args_override
         )
 
     @property
@@ -65,17 +67,20 @@ class VLC(Player):
             return None
 
         elif self.platform == "Linux" or self.platform == "Windows":
-            args = [
+            default_args = [
                 "vlc", 
-                f'--meta-title="{media.display_name}"', 
                 media.url
+            ]
+
+            if media.audio_url is not None:
+                default_args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
+
+            args = [
+                f'--meta-title="{media.display_name}"'
             ]
 
             if media.referrer is not None:
                 args.append(f'--http-referrer="{media.referrer}"')
-
-            if media.audio_url is not None:
-                args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
 
             if media.subtitles is not None:
 
@@ -90,7 +95,9 @@ class VLC(Player):
             if self.debug is False:
                 args.append("--quiet")
 
-            return subprocess.Popen(args)
+            args = self.handle_additional_args(args, self.args)
+
+            return subprocess.Popen(default_args + args)
 
         return None
 

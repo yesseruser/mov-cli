@@ -23,14 +23,14 @@ class CustomPlayer(Player):
     def __init__(
         self, 
         binary: str, 
-        player_args: Optional[List[str]] = None, 
+        args: Optional[List[str]] = None, 
         debug: bool = False, 
         **kwargs
     ) -> None:
         self.binary = binary
 
         super().__init__(
-            player_args = player_args,
+            args = args, 
             debug = debug
         )
 
@@ -39,5 +39,5 @@ class CustomPlayer(Player):
         logger.debug(f"Launching your custom media player '{self.binary}'...")
 
         return subprocess.Popen(
-            [self.binary, media.url]
+            [self.binary, media.url] + self.args
         )

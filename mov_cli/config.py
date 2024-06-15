@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, TypedDict, final
 from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
-    from typing import Dict, Literal, Any, Optional
+    from typing import Dict, Literal, Any, Optional, List
 
     SupportedParsersT = Literal["lxml", "html.parser"]
 
@@ -28,6 +28,11 @@ from .utils import get_appdata_directory, what_platform
 from .utils.subtitles import Lang, lang_exists
 
 __all__ = ("Config",)
+
+@final
+class PlayerData(TypedDict):
+    binary: str
+    args: List[str]
 
 @final
 class ConfigUIData(TypedDict):
@@ -59,7 +64,7 @@ ConfigDebugData = TypedDict("ConfigDebugData", {"global": bool, "player": bool})
 class ConfigData(TypedDict):
     version: int
     debug: bool | ConfigDebugData
-    player: str
+    player: str | PlayerData
     editor: str
     parser: SupportedParsersT
     skip_update_checker: bool
@@ -112,7 +117,25 @@ class Config():
     @property
     def player(self) -> str:
         """Returns the player that was configured in the config. Defaults to MPV."""
-        return self.data.get("player", "mpv")
+        player_config = self.data.get("player", None)
+
+        if player_config is None:
+            return "mpv"
+
+        if isinstance(player_config, dict):
+            return player_config.get("binary", "mpv")
+
+        return player_config
+
+    @property
+    def player_args(self) -> List[str]:
+        """Returns the player that was configured in the config. Defaults to MPV."""
+        return self.data.get("player", {}).get("args", [])
+
+    @property
+    def player_args_override(self) -> bool:
+        """Returns the player that was configured in the config. Defaults to MPV."""
+        return self.data.get("player", {}).get("args_override", False)
 
     @property
     def plugins(self) -> Dict[str, str]:

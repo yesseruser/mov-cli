@@ -18,7 +18,8 @@ class IINA(Player):
     def __init__(
         self, 
         platform: SUPPORTED_PLATFORMS, 
-        player_args: Optional[List[str]] = None, 
+        args: Optional[List[str]] = None, 
+        args_override: bool = False, 
         debug: bool = False, 
         **kwargs
     ) -> None:
@@ -26,35 +27,43 @@ class IINA(Player):
 
         super().__init__(
             platform = platform, 
-            player_args = player_args,
-            debug = debug
+            args = args, 
+            debug = debug,
+            args_override = args_override
         )
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the IINA media player for MacOS."""
 
         if self.platform == "Darwin":
-            args = [
-                "iina",
-                "--keep-running",
-                media.url,
+            default_args = [
+                "iina", 
+                "--keep-running", 
+                media.url
+            ]
+
+            if media.audio_url is not None: # TODO: This will need testing.
+                default_args.append(f"--mpv-audio-file={media.audio_url}")
+
+            additional_args = [
                 f"--mpv-force-media-title={media.display_name}",
             ]
 
             if media.referrer is not None:
-                args.append(f"--mpv-referrer={media.referrer}")
-
-            if media.audio_url is not None: # TODO: This will need testing.
-                args.append(f"--mpv-audio-file={media.audio_url}")
+                additional_args.append(f"--mpv-referrer={media.referrer}")
 
             if media.subtitles is not None: # TODO: This will need testing.
 
                 for subtitle in media.subtitles:
-                    args.append(f"--mpv-sub-file={subtitle}")
+                    additional_args.append(f"--mpv-sub-file={subtitle}")
 
             if self.debug is False:
-                args.append("--no-stdin")
+                additional_args.append("--no-stdin")
 
-            return subprocess.Popen(args)
+            additional_args = self.handle_additional_args(additional_args, self.args)
+
+            return subprocess.Popen(
+                default_args + additional_args
+            )
 
         return None

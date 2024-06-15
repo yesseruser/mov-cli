@@ -119,12 +119,15 @@ def __get_player(config: Config, platform: SUPPORTED_PLATFORMS) -> Player:
         player = cast(Type[CustomPlayer], player)
 
         return player(
-            binary = config.player
+            binary = config.player, 
+            args = config.player_args
         )
 
     return player(
         platform = platform, 
-        debug = config.debug_player
+        args = config.player_args, 
+        debug = config.debug_player, 
+        args_override = config.player_args_override
     )
 
 def __handle_next_season(episode: EpisodeSelector, season_episode_count: int, media_episodes: ScrapeEpisodesT) -> bool:

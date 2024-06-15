@@ -18,12 +18,14 @@ class Player(ABC):
     def __init__(
         self, 
         platform: Optional[SUPPORTED_PLATFORMS] = None, 
-        player_args: Optional[List[str]] = None, 
+        args: Optional[List[str]] = None, 
+        args_override: bool = False, 
         debug: bool = False, 
         **kwargs
     ) -> None:
         self.platform = platform
-        self.player_args = player_args or []
+        self.args = args or []
+        self.args_override = args_override
         self.debug = debug
 
         super().__init__()
@@ -36,3 +38,16 @@ class Player(ABC):
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Method to be overridden with code to play media in that specific player."""
         ...
+
+    def handle_additional_args(self, default_args: List[str], additional_args: List[str]) -> List[str]:
+        handled_args = default_args
+
+        if self.args_override is True:
+            return additional_args
+
+        for arg in additional_args:
+
+            if arg not in handled_args:
+                handled_args.append(arg)
+
+        return handled_args

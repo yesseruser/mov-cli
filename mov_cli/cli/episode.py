@@ -46,7 +46,7 @@ def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Meta
         if episode is None:
             return None
 
-        return EpisodeSelector(episode, season, metadata_episodes)
+        return EpisodeSelector(episode, season)
 
     try:
         episode_season = episode_string.split(":")

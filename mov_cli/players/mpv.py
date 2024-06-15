@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from typing import Optional
 
     from ..media import Media
-    from ..utils.platform import SUPPORTED_PLATFORMS
+    from ..utils.platform import SUPPORTED_PLATFORMS, Literal
 
 import subprocess
 from devgoldyutils import Colours
@@ -18,19 +18,44 @@ class MPV(Player):
     def __init__(
         self, 
         platform: SUPPORTED_PLATFORMS, 
-        player_args: Optional[List[str]] = None, 
+        args: Optional[List[str]] = None, 
+        args_override: bool = False, 
         debug: bool = False, 
         **kwargs
     ) -> None:
         super().__init__(
             platform = platform, 
-            player_args = player_args,
-            debug = debug
+            args = args,
+            debug = debug, 
+            args_override = args_override
         )
 
     @property
     def display_name(self) -> str:
         return Colours.PURPLE.apply("MPV")
+
+    def _get_args(self, platform: Literal["Windows", "Linux", "Android", "Darwin"], media: Media):
+        if platform == "Android":
+            return []
+
+        args = [
+            f"--force-media-title={media.display_name}",
+        ]
+
+        if media.referrer is not None:
+            args.append(f"--referrer={media.referrer}")
+
+        if media.subtitles is not None:
+
+            for subtitle in media.subtitles:
+                args.append(f"--sub-file={subtitle}")
+
+        if self.debug is False:
+            args.append("--no-terminal")
+
+        args = self.handle_additional_args(args, self.args)
+
+        return args
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the MPV media player."""
@@ -49,26 +74,14 @@ class MPV(Player):
             )
 
         elif self.platform == "Linux" or self.platform == "Windows" or self.platform == "Darwin":
-            args = [
-                "mpv",
-                media.url,
-                f"--force-media-title={media.display_name}",
+            default_args = [
+                "mpv", 
+                media.url
             ]
 
-            if media.referrer is not None:
-                args.append(f"--referrer={media.referrer}")
-
             if media.audio_url is not None:
-                args.append(f"--audio-file={media.audio_url}")
+                default_args.append(f"--audio-file={media.audio_url}")
 
-            if media.subtitles is not None:
-
-                for subtitle in media.subtitles:
-                    args.append(f"--sub-file={subtitle}")
-
-            if self.debug is False:
-                args.append("--no-terminal")
-
-            return subprocess.Popen(args)
+            return subprocess.Popen(default_args + self._get_args(self.platform, media))
 
         return None

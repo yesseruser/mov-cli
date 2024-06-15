@@ -2,9 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
 
-    from .. import Config
     from pathlib import Path
     from ..media import Media
     from ..utils.platform import SUPPORTED_PLATFORMS
@@ -23,11 +22,22 @@ __all__ = ("VLC",)
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.ORANGE.apply("VLC"))
 
 class VLC(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
-        self.platform = platform
-        self.config = config
+    def __init__(
+        self, 
+        platform: SUPPORTED_PLATFORMS, 
+        player_args: Optional[List[str]] = None, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        super().__init__(
+            platform = platform, 
+            player_args = player_args,
+            debug = debug
+        )
 
-        super().__init__(display_name = Colours.ORANGE.apply("VLC"), **kwargs)
+    @property
+    def display_name(self) -> str:
+        return Colours.ORANGE.apply("VLC")
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the VLC media player."""
@@ -77,10 +87,7 @@ class VLC(Player):
 
                     args.append(f"--sub-file={subtitle}")
 
-            if self.config.resolution is not None:
-                args.append(f"--adaptive-maxwidth={self.config.resolution.value}") # NOTE: I don't really know if that works ~ Ananas
-
-            if self.config.debug_player is False:
+            if self.debug is False:
                 args.append("--quiet")
 
             return subprocess.Popen(args)

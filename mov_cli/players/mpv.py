@@ -1,10 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from typing import Optional
 
-    from .. import Config
     from ..media import Media
     from ..utils.platform import SUPPORTED_PLATFORMS
 
@@ -12,16 +11,26 @@ import subprocess
 from devgoldyutils import Colours
 
 from .player import Player
-from ..media.quality import Quality
 
 __all__ = ("MPV",)
 
 class MPV(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
-        self.platform = platform
-        self.config = config
+    def __init__(
+        self, 
+        platform: SUPPORTED_PLATFORMS, 
+        player_args: Optional[List[str]] = None, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        super().__init__(
+            platform = platform, 
+            player_args = player_args,
+            debug = debug
+        )
 
-        super().__init__(display_name = Colours.PURPLE.apply("MPV"), **kwargs)
+    @property
+    def display_name(self) -> str:
+        return Colours.PURPLE.apply("MPV")
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the MPV media player."""
@@ -57,10 +66,7 @@ class MPV(Player):
                 for subtitle in media.subtitles:
                     args.append(f"--sub-file={subtitle}")
 
-            if not self.config.resolution == Quality.AUTO:
-                args.append(f"--hls-bitrate={self.config.resolution.value}") # NOTE: This only works when the file is a m3u8
-
-            if self.config.debug_player is False:
+            if self.debug is False:
                 args.append("--no-terminal")
 
             return subprocess.Popen(args)

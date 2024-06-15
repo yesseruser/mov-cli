@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
+
     from ..media import Media
-    from .. import Config
     from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
@@ -15,11 +15,22 @@ from .player import Player
 __all__ = ("SyncPlay",)
 
 class SyncPlay(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
-        self.platform = platform
-        self.config = config
+    def __init__(
+        self, 
+        platform: SUPPORTED_PLATFORMS, 
+        player_args: Optional[List[str]] = None, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        super().__init__(
+            platform = platform, 
+            player_args = player_args,
+            debug = debug
+        )
 
-        super().__init__(display_name = Colours.BLUE.apply("Syncplay"), **kwargs)
+    @property
+    def display_name(self) -> str:
+        return Colours.BLUE.apply("Syncplay")
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in SyncPlay."""
@@ -42,9 +53,6 @@ class SyncPlay(Player):
                 for subtitle in media.subtitles:
                     args.append(f"--sub-file={subtitle}")
 
-            if self.config.resolution is not None:
-                args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: Only M3U8
-
             return subprocess.Popen(args)
 
         elif self.platform == "Darwin": # NOTE: Limits you to IINA
@@ -66,10 +74,7 @@ class SyncPlay(Player):
                 for subtitle in media.subtitles:
                     args.append(f"--mpv-sub-file={media.subtitles}")
 
-            if self.config.resolution is not None: # NOTE: Let us know if this works.
-                args.append(f"--mpv-hls-bitrate={self.config.resolution}")
-
-            if self.config.debug_player is False: # NOTE: Needs testing.
+            if self.debug is False: # NOTE: Needs testing.
                 args.append("--mpv-no-terminal")
 
             return subprocess.Popen(args)

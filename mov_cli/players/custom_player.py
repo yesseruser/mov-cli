@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Optional, List
+
     from ..media import Media
 
 import subprocess
@@ -18,15 +20,24 @@ class CustomPlayer(Player):
     """
     This player is invoked if you set a player that is not supported by mov-cli in the config, allowing users to invoke their own players.
     """
-    def __init__(self, player_command: str, **kwargs) -> None:
-        self.player_command = player_command
+    def __init__(
+        self, 
+        binary: str, 
+        player_args: Optional[List[str]] = None, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        self.binary = binary
 
-        super().__init__(**kwargs)
+        super().__init__(
+            player_args = player_args,
+            debug = debug
+        )
 
     def play(self, media: Media) -> subprocess.Popen:
         """Plays this media in a custom player."""
-        logger.debug(f"Launching your custom media player '{self.player_command}'...")
+        logger.debug(f"Launching your custom media player '{self.binary}'...")
 
         return subprocess.Popen(
-            [self.player_command, media.url]
+            [self.binary, media.url]
         )

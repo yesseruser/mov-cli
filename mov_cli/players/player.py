@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from typing import Optional, List
 
     from ..media import Media
+    from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
 from devgoldyutils import Colours
@@ -14,11 +15,22 @@ __all__ = ("Player",)
 
 class Player(ABC):
     """A base class for all players in mov-cli."""
-    def __init__(self, display_name: Optional[str] = None, player_args: Optional[List[str]] = None, **kwargs) -> None:
-        self.player_args = player_args
-        self.display_name = display_name or Colours.PINK_GREY.apply(self.__class__.__name__)
+    def __init__(
+        self, 
+        platform: Optional[SUPPORTED_PLATFORMS] = None, 
+        player_args: Optional[List[str]] = None, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        self.platform = platform
+        self.player_args = player_args or []
+        self.debug = debug
 
         super().__init__()
+
+    @property
+    def display_name(self) -> str:
+        return Colours.PINK_GREY.apply(self.__class__.__name__)
 
     @abstractmethod
     def play(self, media: Media) -> Optional[subprocess.Popen]:

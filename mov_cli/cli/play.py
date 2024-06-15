@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type, cast
 
 if TYPE_CHECKING:
     from typing import Optional, Literal
@@ -7,7 +7,9 @@ if TYPE_CHECKING:
     from ..config import Config
     from ..media import Media, Metadata
     from ..scraper import Scraper, ScrapeEpisodesT
+    from ..players import Player
 
+    from ..utils.platform import SUPPORTED_PLATFORMS
     from ..utils.episode_selector import EpisodeSelector
 
 from devgoldyutils import Colours
@@ -17,13 +19,14 @@ from .episode import handle_episode
 from .watch_options import watch_options
 
 from ..media import MetadataType
-from ..utils import what_platform, hide_ip
 from ..logger import mov_cli_logger
+from ..utils import what_platform, hide_ip
+from ..players import PLAYER_TABLE, CustomPlayer
 
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config) -> Optional[Literal["search"]]:
     platform = what_platform()
 
-    chosen_player = config.player
+    chosen_player = __get_player(config, platform)
 
     quality_string = ""
     episode_details_string = ""
@@ -108,6 +111,21 @@ def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSel
     popen.wait()
 
     return None
+
+def __get_player(config: Config, platform: SUPPORTED_PLATFORMS) -> Player:
+    player = PLAYER_TABLE.get(config.player, CustomPlayer)
+
+    if player == CustomPlayer:
+        player = cast(Type[CustomPlayer], player)
+
+        return player(
+            binary = config.player
+        )
+
+    return player(
+        platform = platform, 
+        debug = config.debug_player
+    )
 
 def __handle_next_season(episode: EpisodeSelector, season_episode_count: int, media_episodes: ScrapeEpisodesT) -> bool:
 

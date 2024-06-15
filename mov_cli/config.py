@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, TypedDict, final
 from typing_extensions import NotRequired
 
 if TYPE_CHECKING:
-    from .players import Player
     from typing import Dict, Literal, Any, Optional
 
     SupportedParsersT = Literal["lxml", "html.parser"]
@@ -23,7 +22,6 @@ from decouple import AutoConfig
 from importlib.util import find_spec
 from devgoldyutils import LoggerAdapter
 
-from . import players
 from .media import Quality
 from .logger import mov_cli_logger
 from .utils import get_appdata_directory, what_platform
@@ -112,24 +110,9 @@ class Config():
         return self.data.get("version", 1)
 
     @property
-    def player(self) -> Player:
-        """Returns the player class that was configured in the config. Defaults to MPV."""
-        value = self.data.get("player", "mpv")
-
-        platform = what_platform()
-
-        if value.lower() == "mpv":
-            return players.MPV(platform, self)
-        elif value.lower() == "vlc":
-            return players.VLC(platform, self)
-        elif value.lower() == "syncplay":
-            return players.SyncPlay(platform, self)
-        elif value.lower() == "iina":
-            return players.IINA(platform, self)
-        elif value.lower() in ["tty", "mpv-tty"]:
-            return players.MPV_TTY(platform, self)
-
-        return players.CustomPlayer(value)
+    def player(self) -> str:
+        """Returns the player that was configured in the config. Defaults to MPV."""
+        return self.data.get("player", "mpv")
 
     @property
     def plugins(self) -> Dict[str, str]:

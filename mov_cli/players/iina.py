@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
+
     from ..media import Media
-    from .. import Config
     from ..utils.platform import SUPPORTED_PLATFORMS
 
 import subprocess
@@ -15,11 +15,20 @@ from .player import Player
 __all__ = ("IINA",)
 
 class IINA(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
-        self.config = config
-        self.platform = platform
+    def __init__(
+        self, 
+        platform: SUPPORTED_PLATFORMS, 
+        player_args: Optional[List[str]] = None, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        self.display_name = Colours.GREY.apply("IINA")
 
-        super().__init__(display_name = Colours.GREY.apply("IINA"), **kwargs)
+        super().__init__(
+            platform = platform, 
+            player_args = player_args,
+            debug = debug
+        )
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the IINA media player for MacOS."""
@@ -43,10 +52,7 @@ class IINA(Player):
                 for subtitle in media.subtitles:
                     args.append(f"--mpv-sub-file={subtitle}")
 
-            if self.config.resolution is not None:
-                args.append(f"--mpv-hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
-
-            if self.config.debug_player is False:
+            if self.debug is False:
                 args.append("--no-stdin")
 
             return subprocess.Popen(args)

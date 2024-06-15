@@ -7,3 +7,4 @@ target-version = "py38"
 [lint.per-file-ignores]
 "__init__.py" = ["F403"]
 "scripts/*" = ["F401"]
+"mov_cli/players/__init__.py" = ["F405"]

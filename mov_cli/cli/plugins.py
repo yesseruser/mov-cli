@@ -5,6 +5,8 @@ if TYPE_CHECKING:
     from typing import Tuple, List, Dict, NoReturn
 
     from ..plugins import Plugin
+    from ..utils.platform import SUPPORTED_PLATFORMS
+
     PluginsDataT = List[Tuple[str, str, Plugin]]
 
 from devgoldyutils import Colours
@@ -27,7 +29,7 @@ def get_plugins_data(plugins: Dict[str, str]) -> PluginsDataT:
 
     return plugins_data
 
-def show_all_plugins(plugins: Dict[str, str]) -> None:
+def show_all_plugins(plugins: Dict[str, str], platform: SUPPORTED_PLATFORMS) -> None:
 
     for plugin_namespace, plugin_module_name, plugin in get_plugins_data(plugins):
 
@@ -36,8 +38,10 @@ def show_all_plugins(plugins: Dict[str, str]) -> None:
 
             print(f"- {Colours.PURPLE.apply(plugin_module_name)} ({plugin_namespace}) [{Colours.BLUE.apply(plugin_version)}]")
 
-            for scraper_name in plugin.scrapers:
-                print(f"  - {Colours.PINK_GREY.apply(scraper_name[0])}")
+            plugin_default_scraper = plugin.default_scraper(platform)
+
+            for scraper_name, scraper_class in plugin.scrapers:
+                print(f"  - {Colours.PINK_GREY.apply(scraper_name) + (' ❤' if scraper_class == plugin_default_scraper and len(plugin.scrapers) > 1 else '')}")
 
 def handle_internal_plugin_error(e: Exception) -> NoReturn:
     mov_cli_logger.critical(

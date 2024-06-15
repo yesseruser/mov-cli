@@ -80,13 +80,19 @@ def select_scraper(plugins: Dict[str, str], scrapers: ScrapersConfigT, fzf_enabl
         fzf_enabled = fzf_enabled
     )
 
+    plaform = what_platform()
+
     if chosen_plugin is not None:
         plugin_namespace, _, plugin = chosen_plugin
+
+        plugin_default_scraper = plugin.default_scraper(plaform)
 
         chosen_scraper = prompt(
             "Select a scraper", 
             choices = [scraper for scraper in plugin.scrapers], 
-            display = lambda x: Colours.BLUE.apply(x[0].lower()), 
+            display = (
+                lambda x: Colours.BLUE.apply(x[0].lower()) + Colours.CLAY.apply(" [DEFAULT]") if x[1] == plugin_default_scraper else Colours.BLUE.apply(x[0].lower())
+            ), 
             fzf_enabled = fzf_enabled
         )
 

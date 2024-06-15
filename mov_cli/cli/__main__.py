@@ -82,7 +82,7 @@ def mov_cli(
     plugins = config.plugins
 
     if list_plugins:
-        show_all_plugins(plugins)
+        show_all_plugins(plugins, platform)
         return None
 
     welcome_message = welcome_msg(

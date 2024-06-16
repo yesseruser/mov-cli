@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from ..media import Metadata
     from ..scraper import Scraper
 
+import re
 from devgoldyutils import Colours
 
 from .ui import prompt
@@ -18,12 +19,10 @@ from ..utils import what_platform
 from ..logger import mov_cli_logger
 
 def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
+    ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])') # Remove colours
 
     def before_display_callable(metadata: Metadata) -> Metadata:
-        year = f" ({metadata.year})" if metadata.year else ""
-        name = metadata.title + year
-
-        cache.set_cache(name, metadata.image_url)
+        cache.set_cache(ansi_remover.sub("", metadata.display_name), metadata.image_url)
 
         return metadata
 

@@ -69,4 +69,4 @@ def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Meta
 
         return None
 
-    return EpisodeSelector(episode, season, metadata_episodes)
+    return EpisodeSelector(episode, season)

@@ -2,48 +2,62 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Tuple, List, Dict
+    from typing import Tuple, List, Dict, Optional
+
+    from pathlib import Path
+    from ..cache import Cache
 
 import httpx
 from packaging import version
+from datetime import timedelta
 from devgoldyutils import LoggerAdapter, Colours
 
 import mov_cli
 from ..plugins import load_plugin
 from ..logger import mov_cli_logger
+from .platform import what_distro
 
 __all__ = (
     "update_available", 
-    "plugin_update_available"
+    "plugin_update_available",
+    "update_command",
 )
 
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.GREEN.apply("version"))
 
-def update_available() -> bool:
+def update_available(cache: Cache) -> bool:
     logger.debug("Checking if mov-cli needs updating...")
 
     update_fail_msg = "Failed to check for mov-cli update!"
 
-    try:
-        response = httpx.get("https://pypi.org/pypi/mov-cli/json")
-    except httpx.HTTPError as e:
-        logger.warning(update_fail_msg + f" Error: {e}")
-        return False
+    pypi_version: Optional[str] = cache.get_cache("pypi_version")
 
-    if response.status_code >= 400:
-        logger.warning(update_fail_msg + f" Response: {response}")
-        return False
+    if pypi_version is None:
 
-    pypi_json = response.json()
-    pypi_version: str = pypi_json["info"]["version"]
+        try:
+            response = httpx.get("https://pypi.org/pypi/mov-cli/json")
+        except httpx.HTTPError as e:
+            logger.warning(update_fail_msg + f" Error: {e}")
+            return False
+
+        if response.status_code >= 400:
+            logger.warning(update_fail_msg + f" Response: {response}")
+            return False
+
+        pypi_version: str = cache.set_cache(
+            id = "pypi_version", 
+            value = response.json()["info"]["version"], 
+            seconds_until_expired = timedelta(hours = 1).total_seconds()
+        )
 
     if version.parse(pypi_version) > version.parse(mov_cli.__version__):
         return True
 
     return False
 
-def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
+def plugin_update_available(cache: Cache, plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
     plugins_with_updates: List[str] = []
+
     logger.debug("Checking if plugins need updating...")
 
     for _, module_name in plugins.items():
@@ -69,18 +83,25 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
             )
             continue
 
-        try:
-            response = httpx.get(f"https://pypi.org/pypi/{pypi_package_name}/json")
-        except httpx.HTTPError as e:
-            logger.warning(f"Failed to check for update of the plugin '{module_name}'! Error: {e}")
-            continue
+        pypi_version: Optional[str] = cache.get_cache(f"{pypi_package_name}_pypi_version")
 
-        if response.status_code >= 400:
-            logger.warning(f"Failed to check for update of the plugin '{module_name}'! Response: {response}")
-            continue
+        if pypi_version is None:
 
-        pypi_json = response.json()
-        pypi_version: str = pypi_json["info"]["version"]
+            try:
+                response = httpx.get(f"https://pypi.org/pypi/{pypi_package_name}/json")
+            except httpx.HTTPError as e:
+                logger.warning(f"Failed to check for update of the plugin '{module_name}'! Error: {e}")
+                continue
+
+            if response.status_code >= 400:
+                logger.warning(f"Failed to check for update of the plugin '{module_name}'! Response: {response}")
+                continue
+
+            pypi_version: str = cache.set_cache(
+                id = f"{pypi_package_name}_pypi_version", 
+                value = response.json()["info"]["version"], 
+                seconds_until_expired = timedelta(hours = 1).total_seconds()
+            )
 
         if version.parse(pypi_version) > version.parse(plugin_version):
             plugins_with_updates.append(pypi_package_name)
@@ -89,3 +110,22 @@ def plugin_update_available(plugins: Dict[str, str]) -> Tuple[bool, List[str]]:
         return True, plugins_with_updates
 
     return False, []
+
+def update_command(mov_cli_path: Path, package: str | list = "mov-cli") -> str:
+    path = str(mov_cli_path)
+
+    if "pipx" in path:
+        return "pipx upgrade mov-cli --include-injected"
+    elif "/usr/bin" in path:
+        if what_distro() == "arch":
+            return "yay"
+        else:
+            if isinstance(package, list):
+                return f"Use your package manager. Packages to update: {' '.join(package)}"
+            else:
+                return f"Use your package manager. Package to update: {package}"
+
+    if isinstance(package, list):
+        return f"pip install {' '.join(package)} -U"
+    else:
+        return f"pip install {package} -U"

@@ -2,27 +2,41 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, Callable
 
     from ..media import Metadata
     from ..scraper import Scraper
 
+import re
 from devgoldyutils import Colours
 
 from .ui import prompt
 from .auto_select import auto_select_choice
 from .plugins import handle_internal_plugin_error
 
-from ..media import MetadataType
+from ..cache import Cache
+from ..utils import what_platform
 from ..logger import mov_cli_logger
 
-def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool) -> Optional[Metadata]:
+def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
+    ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])') # Remove colours
+
+    def before_display_callable(metadata: Metadata) -> Metadata:
+        cache.set_cache(ansi_remover.sub("", metadata.display_name), metadata.image_url)
+
+        return metadata
+
+    return before_display_callable
+
+def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled: bool, preview: bool, limit: Optional[int]) -> Optional[Metadata]:
     choice = None
+
+    cache = Cache(what_platform(), section = "image_urls")
 
     mov_cli_logger.info(f"Searching for '{Colours.ORANGE.apply(query)}'...")
 
     try:
-        search_results = scraper.search(query)
+        search_results = scraper.search(query, limit)
     except Exception as e:
         handle_internal_plugin_error(e)
 
@@ -32,9 +46,12 @@ def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled
         choice = prompt(
             "Choose Result", 
             choices = (choice for choice in search_results), 
-            display = lambda x: f"{Colours.BLUE if x.type == MetadataType.SINGLE else Colours.PINK_GREY}{x.title}" \
-                f"{Colours.RESET}" + (f" ({x.year})" if x.year is not None else ""), 
-            fzf_enabled = fzf_enabled
+            display = lambda x: x.display_name, 
+            fzf_enabled = fzf_enabled,
+            before_display = cache_image_for_preview(cache),
+            preview = "mov-cli-dev preview image {}" if preview else None
         )
+
+    cache.clear_all_cache()
 
     return choice

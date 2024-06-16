@@ -9,7 +9,8 @@ from pathlib import Path
 
 __all__ = (
     "get_appdata_directory", 
-    "get_temp_directory"
+    "get_temp_directory", 
+    "get_cache_directory"
 )
 
 def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
@@ -20,7 +21,7 @@ def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         user_profile = Path(os.getenv("USERPROFILE"))
         appdata_dir = user_profile.joinpath("AppData", "Local")
 
-    elif platform == "Darwin": # NOTE: Path maybe incorrect
+    elif platform == "Darwin":
         user_profile = Path.home()
         appdata_dir = user_profile.joinpath("Library", "Application Support")
 
@@ -42,7 +43,10 @@ def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
     return appdata_dir
 
 def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
-    """Returns the temporary directory where mov-cli dumps stuff. Files stored here WILL get cleared/deleted."""
+    """
+    Returns the temporary directory where mov-cli can dump stuff. 
+    Files stored here WILL get cleared / deleted automatically by the operating system.
+    """
     temp_directory = None
 
     if platform == "Windows":
@@ -51,17 +55,42 @@ def get_temp_directory(platform: SUPPORTED_PLATFORMS) -> Path:
     elif platform == "Darwin": # NOTE: Path maybe incorrect
         temp_directory = Path(os.getenv("TMPDIR"))
 
-    elif platform == "iOS":
-        # TODO: Temp directory for "iSH".
-        ...
+    elif platform == "Linux" or platform == "iOS":
+        linux_temp_dir = os.getenv("TMPDIR") # Respect the TMPDIR environment variable on Linux: https://unix.stackexchange.com/a/362107
 
-    elif platform == "Linux":
-        temp_directory = Path("/tmp")
+        if linux_temp_dir is None:
+            linux_temp_dir = "/tmp"
+
+        temp_directory = Path(linux_temp_dir)
 
     elif platform == "Android":
-        temp_directory = Path("$PREFIX/tmp")
+        temp_directory = Path(f"{os.getenv('PREFIX')}/tmp")
 
-    temp_directory = temp_directory.joinpath("mov-cli")
+    temp_directory = temp_directory.joinpath("mov-cli-temp")
     temp_directory.mkdir(exist_ok = True)
 
     return temp_directory
+
+def get_cache_directory(platform: SUPPORTED_PLATFORMS) -> Path:
+    """
+    Returns the cache directory where mov-cli can dump longer lived cache.
+    """
+    cache_directory = None
+
+    if platform == "Windows":
+        cache_directory = Path(os.getenv("LOCALAPPDATA"))
+
+    elif platform == "Darwin": # NOTE: Path maybe incorrect
+        user_profile = Path.home()
+        cache_directory = user_profile.joinpath("Library", "Caches")
+
+    elif platform == "Linux" or platform == "Android" or platform == "iOS":
+        user_profile = Path(os.getenv("HOME"))
+        cache_directory = user_profile.joinpath(".cache")
+
+        cache_directory.mkdir(exist_ok = True) # on android the .cache file may not exist.
+
+    cache_directory = cache_directory.joinpath("mov-cli")
+    cache_directory.mkdir(exist_ok = True)
+
+    return cache_directory

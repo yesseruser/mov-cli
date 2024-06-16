@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from typing import Optional, Dict, Literal, List, Tuple
 
     from .scraper import Scraper
+    from .utils.platform import SUPPORTED_PLATFORMS
 
 import importlib
 from dataclasses import dataclass
@@ -52,6 +53,15 @@ class Plugin:
     @property
     def version(self) -> Optional[str]:
         return getattr(self.module, "__version__", None)
+
+    def default_scraper(self, platform: SUPPORTED_PLATFORMS) -> Optional[Scraper]:
+
+        for scraper_namespace, scraper_class in self.hook_data["scrapers"].items():
+
+            if scraper_namespace == f"{platform}.DEFAULT" or scraper_namespace == "DEFAULT":
+                return scraper_class
+
+        return None
 
 def load_plugin(module_name: str) -> Optional[Plugin]:
     try:

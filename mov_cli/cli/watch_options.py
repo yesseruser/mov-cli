@@ -12,7 +12,7 @@ import time
 from subprocess import Popen
 
 from .ui import prompt
-from ..media import Series
+from ..media import Multi
 
 def watch_options(
     popen: Popen, 
@@ -20,14 +20,13 @@ def watch_options(
     platform: SUPPORTED_PLATFORMS, 
     media: Media, 
     fzf_enabled: bool
-) -> Optional[Literal["search", "next", "previous", "select"]]:
+) -> Optional[Literal["next", "previous", "select"]]:
     options = [
-        "search",
         "replay",
         "quit"
     ]
 
-    if isinstance(media, Series):
+    if isinstance(media, Multi):
         options.insert(0, "next")
         options.insert(1, "previous")
         options.insert(2, "select")

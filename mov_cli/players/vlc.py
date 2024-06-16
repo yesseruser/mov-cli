@@ -2,9 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
 
-    from .. import Config
     from pathlib import Path
     from ..media import Media
     from ..utils.platform import SUPPORTED_PLATFORMS
@@ -14,7 +13,6 @@ import subprocess
 import unicodedata
 from devgoldyutils import Colours, LoggerAdapter
 
-from .. import errors
 from .player import Player
 from ..logger import mov_cli_logger
 from ..utils import get_temp_directory
@@ -24,15 +22,27 @@ __all__ = ("VLC",)
 logger = LoggerAdapter(mov_cli_logger, prefix = Colours.ORANGE.apply("VLC"))
 
 class VLC(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
-        self.platform = platform
-        self.config = config
+    def __init__(
+        self, 
+        platform: SUPPORTED_PLATFORMS, 
+        args: Optional[List[str]] = None, 
+        args_override: bool = False, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        super().__init__(
+            platform = platform, 
+            args = args, 
+            debug = debug, 
+            args_override = args_override
+        )
 
-        super().__init__(**kwargs)
+    @property
+    def display_name(self) -> str:
+        return Colours.ORANGE.apply("VLC")
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the VLC media player."""
-        logger.info("Launching VLC Media Player...")
 
         if self.platform == "Android":
             return subprocess.Popen(
@@ -57,36 +67,37 @@ class VLC(Player):
             return None
 
         elif self.platform == "Linux" or self.platform == "Windows":
-            try:
-                args = [
-                    "vlc", 
-                    f'--meta-title="{media.display_name}"', 
-                    media.url, 
-                    "--quiet"
-                ]
+            default_args = [
+                "vlc", 
+                media.url
+            ]
 
-                if media.referrer is not None:
-                    args.append(f'--http-referrer="{media.referrer}"')
+            if media.audio_url is not None:
+                default_args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
 
-                if media.audio_url is not None:
-                    args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
+            args = [
+                f'--meta-title="{media.display_name}"'
+            ]
 
-                if media.subtitles is not None:
-                    subtitles = media.subtitles
+            if media.referrer is not None:
+                args.append(f'--http-referrer="{media.referrer}"')
 
-                    if subtitles.startswith("https://"):
+            if media.subtitles is not None:
+
+                for subtitle in media.subtitles:
+
+                    if subtitle.startswith("https://"):
                         logger.debug("Subtitles detected as a url.")
-                        subtitles = str(self.__url_subtitles_to_file(media, subtitles))
+                        subtitle = str(self.__url_subtitles_to_file(media, subtitle))
 
-                    args.append(f"--sub-file={subtitles}")
+                    args.append(f"--sub-file={subtitle}")
 
-                if self.config.resolution is not None:
-                    args.append(f"--adaptive-maxwidth={self.config.resolution}") # NOTE: I don't really know if that works ~ Ananas
+            if self.debug is False:
+                args.append("--quiet")
 
-                return subprocess.Popen(args)
+            args = self.handle_additional_args(args, self.args)
 
-            except (ModuleNotFoundError, FileNotFoundError):
-                raise errors.PlayerNotFound(self)
+            return subprocess.Popen(default_args + args)
 
         return None
 

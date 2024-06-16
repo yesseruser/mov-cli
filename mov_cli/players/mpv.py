@@ -1,34 +1,64 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from typing import Optional
+
     from ..media import Media
-    from .. import Config
-    from ..utils.platform import SUPPORTED_PLATFORMS
+    from ..utils.platform import SUPPORTED_PLATFORMS, Literal
 
 import subprocess
-from devgoldyutils import Colours, LoggerAdapter
+from devgoldyutils import Colours
 
-from .. import errors
-from ..logger import mov_cli_logger
 from .player import Player
 
 __all__ = ("MPV",)
 
-logger = LoggerAdapter(mov_cli_logger, prefix = Colours.PURPLE.apply("MPV"))
-
 class MPV(Player):
-    def __init__(self, platform: SUPPORTED_PLATFORMS, config: Config, **kwargs) -> None:
-        self.platform = platform
-        self.config = config
+    def __init__(
+        self, 
+        platform: SUPPORTED_PLATFORMS, 
+        args: Optional[List[str]] = None, 
+        args_override: bool = False, 
+        debug: bool = False, 
+        **kwargs
+    ) -> None:
+        super().__init__(
+            platform = platform, 
+            args = args,
+            debug = debug, 
+            args_override = args_override
+        )
 
-        super().__init__(**kwargs)
+    @property
+    def display_name(self) -> str:
+        return Colours.PURPLE.apply("MPV")
+
+    def _get_args(self, platform: Literal["Windows", "Linux", "Android", "Darwin"], media: Media):
+        if platform == "Android":
+            return []
+
+        args = [
+            f"--force-media-title={media.display_name}",
+        ]
+
+        if media.referrer is not None:
+            args.append(f"--referrer={media.referrer}")
+
+        if media.subtitles is not None:
+
+            for subtitle in media.subtitles:
+                args.append(f"--sub-file={subtitle}")
+
+        if self.debug is False:
+            args.append("--no-terminal")
+
+        args = self.handle_additional_args(args, self.args)
+
+        return args
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the MPV media player."""
-
-        logger.info("Launching MPV Media Player...")
 
         if self.platform == "Android":
             return subprocess.Popen(
@@ -43,54 +73,15 @@ class MPV(Player):
                 ]
             )
 
-        try:
+        elif self.platform == "Linux" or self.platform == "Windows" or self.platform == "Darwin":
+            default_args = [
+                "mpv", 
+                media.url
+            ]
 
-            if self.platform == "Linux" or self.platform == "Windows":
-                args = [
-                    "mpv",
-                    media.url,
-                    f"--force-media-title={media.display_name}",
-                    "--no-terminal",
-                ]
+            if media.audio_url is not None:
+                default_args.append(f"--audio-file={media.audio_url}")
 
-                if media.referrer is not None:
-                    args.append(f"--referrer={media.referrer}")
-
-                if media.audio_url is not None:
-                    args.append(f"--audio-file={media.audio_url}")
-
-                if media.subtitles is not None:
-                    args.append(f"--sub-file={media.subtitles}")
-
-                if self.config.resolution is not None:
-                    args.append(f"--hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
-
-                return subprocess.Popen(args)
-
-            elif self.platform == "Darwin":
-                args = [
-                    "iina",
-                    "--no-stdin",
-                    "--keep-running",
-                    media.url,
-                    f"--mpv-force-media-title={media.display_name}",
-                ]
-
-                if media.referrer is not None:
-                    args.append(f"--mpv-referrer={media.referrer}")
-
-                if media.audio_url is not None: # TODO: This will need testing.
-                    args.append(f"--mpv-audio-file={media.audio_url}")
-
-                if media.subtitles is not None: # TODO: This will need testing.
-                    args.append(f"--mpv-sub-file={media.subtitles}")
-
-                if self.config.resolution is not None:
-                    args.append(f"--mpv-hls-bitrate={self.config.resolution}") # NOTE: This only works when the file is a m3u8
-
-                return subprocess.Popen(args)
-
-        except (ModuleNotFoundError, FileNotFoundError):
-            raise errors.PlayerNotFound(self)
+            return subprocess.Popen(default_args + self._get_args(self.platform, media))
 
         return None

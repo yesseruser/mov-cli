@@ -1,4 +1,8 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..scraper import ScrapeEpisodesT
 
 from dataclasses import dataclass, field
 
@@ -16,6 +20,6 @@ class EpisodeSelector:
         self.episode = 1
         self.season += 1
 
-    def _previous_season(self) -> None:
+    def _previous_season(self, media_episodes: ScrapeEpisodesT) -> None:
         self.season -= 1
-        self.episode = 1
+        self.episode = media_episodes.get(self.season, 1)

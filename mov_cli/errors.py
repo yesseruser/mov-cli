@@ -3,14 +3,12 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import logging
-    from .players import Player
 
 from devgoldyutils import Colours
 from .logger import mov_cli_logger
 
 __all__ = (
-    "MovCliException", 
-    "PlayerNotFound"
+    "MovCliException"
 )
 
 class MovCliException(Exception):
@@ -23,12 +21,3 @@ class MovCliException(Exception):
 
         logger.critical(message)
         super().__init__(message)
-
-# NOTE: I might remove this. ~ Goldy
-class PlayerNotFound(MovCliException):
-    """Raised when player is not found."""
-    def __init__(self, player: Player) -> None:
-        super().__init__(
-            f"The player '{player.__class__.__name__}' was not found. Are you sure you have it installed? " \
-            "Are you sure the environment variable is set correctly?"
-        )

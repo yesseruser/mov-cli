@@ -3,11 +3,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import (
-        Any, Dict, List, Tuple, 
+        Any, Dict, List, Tuple, Optional,
         TypeVar, Literal, Iterable, Callable, Generator
     )
 
-    T = TypeVar('T')
+    T = TypeVar("T")
+
+    from ..utils.platform import SUPPORTED_PLATFORMS
 
 import re
 import os
@@ -25,9 +27,10 @@ from devgoldyutils import Colours, LoggerAdapter
 
 import mov_cli
 
+from ..cache import Cache
 from ..iterfzf import iterfzf
 from ..logger import mov_cli_logger
-from ..utils import  what_platform, update_available, plugin_update_available
+from ..utils import  what_platform, update_available, plugin_update_available, update_command
 
 __all__ = (
     "prompt", 
@@ -69,9 +72,17 @@ def is_it_just_one_choice(choices: Iterable[T]) -> Tuple[bool, List[T] | Generat
 
     return False, choices
 
-def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Callable[[T], str], fzf_enabled: bool) -> T | None:
+def prompt(
+    text: str, 
+    choices: List[T] | Generator[T, Any, None], 
+    display: Callable[[T], str], 
+    fzf_enabled: bool, 
+    before_display: Optional[Callable[[T], T]] = None, 
+    preview: Optional[str] = None
+) -> T | None:
     """Prompt the user to pick from a list choices."""
     choice_picked = None
+    before_display = before_display or (lambda x: x)
 
     is_just_one, choices = is_it_just_one_choice(choices)
 
@@ -90,15 +101,18 @@ def prompt(text: str, choices: List[T] | Generator[T, Any, None], display: Calla
         # We pass this in as a generator to take advantage of iterfzf's streaming capabilities.
         # You can find that explained as the second bullet point here: https://github.com/dahlia/iterfzf#key-features
         choice_picked = iterfzf(
-            iterable = ((display(choice), choice) for choice in choices), 
+            iterable = ((display(before_display(choice)), choice) for choice in choices), 
             prompt = text + ": ", 
-            ansi = True
+            ansi = True, 
+            preview = preview
         )
 
     else:
         logger.debug("Launching inquirer (fallback ui)...")
         inquirer_result = inquirer.prompt(
-            questions = [inquirer.List("choices", message = text, choices = [display(x) for x in choices])], 
+            questions = [
+                inquirer.List("choices", message = text, choices = [display(before_display(x)) for x in choices])
+            ], 
             theme = MovCliTheme()
         )
 
@@ -158,17 +172,19 @@ def greetings() -> Tuple[Literal["Good Morning", "Good Afternoon", "Good Evening
 # This function below is inspired by animdl: https://github.com/justfoolingaround/animdl
 def welcome_msg(
     plugins: Dict[str, str], 
+    platform: SUPPORTED_PLATFORMS, 
     check_for_updates: bool = False, 
     display_tip: bool = False, 
     display_version: bool = False
 ) -> str:
     """Returns cli welcome message."""
     now = datetime.now()
+    mov_cli_path = Path(os.path.split(__file__)[0])
     adjective = random.choice(
         ("gorgeous", "wonderful", "beautiful", "magnificent")
     )
 
-    random_tips_path = Path(os.path.split(__file__)[0]).joinpath("random_tips.json")
+    random_tips_path = mov_cli_path.joinpath("random_tips.json")
 
     greeting, user_name = greetings()
 
@@ -193,13 +209,16 @@ def welcome_msg(
         text += f"\n\n{Colours.CLAY}-> {Colours.RESET}Version: {Colours.BLUE}{mov_cli.__version__}{Colours.RESET}"
 
     if check_for_updates:
+        cache = Cache(platform, section = "update_checker")
 
-        if update_available():
-            text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}pip install mov-cli -U"
+        if update_available(cache):
+            update = update_command(mov_cli_path)
+            text += f"\n\n {Colours.PURPLE}ツ {Colours.ORANGE}An update is available! --> {Colours.RESET}{update}"
 
-        plugin_needs_updating, plugins_to_update = plugin_update_available(plugins)
+        plugin_needs_updating, plugins_to_update = plugin_update_available(cache, plugins)
 
         if plugin_needs_updating:
-            text += f"\n\n {Colours.ORANGE}|˶˙ᵕ˙ )ﾉﾞ {Colours.GREEN}Some plugins need updating! --> {Colours.RESET}pip install {' '.join(plugins_to_update)} -U"
+            update = update_command(mov_cli_path, plugins_to_update)
+            text += f"\n\n {Colours.ORANGE}|˶˙ᵕ˙ )ﾉﾞ {Colours.GREEN}Some plugins need updating! --> {Colours.RESET}{update}"
 
     return text + "\n"

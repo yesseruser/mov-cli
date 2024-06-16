@@ -5,8 +5,9 @@ if TYPE_CHECKING:
     ...
 
 import typer
+import shutil
 import logging
-from devgoldyutils import Colours
+from pathlib import Path
 
 from .play import play
 from .search import search
@@ -18,8 +19,10 @@ from .configuration import open_config_file, set_cli_config
 
 from ..config import Config
 from ..download import Download
+from ..media import MetadataType
 from ..logger import mov_cli_logger
 from ..http_client import HTTPClient
+from ..utils import hide_ip, get_temp_directory, what_platform, get_cache_directory
 
 __all__ = ("mov_cli",)
 
@@ -29,45 +32,62 @@ def mov_cli(
     query: Optional[List[str]] = typer.Argument(None, help = "A film, tv show or anime you would like to Query."), 
     debug: Optional[bool] = typer.Option(None, help = "Enable extra logging details. Useful for bug reporting."), 
     player: Optional[str] = typer.Option(None, "--player", "-p", help = "Player you would like to stream with. E.g. mpv, vlc"), 
-    scraper: Optional[str] = typer.Option(None, "--scraper", "-s", help = "Scraper you would like to scrape with. E.g. remote_stream, sflix"), 
+    scraper: Optional[str] = typer.Option(None, "--scraper", "-s", help = "Scraper you would like to scrape with. E.g. test, youtube, jellyplex"), 
     fzf: Optional[bool] = typer.Option(None, help = "Toggle fzf on/off for all user selection prompts."), 
+    preview: Optional[bool] = typer.Option(None, help = "Toggle fzf's preview (image preview, etc) on/off for fzf prompts."), 
     episode: Optional[str] = typer.Option(None, "--episode", "-ep", help = "Episode and season you wanna scrape. E.g. {episode}:{season} like -> 26:3"), 
     auto_select: Optional[int] = typer.Option(None, "--choice", "-c", help = "Auto select the search results. E.g. Setting it to 1 with query 'nyan cat' will pick " \
         "the first nyan cat video to show up in search results."
     ), 
+    limit: Optional[int] = typer.Option(None, "--limit", "-l", help = "Specify the maximum number of results"), 
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
-    download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."),
-    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."),
+    download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."), 
+    list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."), 
+    clear_cache: bool = typer.Option(False, "--no-cache", "--clear-cache", help = "Clears ALL cache stored by mov-cli, including the temp directory cache.")
 ):
     config = Config()
+    platform = what_platform()
 
     config = set_cli_config(
-        config,
-        debug = debug,
-        player = player,
-        scraper = scraper,
-        fzf = fzf
+        config, 
+        debug = debug, 
+        player = player, 
+        scraper = (scraper, ["scrapers", "default"]), 
+        fzf = (fzf, ["ui", "fzf"]), 
+        preview = (preview, ["ui", "preview"]), 
+        limit = (limit, ["ui", "limit"])
     )
 
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
 
+    if clear_cache:
+        mov_cli_logger.info("Clearing cache...")
+        shutil.rmtree(get_temp_directory(platform))
+        shutil.rmtree(get_cache_directory(platform))
+
+        # return right away after clearing cache if only --clear-cache or --no-cache is passed.
+        if query is None: 
+            return None
+
     mov_cli_logger.debug(f"Config -> {config.data}")
 
     if edit:
-        open_config_file(config)
+        file_path = None if query is None else Path(query[0])
+        open_config_file(config, file_path)
         return None
 
     plugins = config.plugins
 
     if list_plugins:
-        show_all_plugins(plugins)
+        show_all_plugins(plugins, platform)
         return None
 
     welcome_message = welcome_msg(
         plugins = plugins, 
+        platform = platform, 
         check_for_updates = True if query is None and config.skip_update_checker is False else False, 
         display_tip = True if query is None else False, 
         display_version = version
@@ -82,9 +102,13 @@ def mov_cli(
 
         query: str = " ".join(query)
 
-        http_client = HTTPClient(config)
+        http_client = HTTPClient(
+            headers = config.http_headers, 
+            timeout = config.http_timeout, 
+            hide_ip = config.hide_ip
+        )
 
-        selected_scraper = select_scraper(plugins, config.fzf_enabled, config.default_scraper)
+        selected_scraper = select_scraper(plugins, config.scrapers, config.fzf_enabled, config.default_scraper)
 
         if selected_scraper is None:
             mov_cli_logger.error(
@@ -93,9 +117,11 @@ def mov_cli(
             )
             return False
 
-        chosen_scraper = use_scraper(selected_scraper, config, http_client, scrape_options)
+        selected_scraper[2].update(scrape_options)
 
-        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled)
+        chosen_scraper = use_scraper(selected_scraper, config, http_client)
+
+        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, config.preview, config.limit)
 
         if choice is None:
             mov_cli_logger.error("There was no results or you didn't select anything.")
@@ -114,40 +140,27 @@ def mov_cli(
 
         media = scrape(choice, chosen_episode, chosen_scraper)
 
-        if media.url is None:
+        if media is None:
+            episode_details_string = f" ep {chosen_episode.episode} season {chosen_episode.season} of" if choice.type == MetadataType.MULTI else ""
+
             mov_cli_logger.error(
-                "Scraper didn't return a streamable url." \
-                    "\nThis is NOT a mov-cli issue. This IS an plugin issue"
+                f"The scraper '{chosen_scraper.__class__.__name__}' couldn't find{episode_details_string} '{choice.title}'! " \
+                    "Don't report this to mov-cli, report this to the plugin itself."
             )
             return False
 
         if download:
             dl = Download(config)
-            mov_cli_logger.debug(f"Downloading from this url -> '{media.url}'")
+
+            mov_cli_logger.debug(f"Downloading from this url -> '{hide_ip(media.url, config.hide_ip)}'")
 
             popen = dl.download(media)
-            popen.wait()
+            
+            if popen:
+                popen.wait()
 
         else:
-            option = play(media, choice, chosen_scraper, chosen_episode, config)
-
-            if option == "search":
-                query = input(Colours.BLUE.apply("  Enter Query: "))
-
-                mov_cli(
-                    query = [query], 
-                    debug = debug, 
-                    player = player, 
-                    scraper = scraper, 
-                    fzf = fzf,
-                    episode = None,
-                    auto_select = None,
-
-                    version = False,
-                    edit = False,
-                    download = False,
-                    list_plugins = False
-                )
+            play(media, choice, chosen_scraper, chosen_episode, config)
 
 def app():
     uwu_app.command()(mov_cli)

@@ -2,7 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional, Any
+    from pathlib import Path
+    from typing import Optional, Any, List, Tuple
     from ..config import Config
 
 import os
@@ -11,38 +12,42 @@ from subprocess import check_call, CalledProcessError
 from .. import utils
 from ..logger import mov_cli_logger
 
-def set_cli_config(config: Config, **kwargs: Optional[Any]) -> Config:
-    debug = kwargs.get("debug")
-    player = kwargs.get("player")
-    scraper = kwargs.get("scraper")
-    fzf = kwargs.get("fzf")
+def set_cli_config(config: Config, **kwargs: Any | Tuple[Any, List[str]]) -> Config:
 
-    if debug is not None:
-        config.data["debug"] = debug
+    for key, value in kwargs.items():
 
-    if player is not None:
-        config.data["player"] = player
+        if isinstance(value, tuple):
+            dict_keys = value[1]
+            actual_value = value[0]
+        else:
+            dict_keys = None
+            actual_value = value
 
-    if scraper is not None:
-        if config.data.get("scrapers") is None:
-            config.data["scrapers"] = {}
+        if actual_value is not None:
 
-        config.data["scrapers"]["default"] = scraper
+            if isinstance(value, tuple):
+                config_data = config.data
 
-    if fzf is not None:
-        if config.data.get("ui") is None:
-            config.data["ui"] = {}
+                for index, dict_key in enumerate(dict_keys):
+                    dict_key = dict_key.format(K = key)
 
-        config.data["ui"]["fzf"] = fzf
+                    if index + 1 == len(dict_keys):
+                        config_data[dict_key] = actual_value
+                        break
+
+                    config_data = config_data.get(dict_key, {})
+
+            else:
+                config.data[key] = actual_value
 
     return config
 
-def open_config_file(config: Config):
+def open_config_file(config: Config, file_path: Optional[Path] = None):
     """Opens the config file in the respectable editor for that platform."""
     editor = config.editor
+    platform = utils.what_platform()
 
     if editor is None: 
-        platform = utils.what_platform()
         env_editor = os.environ.get("EDITOR")        
 
         if env_editor is not None:
@@ -59,8 +64,10 @@ def open_config_file(config: Config):
 
     mov_cli_logger.debug("Opening config file...")
 
+    appdata_path = utils.get_appdata_directory(platform)
+
     try:
-        check_call([editor, config.config_path])
+        check_call([editor, config.config_path if file_path is None else appdata_path.joinpath(file_path)])
     except (FileNotFoundError, CalledProcessError) as e:
         mov_cli_logger.error(
             f"Failed to open config file with the editor '{editor}'! Error: {e}" \

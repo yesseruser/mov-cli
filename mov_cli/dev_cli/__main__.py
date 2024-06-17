@@ -2,14 +2,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, List
 
 import os
+import json
 import typer
 import httpx
 import shutil
 from pathlib import Path
 from subprocess import call
+from devgoldyutils import Colours
 
 from ..cache import Cache
 from ..utils import what_platform, get_temp_directory
@@ -18,14 +20,27 @@ __all__ = ()
 
 app = typer.Typer(
     pretty_exceptions_enable = False, 
-    help = "Developer only commands to be executed from scripts and assist with testing and development of mov-cli plugins."
+    help = "Developer only commands to be executed from scripts and assist with testing and development of mov-cli plugins and more."
 )
 
-test_app = typer.Typer(name = "test", help = "Run tests on plugins varies mov-cli functionalities.")
+test_app = typer.Typer(name = "test", help = "Run tests on mov-cli plugins and other varies mov-cli functionalities.")
+
+test_misc_app = typer.Typer(name = "misc", help = "")
+test_app.add_typer(test_misc_app)
+
 preview_app = typer.Typer(name = "preview", help = "Dev command used by stuff like fzf to display images from mov-cli in the terminal.")
 
 app.add_typer(test_app)
 app.add_typer(preview_app)
+
+@test_misc_app.command(help = "Test how a tip that get's displayed under the mov-cli welcome message is displayed.")
+def tip(tip_index: int):
+    mov_cli_path = Path(__file__).parent.parent
+    random_tips_path = mov_cli_path.joinpath("cli", "random_tips.json")
+
+    random_tips_json: List[str] = json.load(random_tips_path.open("r"))
+
+    print(f"\n- {Colours.ORANGE}TIP: {Colours.RESET}{random_tips_json[tip_index]}\n")
 
 @preview_app.command(help = "Preview image from mov-cli cache to terminal.")
 def image(id: str):

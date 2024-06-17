@@ -23,14 +23,16 @@ class IINA(Player):
         debug: bool = False, 
         **kwargs
     ) -> None:
-        self.display_name = Colours.GREY.apply("IINA")
-
         super().__init__(
             platform = platform, 
             args = args, 
             debug = debug,
             args_override = args_override
         )
+
+    @property
+    def display_name(self):
+        return Colours.GREY.apply("IINA")
 
     def play(self, media: Media) -> Optional[subprocess.Popen]:
         """Plays this media in the IINA media player for MacOS."""

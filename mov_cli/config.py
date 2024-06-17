@@ -229,30 +229,6 @@ class Config():
         return debug.get("player", False)
 
     @property
-    def proxy(self) -> dict | None:
-        """Returns proxy data. Defaults to None"""
-        proxy_config = self.data.get("proxy")
-
-        if proxy_config is not None:
-            proxy = None
-
-            username = proxy_config.get("username")
-            password = proxy_config.get("password")
-
-            scheme = proxy_config.get("scheme")
-            ip = proxy_config.get("ip")
-            port = proxy_config.get("port")
-
-            if username and password:
-                proxy = f"{scheme}://{username}:{password}@{ip}:{port}"
-            else:
-                proxy = f"{scheme}://{ip}:{port}"
-
-            return {"all://": proxy}
-        else:
-            return None
-
-    @property
     def http_timeout(self) -> int:
         """Returns the http timeout delay that should be set."""
         return self.data.get("http", {}).get("timeout", 15)

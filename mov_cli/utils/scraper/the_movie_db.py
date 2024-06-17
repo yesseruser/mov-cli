@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from ...http_client import HTTPClient
 
 from ...media import Metadata, MetadataType, ExtraMetadata, AiringType
-from base64 import b64decode
 
 __all__ = ("TheMovieDB",)
 

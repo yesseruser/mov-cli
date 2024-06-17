@@ -33,7 +33,7 @@ class TheMovieDB:
     """API-Wrapper for themoviedb.org"""
     def __init__(self, http_client: HTTPClient):
         self.http_client = http_client
-        self.api_key = str(b64decode("ZDM5MjQ1ZTExMTk0N2ViOTJiOTQ3ZTNhOGFhY2M4OWY="), "utf-8")
+        self.api_key = "2cdf18cd7b98344296dde21c5ed02bbd" # DO NOT USE https://cdn.ananas.moe/live-reaction.gif
 
         self.metadata = "https://api.themoviedb.org/3/{}/{}?language=en-US&append_to_response=episode_groups,alternative_titles,credits&api_key={}"
 

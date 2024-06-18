@@ -106,15 +106,11 @@ class VLC(Player):
         temp_dir = get_temp_directory(self.platform)
 
         file_name = unicodedata.normalize("NFKD", media.display_name).encode("ascii", "ignore").decode("ascii")
-
-        for path in temp_dir.iterdir():
-
-            if path.name == file_name:
-                sub_file_exists_already = True
-                logger.debug("Subtitles already exists in temp directory, skipping download...")
-                break
-
         file_path = temp_dir.joinpath(file_name)
+
+        if file_path.exists():
+            sub_file_exists_already = True
+            logger.debug("Subtitles already exists in temp directory, skipping download...")
 
         if sub_file_exists_already is False:
             logger.debug("Downloading subtitles to temp directory as vlc does not support streaming of subs via url...")

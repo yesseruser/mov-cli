@@ -19,15 +19,14 @@ __all__ = ("TheMovieDB",)
 
 class TheMovieDB():
     """Wrapper for themoviedb.org"""
-    def __init__(self, config: Config, http_client: HTTPClient) -> None:
+    def __init__(self, http_client: HTTPClient) -> None:
         self.http_client = http_client
-        self.config = config
 
         self.base_url = "https://www.themoviedb.org"
         self.not_translated = "translated in English"
 
     def soup(self, query: str) -> BeautifulSoup:
-        return BeautifulSoup(query, self.config.parser)
+        return BeautifulSoup(query, "html.parser")
 
     def search(self, query: str, limit: Optional[int]) -> List[Metadata]:
         limit = 20 if limit is None else limit

@@ -1,120 +1,119 @@
 """
-Search api used for searching movies and tv series.
+Search api used for TMDb
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Any, Generator, Dict, Literal, Optional
+    from typing import List, Optional
     from ...http_client import HTTPClient
+    from ... import Config
+
+from bs4 import BeautifulSoup, Tag
+import re
+from thefuzz import fuzz
 
 from ...media import Metadata, MetadataType, ExtraMetadata, AiringType
 
 __all__ = ("TheMovieDB",)
 
-class TMDbSerial:
-    def __init__(self, data, type: MetadataType):
-        self.id: int = data.get("id")
-        self.title: str = self.__extract_title(data)
-        self.release_date: Optional[str] = data.get("release_date") or data.get("first_air_date")
-        self.year: Optional[str] = self.release_date[:4] if self.release_date else None
-        self.type: MetadataType = type
-        self.image_url: Optional[str] = "https://image.tmdb.org/t/p/w600_and_h900_bestv2" + data.get("poster_path") if data.get("poster_path") else None
-    
-    def __extract_title(self, data):
-        title_fields = ["title", "name", "original_title", "original_name"]
-        for field in title_fields:
-            if field in data:
-                return data[field]
-        return ""
-
-class TheMovieDB:
-    """API-Wrapper for themoviedb.org"""
-    def __init__(self, http_client: HTTPClient):
+class TheMovieDB():
+    """Wrapper for themoviedb.org"""
+    def __init__(self, config: Config, http_client: HTTPClient) -> None:
         self.http_client = http_client
-        self.api_key = "2cdf18cd7b98344296dde21c5ed02bbd" # DO NOT USE https://cdn.ananas.moe/live-reaction.gif
+        self.config = config
 
-        self.metadata = "https://api.themoviedb.org/3/{}/{}?language=en-US&append_to_response=episode_groups,alternative_titles,credits&api_key={}"
+        self.base_url = "https://www.themoviedb.org"
+        self.not_translated = "translated in English"
 
-        self.search_url = "https://api.themoviedb.org/3/search/{}?query={}&include_adult=false&language=en-US&page=1&api_key={}"
+    def soup(self, query: str) -> BeautifulSoup:
+        return BeautifulSoup(query, self.config.parser)
 
+    def search(self, query: str, limit: Optional[int]) -> List[Metadata]:
+        limit = 20 if limit is None else limit
 
-    def search(self, query: str, limit: Optional[int]) -> Generator[Metadata, Any, None]:
-        max_metadata = 20 if limit is None else limit
+        metadata = []
+        response = self.http_client.get(f"{self.base_url}/search", params = {"query": query})
+        soup = self.soup(response.text)
 
-        serial_list: List[TMDbSerial] = []
+        movie_items = soup.find("div", {"class": "movie"}).find_all("div", {"class": "card v4 tight"})
+        tv_items = soup.find("div", {"class": "tv"}).find_all("div", {"class": "card v4 tight"})
 
-        movie = self.http_client.get(self.search_url.format("movie", query, self.api_key)).json()["results"]
-        tv = self.http_client.get(self.search_url.format("tv", query, self.api_key)).json()["results"]
+        items: List[Tag] = movie_items + tv_items
+        items.sort(key=lambda data: fuzz.ratio(query, data.find("h2").text), reverse=True)
 
-        for item in movie:
-            item = TMDbSerial(item, MetadataType.SINGLE)
+        for item in items:
+            release_date = item.find("span", {"class": "release_date"})
+            id = item.find("a")["href"].split("/")[-1].split("-")[0]
+            image = item.find("img")
 
-            if not item.release_date:
+            if image is not None:
+                image = image["src"].replace("w94_and_h141_bestv2", "w600_and_h900_bestv2")
+
+            metadata.append(Metadata(
+                id = id,
+                title = item.find("h2").text,
+                type = MetadataType.SINGLE if "movie" in item.parent.parent.attrs["class"] else MetadataType.MULTI,
+                image_url = image,
+                year = release_date.text.split(" ")[-1] if release_date is not None else None,
+                extra_func = lambda: self.__scrape_extra_metadata(item)
+            ))
+
+        return metadata[:limit]
+
+    def scrape_episodes(self, metadata: Metadata):
+        episodes_dict = {}
+        url = f"{self.base_url}/tv/{metadata.id}/seasons"
+
+        seasons_page = self.http_client.get(url, redirect=True)
+        soup = self.soup(seasons_page)
+
+        seasons = soup.findAll("div", {"class": "season_wrapper"})
+
+        for num in range(len(seasons)):
+            season = seasons[num]
+
+            name_of_season = season.select("h2 > a")[0].text
+            episodes_text = season.find("h4").text
+
+            if name_of_season == "Specials":
                 continue
 
-            serial_list.append(item)
+            pattern = r"(\d+) Episodes"
+            episodes = re.findall(pattern, episodes_text)[0]
 
-        for item in tv:
-            item = TMDbSerial(item, MetadataType.MULTI)
-
-            if not item.release_date:
-                continue
-
-            serial_list.append(item)
+            episodes_dict[num + 1] = int(episodes)
         
-        serial_list = serial_list[:max_metadata]
+        return episodes_dict
 
-        for item in serial_list:
-            yield Metadata(
-                id = item.id,
-                title = item.title,
-                type = item.type,
-                image_url = item.image_url,
-                year = item.year,
-                extra_func = lambda: self.__extra_metadata(item)
-            )
-
-    def scrape_episodes(self, metadata: Metadata, **kwargs) -> Dict[int, int] | Dict[None, Literal[1]]:
-        scraped_seasons = {}
-
-        seasons = self.http_client.get(self.metadata.format("tv", metadata.id, self.api_key)).json()["seasons"]
-
-        for season in seasons:
-            if season["season_number"] == 0:
-                continue
-
-            scraped_seasons[season["season_number"]] = season["episode_count"]
-
-        return scraped_seasons
-
-    def __extra_metadata(self, serial: TMDbSerial) -> ExtraMetadata: # This API is dawgshit
-        type = "movie" if serial.type == MetadataType.SINGLE else "tv"
-        metadata = self.http_client.get(self.metadata.format(type, serial.id, self.api_key)).json()
-
-        description = None
-        cast = None
-        alternate_titles = None
-        genres = None
+    def __scrape_extra_metadata(self, item: Tag) -> ExtraMetadata:
+        cast = []
+        alternate_titles = []
+        genres = []
+        people = []
         airing = None
+        description = None
 
-        if metadata.get("overview"):
-            description = metadata.get("overview")
+        description_tag = item.find("div", {"class": "overview"}).find("p")
+        id = item.find("a")["href"]
+        type = item.parent.parent.attrs["class"]
+        url = f"{self.base_url}/{type}/{id}"
 
-        if metadata["credits"]["cast"]:
-            cast = [i.get("name") or i.get("original_name") for i in metadata["credits"]["cast"]]
-        
-        alternative = metadata["alternative_titles"]
+        page = self.http_client.get(url, redirect=True)
+        cast_page = self.http_client.get(f"{url}/cast", redirect=True)
 
-        titles = alternative.get("results") or alternative.get("titles")
+        soup = self.soup(page)
+        soup_c = self.soup(cast_page)
 
-        if titles:
-            alternate_titles = [(i.get("iso_3166_1"), i.get("title")) for i in titles]
+        airing_status = soup.find("section", {"class": "facts left_column"}).find("p").contents[-1].text
+        genre: List[Tag] = soup.find("span", {"class":"genres"}).findAll("a")
+        people_credits = soup_c.find("ol", {"class":"people credits"})
 
-        if metadata["genres"]:
-            genres = [i["name"] for i in metadata["genres"]]
+        if description_tag is not None:
+            description = description_tag.text
 
-        airing_status = metadata["status"]
+        if self.not_translated in description:
+            description = None
 
         if "Released" in airing_status:
             airing = AiringType.RELEASED
@@ -127,10 +126,22 @@ class TheMovieDB:
         else:
             airing = AiringType.DONE
 
+        if people_credits is not None:
+            people = people_credits.findAll("li")
+
+        for g in genre:
+            genres.append(g.text)
+
+        if soup.find_all("p", {"class": "wrap"}):
+            alternate_titles.append(soup.find("p", {"class": "wrap"}).contents[-1].text)
+        
+        for i in people:
+            cast.append(i.select("p:nth-child(1) > a:nth-child(1)")[0].text)
+
         return ExtraMetadata(
             description = description,
-            cast = cast,
             alternate_titles = alternate_titles,
+            cast = cast,
             genres = genres,
             airing = airing
         )

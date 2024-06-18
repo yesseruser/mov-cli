@@ -7,10 +7,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Optional
     from ...http_client import HTTPClient
-    from ... import Config
 
-from bs4 import BeautifulSoup, Tag
 import re
+from bs4 import BeautifulSoup, Tag
 from thefuzz import fuzz
 
 from ...media import Metadata, MetadataType, ExtraMetadata, AiringType

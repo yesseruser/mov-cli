@@ -94,7 +94,7 @@ youtube = "mov-cli-youtube"
 ```sh
 mov-cli -s youtube blender studio
 ```
-<img src="https://github.com/mov-cli/mov-cli/assets/132799819/f9ea5642-712e-4440-b3df-0f9b60b8223b">
+<img src="https://github.com/mov-cli/mov-cli/assets/132799819/f7a75a14-105b-4afa-9075-bb2d937baa25">
 
 > The command above searches for `blender studio` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
 

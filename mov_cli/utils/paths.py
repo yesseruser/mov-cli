@@ -25,13 +25,7 @@ def get_appdata_directory(platform: SUPPORTED_PLATFORMS) -> Path:
         user_profile = Path.home()
         appdata_dir = user_profile.joinpath("Library", "Application Support")
 
-    elif platform == "iOS":
-        user_profile = Path(os.getenv("HOME"))
-        appdata_dir = user_profile.joinpath("Library")
-
-        appdata_dir.mkdir(exist_ok = True)
-
-    elif platform == "Linux" or platform == "Android":
+    elif platform == "Linux" or platform == "Android" or platform == "iOS":
         user_profile = Path(os.getenv("HOME"))
         appdata_dir = user_profile.joinpath(".config")
 

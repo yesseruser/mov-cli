@@ -92,11 +92,11 @@ youtube = "mov-cli-youtube"
 
 2. Scrape away!
 ```sh
-mov-cli -s youtube flight 370
+mov-cli -s youtube blender studio
 ```
-<img src="https://github.com/mov-cli/mov-cli/assets/132799819/8ccbd4b9-16d7-44cd-af8c-f788da1d5118">
+<img src="https://github.com/mov-cli/mov-cli/assets/132799819/f9ea5642-712e-4440-b3df-0f9b60b8223b">
 
-> The command above searches for `flight 370` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
+> The command above searches for `blender studio` with our [youtube](https://github.com/mov-cli/mov-cli-youtube) plugin, **however once again mov-cli is plugin based and there are many of them [in the wild](https://github.com/topics/mov-cli-plugin). 😉**
 
 ## Star Graph ⭐
 [![Star Graph Chart](https://api.star-history.com/svg?repos=mov-cli/mov-cli&type=Date)](https://star-history.com/#mov-cli/mov-cli&Date)

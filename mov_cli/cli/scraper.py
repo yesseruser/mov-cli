@@ -22,7 +22,7 @@ from ..utils import what_platform
 from ..logger import mov_cli_logger
 
 def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Optional[Media]:
-    mov_cli_logger.info(f"Scrapping '{Colours.CLAY.apply(choice.title)}'...")
+    mov_cli_logger.info(f"Scraping '{Colours.CLAY.apply(choice.title)}'...")
 
     try:
         media = scraper.scrape(choice, episode)

@@ -12,8 +12,17 @@ build-system-packages:
 install:
 	${PIP} install . -U
 
+install-dev:
+	${PIP} install .[dev] -U
+
 install-editable:
 	${PIP} install -e .[dev] --config-settings editable_mode=compat -U
 
 test:
 	ruff check --target-version=py38 .
+
+build-docs:
+	cd docs && make html
+
+build-clean-docs:
+	cd docs && make clean && make html

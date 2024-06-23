@@ -8,7 +8,7 @@ from devgoldyutils import Colours
 from .logger import mov_cli_logger
 
 __all__ = (
-    "MovCliException"
+    "MovCliException", 
 )
 
 class MovCliException(Exception):

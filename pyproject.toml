@@ -47,7 +47,13 @@ dynamic = ["version"]
 dev = [
     "ruff",
     "build",
-    "devgoldyutils[pprint]>=2.5.7"
+    "devgoldyutils[pprint]>=2.5.7",
+    "Sphinx",
+    "sphinxext-opengraph",
+    "sphinx-inline-tabs",
+    "furo",
+    "myst-parser",
+    "sphinx-copybutton"
 ]
 
 [project.urls]

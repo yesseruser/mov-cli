@@ -1,5 +1,6 @@
-:og:description: The land of the goldy bot framework. 🌟
-   Find documentation and more at this site.
+:og:title: mov-cli documentation site
+
+:og:description: 🌟 Where mov-cli library documentation lives.
 
 .. include:: ../README.md
    :parser: myst_parser.sphinx_

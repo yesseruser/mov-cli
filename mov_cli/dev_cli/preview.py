@@ -26,7 +26,7 @@ preview_app = typer.Typer(
 def image(id: str):
     platform = what_platform()
 
-    if not platform == "Linux" or not platform == "Android":
+    if not platform == "Linux" and not platform == "Android":
         print("Image preview only works on Linux & Android atm.")
         return False
 

@@ -71,16 +71,17 @@ class TheMovieDB():
         for num in range(len(seasons)):
             season = seasons[num]
 
-            name_of_season = season.select("h2 > a")[0].text
+            season_num = season.select("a:nth-child(1)")[0]["href"].split("/")[-1]
             episodes_text = season.find("h4").text
 
-            if name_of_season == "Specials":
+            if season_num == "0":
                 continue
 
-            pattern = r"(\d+) Episodes"
-            episodes = re.findall(pattern, episodes_text)[0]
+            episode_pattern = r"(\d+) Episodes"
+            
+            episodes = re.findall(episode_pattern, episodes_text)[0]
 
-            episodes_dict[num + 1] = int(episodes)
+            episodes_dict[int(season_num)] = int(episodes)
         
         return episodes_dict
 

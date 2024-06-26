@@ -160,7 +160,7 @@ def greetings() -> Tuple[Literal["Good Morning", "Good Afternoon", "Good Evening
         else:
             greeting = "Good Morning"
     else:
-        if i <= 5:
+        if i <= 5 or i == 12:
             greeting = "Good Afternoon"
         elif i > 5 and i <= 8:
             greeting = "Good Evening"

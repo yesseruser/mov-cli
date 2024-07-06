@@ -13,14 +13,14 @@ sys.path.insert(0, os.path.abspath(".."))
 
 project = "mov-cli"
 copyright = "2024, mov-cli"
-author = "Goldy"
+author = "mov-cli"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     "sphinx.ext.todo", 
-    "sphinx.ext.viewcode", 
+    "sphinx.ext.viewcode",           
     "sphinx.ext.autodoc",
     "sphinxext.opengraph",
     "sphinx_inline_tabs",
@@ -34,7 +34,7 @@ source_suffix = ['.rst', '.md']
 
 # Opengraph Settings
 # -------------------
-ogp_site_url = "https://mov-cli.devgoldy.xyz"
+ogp_site_url = "https://mov-cli.sata-andagi.moe"
 ogp_social_cards = {
     "line_color": "#bf5c00",
     "width": 500

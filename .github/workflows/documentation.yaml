@@ -20,7 +20,7 @@ jobs:
           sphinx-build docs _build
       - name: Generate CNAME file with python.
         run: |
-          python -c "open('./_build/CNAME', mode='w').write('mov-cli.devgoldy.xyz')"
+          python -c "open('./_build/CNAME', mode='w').write('mov-cli.sata-andagi.moe')"
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

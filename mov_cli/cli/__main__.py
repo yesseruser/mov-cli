@@ -44,6 +44,7 @@ def mov_cli(
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
     download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."), 
+    continue_watching: bool = typer.Option(False, "--continue", "-co", help = "Continue were you left off on a Series"), 
     list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."), 
     clear_cache: bool = typer.Option(False, "--no-cache", "--clear-cache", help = "Clears ALL cache stored by mov-cli, including the temp directory cache.")
 ):
@@ -131,7 +132,8 @@ def mov_cli(
             episode_string = episode, 
             scraper = chosen_scraper, 
             choice = choice, 
-            fzf_enabled = config.fzf_enabled
+            fzf_enabled = config.fzf_enabled,
+            continue_watching = continue_watching
         )
 
         if chosen_episode is None:

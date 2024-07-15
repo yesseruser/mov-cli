@@ -20,11 +20,15 @@ from .watch_options import watch_options
 
 from ..media import MetadataType
 from ..logger import mov_cli_logger
+from ..cache import Cache
 from ..utils import what_platform, hide_ip
 from ..players import PLAYER_TABLE, CustomPlayer
 
 def play(media: Media, metadata: Metadata, scraper: Scraper, episode: EpisodeSelector, config: Config) -> Optional[Literal["search"]]:
     platform = what_platform()
+    cache = Cache(platform)
+
+    cache.set_cache(str(metadata.id), episode.__dict__)
 
     chosen_player = __get_player(config, platform)
 

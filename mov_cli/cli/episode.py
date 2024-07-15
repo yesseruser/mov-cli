@@ -12,11 +12,21 @@ from .ui import prompt
 
 from ..media import MetadataType
 from ..utils import EpisodeSelector
+from ..cache import Cache
+from ..utils import what_platform
 from ..logger import mov_cli_logger
 
-def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Metadata, fzf_enabled: bool) -> Optional[EpisodeSelector]:
+def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Metadata, fzf_enabled: bool, continue_watching: bool) -> Optional[EpisodeSelector]:
     if choice.type == MetadataType.SINGLE:
         return EpisodeSelector()
+
+    if continue_watching:
+        cache = Cache(what_platform())
+
+        cached_episode = cache.get_cache(choice.id)
+
+        if cached_episode is not None:
+            return EpisodeSelector(**cached_episode)
 
     metadata_episodes = scraper.scrape_episodes(choice)
 

@@ -23,7 +23,7 @@ def handle_episode(episode_string: Optional[str], scraper: Scraper, choice: Meta
     if continue_watching:
         cache = Cache(what_platform())
 
-        cached_episode = cache.get_cache(choice.id)
+        cached_episode = cache.get_cache(str(choice.id))
 
         if cached_episode is not None:
             return EpisodeSelector(**cached_episode)

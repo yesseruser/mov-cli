@@ -10,6 +10,9 @@ import os
 import httpx
 import typer
 import shutil
+import unicodedata
+import re
+
 from subprocess import call
 
 from ..cache import Cache
@@ -76,7 +79,7 @@ def image(id: str):
 
 def image_url_to_file(image_url: str, id: str, platform: str) -> Optional[Path]:
     temp = get_temp_directory(platform)
-    file = temp.joinpath(f"{id}")
+    file = temp.joinpath(slugify(id))
 
     request = httpx.get(image_url)
 
@@ -90,3 +93,13 @@ def image_url_to_file(image_url: str, id: str, platform: str) -> Optional[Path]:
         f.write(request.content)
     
     return file
+
+def slugify(value): # https://github.com/django/django/blob/main/django/utils/text.py#L452-L469
+    value = (
+        unicodedata.normalize("NFKD", value)
+        .encode("ascii", "ignore")
+        .decode("ascii")
+    )
+
+    value = re.sub(r"[^\w\s-]", "", value.lower())
+    return re.sub(r"[-\s]+", "-", value).strip("-_")

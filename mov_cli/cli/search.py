@@ -49,7 +49,7 @@ def search(query: str, auto_select: Optional[int], scraper: Scraper, fzf_enabled
             display = lambda x: x.display_name, 
             fzf_enabled = fzf_enabled,
             before_display = cache_image_for_preview(cache),
-            preview = "mov-cli-dev preview image {}" if preview else None
+            preview = "mov-cli-dev preview image -- {}" if preview else None
         )
 
     cache.clear_all_cache()

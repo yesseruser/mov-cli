@@ -22,7 +22,7 @@ class Download():
         self.config = config
 
     def download(self, media: Multi | Single, subtitles: str = None) -> subprocess.Popen:
-        title = unicodedata.normalize('NFKD', media.display_name).encode('ascii', 'ignore').decode('ascii') # normalize title
+        title = unicodedata.normalize('NFKD', media.display_name).encode('ascii', 'ignore').decode('ascii').replace("/", " ") # normalize title
 
         file_path = os.path.join(self.config.download_location, title + ".mp4")
 

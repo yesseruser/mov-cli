@@ -10,21 +10,12 @@ import httpx
 from deprecation import deprecated
 from devgoldyutils import LoggerAdapter, Colours
 
+from . import __version__
 from .utils import hide_ip
-from . import errors, __version__
 from .logger import mov_cli_logger
+from .errors import SiteMaybeBlockedError
 
 __all__ = ("HTTPClient",)
-
-class SiteMaybeBlocked(errors.MovCliException):
-    """Raises there's a connection error during a get request."""
-    def __init__(self, url: str, error: httpx.ConnectError) -> None:
-        super().__init__(
-            f"A connection error occurred while making a GET request to '{url}'.\n" \
-            "There's most likely nothing wrong with mov-cli. Your ISP's DNS could be blocking this site or perhaps the site is down. " \
-            f"{Colours.GREEN}SOLUTION: Use a VPN or switch DNS!{Colours.RED}\n" \
-            f"Actual Error >> {error}"
-        )
 
 class HTTPClient():
     def __init__(
@@ -90,7 +81,7 @@ class HTTPClient():
         except httpx.ConnectError as e:
             # TODO: I think this needs improving. I see people are getting certificate errors that aren't being caught here.
             if "[SSL: CERTIFICATE_VERIFY_FAILED]" in str(e):
-                raise SiteMaybeBlocked(url, e)
+                raise SiteMaybeBlockedError(url, e)
 
             raise e
 

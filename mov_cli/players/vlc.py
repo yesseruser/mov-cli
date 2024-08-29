@@ -13,9 +13,11 @@ import subprocess
 import unicodedata
 from devgoldyutils import Colours, LoggerAdapter
 
-from .player import Player
 from ..logger import mov_cli_logger
 from ..utils import get_temp_directory
+from ..errors import ReferrerNotSupportedError
+
+from .player import Player
 
 __all__ = ("VLC",)
 
@@ -45,6 +47,12 @@ class VLC(Player):
         """Plays this media in the VLC media player."""
 
         if self.platform == "Android":
+
+            if media.referrer is not None:
+                raise ReferrerNotSupportedError(
+                    "The VLC player on Android does not support passing referrers, so this media cannot be played. :("
+                )
+
             return subprocess.Popen(
                 [
                     "am",
@@ -59,6 +67,12 @@ class VLC(Player):
             )
 
         elif self.platform == "iOS":
+
+            if media.referrer is not None:
+                raise ReferrerNotSupportedError(
+                    "The VLC player on iOS does not support passing referrers, so this media cannot be played. :("
+                )
+
             with open('/dev/clipboard', 'w') as f:
                 f.write(f"vlc://{media.url}")
 

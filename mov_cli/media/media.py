@@ -37,7 +37,7 @@ class Media():
         self.audio_url = audio_url
         """The stream-able url that provides audio for the media if the main url doesn't stream with audio."""
         self.referrer = referrer
-        """The required referrer for streaming the media content."""
+        """The required referrer for streaming the content."""
         self.subtitles = subtitles
         """A tuple of urls or file paths to subtitles."""
 

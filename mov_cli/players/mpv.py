@@ -10,6 +10,8 @@ if TYPE_CHECKING:
 import subprocess
 from devgoldyutils import Colours
 
+from ..errors import ReferrerNotSupportedError
+
 from .player import Player
 
 __all__ = ("MPV",)
@@ -61,6 +63,12 @@ class MPV(Player):
         """Plays this media in the MPV media player."""
 
         if self.platform == "Android":
+
+            if media.referrer is not None:
+                raise ReferrerNotSupportedError(
+                    "The MPV player on Android does not support passing referrers, so this media cannot be played. :("
+                )
+
             return subprocess.Popen(
                 [
                     "am",

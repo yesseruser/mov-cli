@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from typing import Optional, Dict, Literal, List, Tuple
+    from typing import Optional, Dict, List, Tuple, Literal
 
     from .scraper import Scraper
     from .utils.platform import SUPPORTED_PLATFORMS
@@ -26,7 +26,7 @@ __all__ = (
 logger = LoggerAdapter(mov_cli_logger, prefix = "Plugins")
 
 class PluginHookData(TypedDict):
-    version: int
+    version: Literal[1]
     """The version of the plugin hook to use. Version 1 is latest currently."""
     package_name: str
     """The name of the pypi package. This is required for the plugin update notifier to work."""

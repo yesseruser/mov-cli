@@ -30,7 +30,19 @@ class PluginHookData(TypedDict):
     """The version of the plugin hook to use. Version 1 is latest currently."""
     package_name: str
     """The name of the pypi package. This is required for the plugin update notifier to work."""
-    scrapers: Dict[str, Scraper] | Dict[Literal["DEFAULT"], Scraper]
+    scrapers: Dict[str, Scraper] | PluginHookScrapersT
+
+PluginHookScrapersT = TypedDict(
+    "PluginHookScrapersT",
+    {
+        "DEFAULT": Scraper,
+        "LINUX.DEFAULT": Scraper,
+        "ANDROID.DEFAULT": Scraper,
+        "IOS.DEFAULT": Scraper,
+        "WINDOWS.DEFAULT": Scraper,
+        "DARWIN.DEFAULT": Scraper
+    }
+)
 
 @dataclass
 class Plugin:

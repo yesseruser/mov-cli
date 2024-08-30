@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 from devgoldyutils import Colours
 
 from ..plugins import load_plugin
-from ..logger import mov_cli_logger
+from ..errors import InternalPluginError
 
 def get_plugins_data(plugins: Dict[str, str]) -> PluginsDataT:
     plugins_data: PluginsDataT = []
@@ -44,9 +44,8 @@ def show_all_plugins(plugins: Dict[str, str], platform: SUPPORTED_PLATFORMS) -> 
                 print(f"  - {Colours.PINK_GREY.apply(scraper_name) + (' ❤' if scraper_class == plugin_default_scraper and len(plugin.scrapers) > 1 else '')}")
 
 def handle_internal_plugin_error(e: Exception) -> NoReturn:
-    mov_cli_logger.critical(
+
+    raise InternalPluginError(
         "An error occurred inside a plugin. This is MOST LIKELY not a mov-cli error, " \
             f"make SURE mov-cli and your plugins are up to date. Also report this to the plugin, not mov-cli! \nError: {e}"
     )
-
-    raise e

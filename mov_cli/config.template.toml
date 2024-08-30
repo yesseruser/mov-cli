@@ -1,4 +1,5 @@
-# Confused? Check out the WIKI on configuration: https://github.com/mov-cli/mov-cli/wiki/Configuration
+# Confused?
+# Check out the WIKI on configuration: https://github.com/mov-cli/mov-cli/wiki/Configuration
 
 [mov-cli]
 version = 1
@@ -8,6 +9,7 @@ quality = "auto"
 # parser = "lxml"
 # editor = "nano"
 skip_update_checker = false
+auto_try_next_scraper = true
 hide_ip = true
 
 # [mov-cli.quality]
@@ -16,7 +18,7 @@ hide_ip = true
 [mov-cli.ui]
 # fzf = true
 # limit = 20
-preview = false
+preview = true
 watch_options = true
 display_quality = false
 

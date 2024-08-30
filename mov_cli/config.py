@@ -76,6 +76,7 @@ class ConfigData(TypedDict):
     plugins: Dict[str, str]
     quality: ConfigQualityData | str
     subtitle: ConfigSubtitleData
+    auto_try_next_scraper: bool
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -182,6 +183,10 @@ class Config():
     @property
     def skip_update_checker(self) -> bool:
         return self.data.get("skip_update_checker", False)
+
+    @property
+    def auto_try_next_scraper(self) -> bool:
+        return self.data.get("auto_try_next_scraper", True)
 
     @property
     def hide_ip(self) -> bool:

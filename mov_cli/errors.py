@@ -11,7 +11,8 @@ from .logger import mov_cli_logger
 __all__ = (
     "MovCliException",
     "SiteMaybeBlockedError",
-    "ReferrerNotSupportedError"
+    "ReferrerNotSupportedError",
+    "InternalPluginError"
 )
 
 class MovCliException(Exception):
@@ -41,5 +42,11 @@ class ReferrerNotSupportedError(MovCliException):
     """
     Raised by some players on platforms like Android and 
     iOS where players don't support the passing of referrer urls.
+    """
+    ...
+
+class InternalPluginError(MovCliException):
+    """
+    Raised when an exception occurs from inside a plugin's codebase.
     """
     ...

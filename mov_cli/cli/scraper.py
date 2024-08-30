@@ -6,11 +6,15 @@ if TYPE_CHECKING:
 
     from .plugins import PluginsDataT
 
+    from ..plugins import Plugin
     from ..media import Metadata, Media
     from ..http_client import HTTPClient
     from ..config import Config, ScrapersConfigT
+    from ..utils.platform import SUPPORTED_PLATFORMS
     from ..utils.episode_selector import EpisodeSelector
     from ..scraper import Scraper, ScraperOptionsT
+
+    SelectedScraperT = Tuple[str, Type[Scraper], ScraperOptionsT]
 
 from thefuzz import fuzz
 from devgoldyutils import Colours
@@ -32,8 +36,8 @@ def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Opti
     return media
 
 def use_scraper(
-    selected_scraper: Tuple[str, Type[Scraper], ScraperOptionsT], 
-    config: Config, 
+    selected_scraper: SelectedScraperT,
+    config: Config,
     http_client: HTTPClient
 ) -> Scraper:
     scraper_name, scraper_class, scraper_options = selected_scraper
@@ -47,7 +51,78 @@ def use_scraper(
 
     return chosen_scraper
 
-def select_scraper(plugins: Dict[str, str], scrapers: ScrapersConfigT, fzf_enabled: bool, default_scraper: Optional[str] = None) -> Optional[Tuple[str, Type[Scraper], ScraperOptionsT]]:
+def use_next_scraper(
+    current_scraper: Scraper,
+    current_scraper_namespace: str,
+    plugins: Dict[str, str]
+) -> Optional[Tuple[Scraper, SelectedScraperT]]:
+    current_plugin_namespace, current_scraper_namespace = current_scraper_namespace.split(".")
+
+    current_plugin: Plugin # It should get bound. Like it's impossible for it to not. 💀
+
+    for plugin_namespace, _, plugin in get_plugins_data(plugins):
+
+        if plugin_namespace == current_plugin_namespace:
+            current_plugin = plugin
+            break
+
+    # Replace the current scraper namespace with actual scraper 
+    # namespace if the namespace we got was the default scraper namespace.
+    if current_scraper_namespace.endswith("DEFAULT"):
+
+        for plugin_scraper_namespace, plugin_scraper in current_plugin.scrapers:
+
+            if plugin_scraper == current_plugin.hook_data["scrapers"][current_scraper_namespace]:
+                current_scraper_namespace = plugin_scraper_namespace
+                break
+
+    next_plugin_scraper_class = None
+    next_plugin_scraper_namespace = None
+
+    # We get the next scraper by finding the current chosen scraper and returning 
+    # the one after that. If none exist then that is the last scraper so we just continue.
+    current_chosen_scraper_found = False
+
+    plugin_scrapers_amount = len(current_plugin.scrapers)
+
+    for index, (plugin_scraper_namespace, plugin_scraper_class) in enumerate(current_plugin.scrapers):
+
+        if plugin_scraper_namespace == current_scraper_namespace:
+
+            # If we are on the last scraper the next scraper should 
+            # be None to indicate that there's no more scrapers after.
+            if index + 1 >= plugin_scrapers_amount:
+                next_plugin_scraper_class = None
+                break
+
+            current_chosen_scraper_found = True
+            continue # iterate to the next scraper
+
+        if current_chosen_scraper_found:
+            next_plugin_scraper_class = plugin_scraper_class
+            next_plugin_scraper_namespace = f"{plugin_namespace}.{plugin_scraper_namespace}"
+            break
+
+    if next_plugin_scraper_class is None:
+        return None
+
+    next_selected_Scraper = (next_plugin_scraper_namespace, next_plugin_scraper_class, current_scraper.options)
+
+    next_plugin_scraper = use_scraper(
+        selected_scraper = next_selected_Scraper,
+        config = current_scraper.config,
+        http_client = current_scraper.http_client
+    )
+
+    return next_plugin_scraper, next_selected_Scraper
+
+def select_scraper(
+    plugins: Dict[str, str],
+    scrapers: ScrapersConfigT,
+    platform: SUPPORTED_PLATFORMS,
+    fzf_enabled: bool,
+    default_scraper: Optional[str] = None
+) -> Optional[SelectedScraperT]:
     plugins_data = get_plugins_data(plugins)
 
     if default_scraper is not None:
@@ -80,12 +155,10 @@ def select_scraper(plugins: Dict[str, str], scrapers: ScrapersConfigT, fzf_enabl
         fzf_enabled = fzf_enabled
     )
 
-    plaform = what_platform()
-
     if chosen_plugin is not None:
         plugin_namespace, _, plugin = chosen_plugin
 
-        plugin_default_scraper = plugin.default_scraper(plaform)
+        plugin_default_scraper = plugin.default_scraper(platform)
 
         chosen_scraper = prompt(
             "Select a scraper", 

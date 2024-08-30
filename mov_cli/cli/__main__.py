@@ -109,7 +109,7 @@ def mov_cli(
             hide_ip = config.hide_ip
         )
 
-        selected_scraper = select_scraper(plugins, config.scrapers, config.fzf_enabled, config.default_scraper)
+        selected_scraper = select_scraper(plugins, config.scrapers, platform, config.fzf_enabled, config.default_scraper)
 
         if selected_scraper is None:
             mov_cli_logger.error(
@@ -122,7 +122,18 @@ def mov_cli(
 
         chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
-        choice = search(query, auto_select, chosen_scraper, config.fzf_enabled, config.preview, config.limit)
+        choice = search(
+            query = query,
+            auto_select = auto_select,
+            scraper = chosen_scraper,
+            scraper_namespace = selected_scraper[0],
+            platform = platform,
+            auto_try_next_scraper = config.auto_try_next_scraper,
+            fzf_enabled = config.fzf_enabled,
+            preview = config.preview,
+            plugins = plugins,
+            limit = config.limit
+        )
 
         if choice is None:
             mov_cli_logger.error("There was no results or you didn't select anything.")

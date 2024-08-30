@@ -9,8 +9,11 @@ if TYPE_CHECKING:
     from ..media import Metadata, Media
     from ..http_client import HTTPClient
     from ..config import Config, ScrapersConfigT
+    from ..utils.platform import SUPPORTED_PLATFORMS
     from ..utils.episode_selector import EpisodeSelector
     from ..scraper import Scraper, ScraperOptionsT
+
+    SelectedScraperT = Tuple[str, Type[Scraper], ScraperOptionsT]
 
 from thefuzz import fuzz
 from devgoldyutils import Colours
@@ -32,8 +35,8 @@ def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Opti
     return media
 
 def use_scraper(
-    selected_scraper: Tuple[str, Type[Scraper], ScraperOptionsT], 
-    config: Config, 
+    selected_scraper: SelectedScraperT,
+    config: Config,
     http_client: HTTPClient
 ) -> Scraper:
     scraper_name, scraper_class, scraper_options = selected_scraper
@@ -47,7 +50,13 @@ def use_scraper(
 
     return chosen_scraper
 
-def select_scraper(plugins: Dict[str, str], scrapers: ScrapersConfigT, fzf_enabled: bool, default_scraper: Optional[str] = None) -> Optional[Tuple[str, Type[Scraper], ScraperOptionsT]]:
+def select_scraper(
+    plugins: Dict[str, str],
+    scrapers: ScrapersConfigT,
+    platform: SUPPORTED_PLATFORMS,
+    fzf_enabled: bool,
+    default_scraper: Optional[str] = None
+) -> Optional[SelectedScraperT]:
     plugins_data = get_plugins_data(plugins)
 
     if default_scraper is not None:
@@ -80,12 +89,10 @@ def select_scraper(plugins: Dict[str, str], scrapers: ScrapersConfigT, fzf_enabl
         fzf_enabled = fzf_enabled
     )
 
-    plaform = what_platform()
-
     if chosen_plugin is not None:
         plugin_namespace, _, plugin = chosen_plugin
 
-        plugin_default_scraper = plugin.default_scraper(plaform)
+        plugin_default_scraper = plugin.default_scraper(platform)
 
         chosen_scraper = prompt(
             "Select a scraper", 

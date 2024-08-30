@@ -6,15 +6,15 @@ from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
     from types import ModuleType
-    from typing import Optional, Dict, List, Tuple, Literal
+    from typing import Optional, Dict, List, Tuple, Literal, Type
 
-    from .scraper import Scraper
     from .utils.platform import SUPPORTED_PLATFORMS
 
 import importlib
 from dataclasses import dataclass
 from devgoldyutils import LoggerAdapter
 
+from .scraper import Scraper
 from .logger import mov_cli_logger
 
 __all__ = (
@@ -30,7 +30,7 @@ class PluginHookData(TypedDict):
     """The version of the plugin hook to use. Version 1 is latest currently."""
     package_name: str
     """The name of the pypi package. This is required for the plugin update notifier to work."""
-    scrapers: Dict[str, Scraper] | PluginHookScrapersT
+    scrapers: Dict[str, Type[Scraper]] | PluginHookScrapersT
 
 PluginHookScrapersT = TypedDict(
     "PluginHookScrapersT",
@@ -50,7 +50,7 @@ class Plugin:
     hook_data: PluginHookData
 
     @property
-    def scrapers(self) -> List[Tuple[str, Scraper]]:
+    def scrapers(self) -> List[Tuple[str, Type[Scraper]]]:
         non_default_scrapers = []
 
         for scraper_namespace, scraper_class in self.hook_data["scrapers"].items():

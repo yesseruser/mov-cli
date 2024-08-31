@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Tuple, List, Dict, NoReturn
+    from typing import Tuple, List, Dict
 
     from ..plugins import Plugin
     from ..utils.platform import SUPPORTED_PLATFORMS
@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 from devgoldyutils import Colours
 
 from ..plugins import load_plugin
-from ..errors import InternalPluginError
 
 def get_plugins_data(plugins: Dict[str, str]) -> PluginsDataT:
     plugins_data: PluginsDataT = []
@@ -42,10 +41,3 @@ def show_all_plugins(plugins: Dict[str, str], platform: SUPPORTED_PLATFORMS) -> 
 
             for scraper_name, scraper_class in plugin.scrapers:
                 print(f"  - {Colours.PINK_GREY.apply(scraper_name) + (' ❤' if scraper_class == plugin_default_scraper and len(plugin.scrapers) > 1 else '')}")
-
-def handle_internal_plugin_error(e: Exception) -> NoReturn:
-
-    raise InternalPluginError(
-        "An error occurred inside a plugin. This is MOST LIKELY not a mov-cli error, " \
-            f"make SURE mov-cli and your plugins are up to date. Also report this to the plugin, not mov-cli! \nError: {e}"
-    )

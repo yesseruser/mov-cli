@@ -6,8 +6,6 @@ if TYPE_CHECKING:
 
 from devgoldyutils import Colours
 
-from .logger import mov_cli_logger
-
 __all__ = (
     "MovCliException",
     "SiteMaybeBlockedError",
@@ -21,8 +19,6 @@ class MovCliException(Exception):
 
     def __init__(self, message: str) -> None:
         self.message = message
-
-        mov_cli_logger.critical(message)
 
         super().__init__(
             Colours.RED.apply_to_string(self.message)
@@ -49,4 +45,8 @@ class InternalPluginError(MovCliException):
     """
     Raised when an exception occurs from inside a plugin's codebase.
     """
-    ...
+    def __init__(self, error: Exception) -> None:
+        message = "An error occurred inside a plugin. This is MOST LIKELY not a mov-cli error, " \
+            f"make SURE mov-cli and your plugins are up to date. Also report this to the plugin, not mov-cli! \nError: {error}"
+
+        super().__init__(message)

@@ -13,10 +13,10 @@ from devgoldyutils import Colours
 
 from .ui import prompt
 from .auto_select import auto_select_choice
-from .plugins import handle_internal_plugin_error
 
 from ..cache import Cache
 from ..logger import mov_cli_logger
+from ..errors import InternalPluginError
 
 def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
     ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])') # Remove colours
@@ -59,7 +59,7 @@ def search(
             )
 
     except Exception as e:
-        handle_internal_plugin_error(e)
+        raise InternalPluginError(e)
 
     cache.clear_all_cache()
 

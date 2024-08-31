@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ..utils.platform import SUPPORTED_PLATFORMS
     from ..utils.episode_selector import EpisodeSelector
 
-from devgoldyutils import Colours
+from devgoldyutils import Colours, LoggerAdapter
 
 from .search import search
 from .episode import handle_episode
@@ -24,6 +24,8 @@ from ..logger import mov_cli_logger
 from ..errors import InternalPluginError
 
 __all__ = ()
+
+atns_logger = LoggerAdapter(mov_cli_logger, prefix = Colours.PURPLE.apply("ATNS")) # Auto try next scraper
 
 def query_and_grab_content(
     query: str,
@@ -49,6 +51,9 @@ def query_and_grab_content(
         )
 
     except InternalPluginError as e:
+
+        if config.debug:
+            mov_cli_logger.critical(e.message)
 
         if not config.auto_try_next_scraper:
             raise e
@@ -93,6 +98,9 @@ def query_and_grab_content(
 
     except InternalPluginError as e:
 
+        if config.debug:
+            mov_cli_logger.critical(e.message)
+
         if not config.auto_try_next_scraper:
             raise e
 
@@ -135,8 +143,8 @@ def try_again_with_next_scraper(
     platform: SUPPORTED_PLATFORMS,
     config: Config
 ) -> Tuple[Media, Metadata, EpisodeSelector] | Literal[False]:
-    mov_cli_logger.info(
-       f"{reason_for_auto_try} Automatically searching with the next scraper..."
+    atns_logger.info(
+       f"{reason_for_auto_try} Trying the next scraper..."
     )
 
     next_scraper_or_none = use_next_scraper(

@@ -20,10 +20,11 @@ from thefuzz import fuzz
 from devgoldyutils import Colours
 
 from .ui import prompt
-from .plugins import get_plugins_data, handle_internal_plugin_error
+from .plugins import get_plugins_data
 
 from ..utils import what_platform
 from ..logger import mov_cli_logger
+from ..errors import InternalPluginError
 
 def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Optional[Media]:
     mov_cli_logger.info(f"Scraping '{Colours.CLAY.apply(choice.title)}'...")
@@ -31,7 +32,7 @@ def scrape(choice: Metadata, episode: EpisodeSelector, scraper: Scraper) -> Opti
     try:
         media = scraper.scrape(choice, episode)
     except Exception as e:
-        handle_internal_plugin_error(e)
+        raise InternalPluginError(e)
 
     return media
 
@@ -47,7 +48,7 @@ def use_scraper(
     try:
         chosen_scraper = scraper_class(config, http_client, scraper_options)
     except Exception as e:
-        handle_internal_plugin_error(e)
+        raise InternalPluginError(e)
 
     return chosen_scraper
 
@@ -56,7 +57,10 @@ def use_next_scraper(
     current_scraper_namespace: str,
     plugins: Dict[str, str]
 ) -> Optional[Tuple[Scraper, SelectedScraperT]]:
-    current_plugin_namespace, current_scraper_namespace = current_scraper_namespace.split(".")
+    current_scraper_namespaces = current_scraper_namespace.split(".")
+
+    current_plugin_namespace = current_scraper_namespaces[0]
+    current_scraper_namespace = "".join(current_scraper_namespaces[1:])
 
     current_plugin: Plugin # It should get bound. Like it's impossible for it to not. 💀
 

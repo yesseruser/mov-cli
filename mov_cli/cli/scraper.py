@@ -60,7 +60,7 @@ def use_next_scraper(
     current_scraper_namespaces = current_scraper_namespace.split(".")
 
     current_plugin_namespace = current_scraper_namespaces[0]
-    current_scraper_namespace = "".join(current_scraper_namespaces[1:])
+    current_scraper_namespace = ".".join(current_scraper_namespaces[1:])
 
     current_plugin: Plugin # It should get bound. Like it's impossible for it to not. 💀
 

@@ -13,7 +13,7 @@ from mov_cli.utils import EpisodeSelector, what_platform
 
 from mov_cli_youtube.yt_dlp import YTDlpScraper
 
-WELCOME_MESSAGE = f"Hello and welcome to my custom mov-cli script!\n\n" \
+WELCOME_MESSAGE = "Hello and welcome to my custom mov-cli script!\n\n" \
     "What would you like to watch from YouTube?\n"
 
 if __name__ == "__main__":

@@ -48,7 +48,7 @@ if __name__ == "__main__":
     print("Scrapping that... ◉_◉")
     media = scraper.scrape(choice, EpisodeSelector())
 
-    player_class = PLAYER_TABLE["mpv"]
+    player_class = PLAYER_TABLE[config.player]
 
     player = player_class(platform = platform)
 

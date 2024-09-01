@@ -43,7 +43,7 @@
 
 **mov-cli** is a command line tool with plugin support that streamlines the process of streaming media from the comfort of your terminal; ~~*so you can show off to your friends the superiority of the command line.*~~ 💪 The tool is sort of a framework that handles metadata, configuration and scraping of the media to be streamed in your media player of choice.
 
-**mov-cli** [is **not** a piracy tool](./disclaimer.md); in fact, we encourage the opposite through the existence of our plugins [mov-cli-fs](https://github.com/mov-cli/mov-cli-files) and [mov-cli-media-server](https://github.com/mov-cli/mov-cli-ms). 🫵 You obtain the media. You pick the plugins.
+**mov-cli** [is **not** a piracy tool](./disclaimer.md); in fact, we encourage the opposite through the existence of our plugins [mov-cli-files](https://github.com/mov-cli/mov-cli-files) and [mov-cli-jellyplex](https://github.com/mov-cli/mov-cli-jellyplex). 🫵 You obtain the media. You pick the plugins.
 
 ## Installation 🛠️
 
@@ -80,7 +80,14 @@ mov-cli comes packaged with a CLI interface via the `mov-cli` command you can us
 > You may notice mov-cli doesn't ship with any scrapers (or previously known as providers) by default, this is because v4 is plugin-based and scrapers are now part of plugins that must be chosen to be installed.
 > Find out how to do so at the [wiki](https://github.com/mov-cli/mov-cli/wiki#plugins).
 
-1. Install the scraper plugin of your choice. Visit this [wiki page](https://github.com/mov-cli/mov-cli/wiki/Plugins) on how to do so and the [mov-cli-plugin](https://github.com/topics/mov-cli-plugin) topic for a list of **third-party** mov-cli plugins.
+1. Install the plugin of your choice. Visit this [wiki page](https://github.com/mov-cli/mov-cli/wiki/Plugins) on how to do so and the [mov-cli-plugin](https://github.com/topics/mov-cli-plugin) topic for a list of **third-party** mov-cli plugins.
+```sh
+pip install mov-cli-youtube
+```
+> This is just an example.
+> If you are struggling, visit that [wiki page](https://github.com/mov-cli/mov-cli/wiki/Plugins).
+
+2. Add the plugin to your config.
 ```sh
 mov-cli -e
 ```
@@ -89,8 +96,9 @@ Alternatively, you may also edit by manually opening the config file. See this [
 [mov-cli.plugins]
 youtube = "mov-cli-youtube"
 ```
+> Check out the [wiki](https://github.com/mov-cli/mov-cli/wiki/Plugins) for more in-depth explanation.
 
-2. Scrape away!
+3. Scrape away!
 ```sh
 mov-cli -s youtube blender studio
 ```

@@ -234,6 +234,16 @@ class Config():
         return debug.get("player", False)
 
     @property
+    def debug_deprecation_warnings(self) -> bool:
+        """Returns whether deprecation warnings should be enabled on mov-cli"""
+        debug: dict | bool = self.data.get("debug", {})
+
+        if isinstance(debug, bool):
+            return True
+
+        return debug.get("player", True)
+
+    @property
     def http_timeout(self) -> int:
         """Returns the http timeout delay that should be set."""
         return self.data.get("http", {}).get("timeout", 15)

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ..players import Player
 
     from ..utils.platform import SUPPORTED_PLATFORMS
-    from ..utils.episode_selector import EpisodeSelector
+    from ..media.episode_selector import EpisodeSelector
 
 from devgoldyutils import Colours
 

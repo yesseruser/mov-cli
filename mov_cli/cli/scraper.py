@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..http_client import HTTPClient
     from ..config import Config, ScrapersConfigT
     from ..utils.platform import SUPPORTED_PLATFORMS
-    from ..utils.episode_selector import EpisodeSelector
+    from ..media.episode_selector import EpisodeSelector
     from ..scraper import Scraper, ScraperOptionsT
 
     SelectedScraperT = Tuple[str, Type[Scraper], ScraperOptionsT]

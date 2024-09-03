@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..scraper import Scraper
     from ..media.metadata import Metadata
     from ..utils.platform import SUPPORTED_PLATFORMS
-    from ..utils.episode_selector import EpisodeSelector
+    from ..media.episode_selector import EpisodeSelector
 
 from devgoldyutils import Colours, LoggerAdapter
 

@@ -86,8 +86,8 @@ class VLC(Player):
                 media.url
             ]
 
-            if media.audio_url is not None:
-                default_args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
+            if media.audio_tracks is not None:
+                default_args.append(f"--input-slave={media.audio_tracks[0].url}") # WHY IS THIS UNDOCUMENTED!!!
 
             args = [
                 f'--meta-title="{media.display_name}"'

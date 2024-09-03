@@ -8,11 +8,15 @@ if TYPE_CHECKING:
 
 import json
 import shutil
+import warnings
 import subprocess
+from abc import abstractmethod
+from devgoldyutils import LoggerAdapter
+
+from ..logger import mov_cli_logger
 
 from .quality import Quality
-
-from abc import abstractmethod
+from .audio_track import AudioTrack
 
 __all__ = (
     "Media", 
@@ -20,34 +24,67 @@ __all__ = (
     "Single"
 )
 
+logger = LoggerAdapter(mov_cli_logger, prefix = "Media")
+
 class Media():
     """Represents any piece of media in mov-cli that can be streamed or downloaded."""
     def __init__(
-        self, 
-        url: str, 
-        title: str, 
-        audio_url: Optional[str], 
-        referrer: Optional[str], 
-        subtitles: Optional[List[str]]
+        self,
+        url: str,
+        title: str,
+        audio_url: Optional[str],
+        audio_tracks: Optional[List[AudioTrack]],
+        referrer: Optional[str],
+        subtitles: Optional[List[Subtitle]]
     ) -> None:
+        if audio_url is not None:
+            warnings.warn(
+                "The parameter 'audio_url=' is deprecated!!! It will be removed in v4.6! Use 'audio_tracks=' instead.",
+                category = DeprecationWarning,
+                stacklevel = 3
+            )
+
+            audio_tracks = [AudioTrack(audio_url)]
+
+        if isinstance(subtitles, list):
+            warnings.warn(
+                "The parameter 'subtitles=' should now be a list of Subtitle objects! " \
+                    "Passing strings into 'subtitles=' will break in v4.6!",
+                category = DeprecationWarning,
+                stacklevel = 3
+            )
+            # subtitles = [Subtitle() for subtitle_url in subtitles]
+
         self.url = url
         """The stream-able url of the media (Can also be a path to a file). """
         self.title = title
-        """A title to represent this stream-able media."""
-        self.audio_url = audio_url
-        """The stream-able url that provides audio for the media if the main url doesn't stream with audio."""
+        """A raw title of the media."""
+        self.audio_tracks = audio_tracks
+        """
+        A list of streamable audio tracks to stream alongside the video.
+        The list should be in order of priority because if the main stream has no audio, 
+        some players will only play the first audio track.
+        """
         self.referrer = referrer
-        """The required referrer for streaming the content."""
+        """A required referrer url for the player to be able to stream the content."""
         self.subtitles = subtitles
-        """A tuple of urls or file paths to subtitles."""
+        """A list of subtitles for the player to devour. (⚈₋₍⚈)"""
 
         self.__stream_quality: Optional[Quality] = None
 
     @property
     @abstractmethod
-    def display_name(self) -> str:
-        """The title that should be displayed by the player."""
+    def display_title(self) -> str:
+        """
+        The title that should be displayed by the player. (includes attributes like episode and season)
+        """
         ...
+
+    display_name = display_title
+    """
+    DEPRECATED PROPERTY!!! This will be removed next major release (v4.6)! 
+    Use ``Media.display_title`` instead.
+    """
 
     def get_quality(self) -> Optional[Quality]:
         """Uses ffprode to grab the quality of the stream."""
@@ -101,16 +138,18 @@ class Multi(Media):
         title: str,
         episode: EpisodeSelector,
         audio_url: Optional[str] = None,
+        audio_tracks: Optional[List[AudioTrack]] = None,
         referrer: Optional[str] = None,
-        subtitles: Optional[List[str]] = None
+        subtitles: Optional[List[Subtitle]] = None
     ) -> None:
         self.episode = episode
         """The episode and season of this series."""
 
         super().__init__(
-            url, 
-            title = title, 
-            audio_url = audio_url, 
+            url,
+            title = title,
+            audio_url = audio_url,
+            audio_tracks = audio_tracks,
             referrer = referrer,
             subtitles = subtitles
         )
@@ -122,21 +161,23 @@ class Multi(Media):
 class Single(Media):
     """Represents a media with a single episode, like a Film/Movie or a YouTube video."""
     def __init__(
-        self, 
-        url: str, 
-        title: str, 
-        audio_url: Optional[str] = None, 
-        referrer: Optional[str] = None, 
-        year: Optional[str] = None, 
-        subtitles: Optional[List[str]] = None
+        self,
+        url: str,
+        title: str,
+        audio_url: Optional[str] = None,
+        audio_tracks: Optional[List[AudioTrack]] = None,
+        referrer: Optional[str] = None,
+        year: Optional[str] = None,
+        subtitles: Optional[List[Subtitle]] = None
     ) -> None:
         self.year = year
         """The year this film was released."""
 
         super().__init__(
-            url, 
-            title = title, 
-            audio_url = audio_url, 
+            url,
+            title = title,
+            audio_url = audio_url,
+            audio_tracks = audio_tracks,
             referrer = referrer,
             subtitles = subtitles
         )

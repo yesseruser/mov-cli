@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 import typer
 import shutil
 import logging
+import warnings
 from pathlib import Path
 
 from .play import play
@@ -63,6 +64,10 @@ def mov_cli(
 
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
+
+    # Enable deprecation warnings so plugin devs and users are aware of soon coming breakage.
+    if config.debug_deprecation_warnings:
+        warnings.simplefilter("default", category = DeprecationWarning)
 
     if clear_cache:
         mov_cli_logger.info("Clearing cache...")

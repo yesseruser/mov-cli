@@ -77,6 +77,7 @@ class ConfigData(TypedDict):
     quality: ConfigQualityData | str
     subtitle: ConfigSubtitleData
     auto_try_next_scraper: bool
+    auto_continue: bool
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -187,6 +188,10 @@ class Config():
     @property
     def auto_try_next_scraper(self) -> bool:
         return self.data.get("auto_try_next_scraper", True)
+
+    @property
+    def auto_continue(self) -> bool:
+        return self.data.get("auto_continue", False)
 
     @property
     def hide_ip(self) -> bool:

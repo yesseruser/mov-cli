@@ -39,11 +39,11 @@ def mov_cli(
         "the first nyan cat video to show up in search results."
     ), 
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help = "Specify the maximum number of results"), 
+    continue_watching: bool = typer.Option(None, "--continue", "-co", help = "Continue where you left off in a series."), 
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
     download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."), 
-    continue_watching: bool = typer.Option(False, "--continue", "-co", help = "Continue where you left off in a series."), 
     list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."), 
     clear_cache: bool = typer.Option(False, "--no-cache", "--clear-cache", help = "Clears ALL cache stored by mov-cli, including the temp directory cache."),
     no_auto_try_next_scraper: bool = typer.Option(False, "--no-auto-try-next-scraper", "--no-atns", help = "Disables auto try next scraper."),
@@ -59,7 +59,8 @@ def mov_cli(
         fzf = (fzf, ["ui", "fzf"]),
         preview = (preview, ["ui", "preview"]),
         limit = (limit, ["ui", "limit"]),
-        auto_try_next_scraper = not no_auto_try_next_scraper
+        auto_try_next_scraper = not no_auto_try_next_scraper,
+        auto_continue = continue_watching
     )
 
     if config.debug:
@@ -137,7 +138,6 @@ def mov_cli(
             query = query,
             auto_select = auto_select,
             episode = episode,
-            continue_watching = continue_watching,
             scraper = chosen_scraper,
             selected_scraper = selected_scraper,
             platform = platform,

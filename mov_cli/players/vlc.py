@@ -102,7 +102,7 @@ class VLC(Player):
 
                     if subtitle.startswith("https://"):
                         logger.debug("Subtitles detected as a url.")
-                        subtitle = str(self.__url_subtitles_to_file(media, subtitle))
+                        subtitle = str(self.__url_subtitles_to_file(media, subtitle.url))
 
                     args.append(f"--sub-file={subtitle}")
 

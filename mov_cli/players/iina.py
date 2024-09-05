@@ -59,7 +59,7 @@ class IINA(Player):
             if media.subtitles is not None: # TODO: This will need testing.
 
                 for subtitle in media.subtitles:
-                    additional_args.append(f"--mpv-sub-file={subtitle}")
+                    additional_args.append(f"--mpv-sub-file={subtitle.url}")
 
             if self.debug is False:
                 additional_args.append("--no-stdin")

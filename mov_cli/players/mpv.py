@@ -50,7 +50,7 @@ class MPV(Player):
         if media.subtitles is not None:
 
             for subtitle in media.subtitles:
-                args.append(f"--sub-file={subtitle}")
+                args.append(f"--sub-file={subtitle.url}")
 
         if self.debug is False:
             args.append("--no-terminal")

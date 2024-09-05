@@ -2,7 +2,7 @@
 Module containing mov-cli plugin related stuff.
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, TypedDict, TypeVar
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -25,12 +25,16 @@ __all__ = (
 
 logger = LoggerAdapter(mov_cli_logger, prefix = "Plugins")
 
+T = TypeVar('T')
+
 class PluginHookData(TypedDict):
     version: Literal[1]
     """The version of the plugin hook to use. Version 1 is latest currently."""
     package_name: str
     """The name of the pypi package. This is required for the plugin update notifier to work."""
     scrapers: Dict[str, Type[Scraper]] | PluginHookScrapersT
+    args: Dict[str, T]
+
 
 PluginHookScrapersT = TypedDict(
     "PluginHookScrapersT",

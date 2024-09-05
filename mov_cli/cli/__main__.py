@@ -103,11 +103,8 @@ def mov_cli(
     print(welcome_message)
 
     if query is not None:
-        scrape_options = steal_scraper_args(query) 
         # This allows passing arguments to scrapers like this: 
         # https://github.com/mov-cli/mov-cli-youtube/commit/b538d82745a743cd74a02530d6a3d476cd60b808#diff-4e5b064838aa74a5375265f4dfbd94024b655ee24a191290aacd3673abed921a
-
-        query: str = " ".join(query)
 
         http_client = HTTPClient(
             headers = config.http_headers, 
@@ -129,13 +126,15 @@ def mov_cli(
                     "You can set a default scraper with the default key in config.toml."
             )
             return False
+        
+        scrape_options = steal_scraper_args(query, selected_scraper[3])
 
         selected_scraper[2].update(scrape_options)
 
         chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
         content_or_bool = query_and_grab_content(
-            query = query,
+            query = " ".join(query),
             auto_select = auto_select,
             episode = episode,
             scraper = chosen_scraper,

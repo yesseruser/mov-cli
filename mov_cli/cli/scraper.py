@@ -110,7 +110,7 @@ def use_next_scraper(
     if next_plugin_scraper_class is None:
         return None
 
-    next_selected_Scraper = (next_plugin_scraper_namespace, next_plugin_scraper_class, current_scraper.options)
+    next_selected_Scraper = (next_plugin_scraper_namespace, next_plugin_scraper_class, current_scraper.options, current_plugin)
 
     next_plugin_scraper = use_scraper(
         selected_scraper = next_selected_Scraper,

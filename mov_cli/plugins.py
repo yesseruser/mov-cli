@@ -25,7 +25,7 @@ __all__ = (
 
 logger = LoggerAdapter(mov_cli_logger, prefix = "Plugins")
 
-T = TypeVar('T')
+T = TypeVar("T", int, str, bool)
 
 class PluginHookData(TypedDict):
     version: Literal[1]
@@ -34,7 +34,6 @@ class PluginHookData(TypedDict):
     """The name of the pypi package. This is required for the plugin update notifier to work."""
     scrapers: Dict[str, Type[Scraper]] | PluginHookScrapersT
     args: Dict[str, T]
-
 
 PluginHookScrapersT = TypedDict(
     "PluginHookScrapersT",
@@ -86,7 +85,7 @@ def load_plugin(module_name: str) -> Optional[Plugin]:
         logger.error(f"Failed to import a plugin from the module '{module_name}'! Error --> {e}")
         return None
 
-    plugin_data: PluginHookData = getattr(plugin_module, "plugin", None)
+    plugin_data: Optional[PluginHookData] = getattr(plugin_module, "plugin", None)
 
     if plugin_data is None:
         logger.warning(f"Failed to load the plugin '{module_name}'! It doesn't contain a plugin hook!")

@@ -11,11 +11,13 @@ import shutil
 import warnings
 import subprocess
 from abc import abstractmethod
+from deprecation import deprecated
 from devgoldyutils import LoggerAdapter
 
 from ..logger import mov_cli_logger
 
 from .quality import Quality
+from .subtitle import Subtitle
 from .audio_track import AudioTrack
 
 __all__ = (
@@ -53,7 +55,7 @@ class Media():
                 category = DeprecationWarning,
                 stacklevel = 3
             )
-            # subtitles = [Subtitle() for subtitle_url in subtitles]
+            subtitles = [Subtitle(url = subtitle_url) for subtitle_url in subtitles]
 
         self.url = url
         """The stream-able url of the media (Can also be a path to a file). """
@@ -80,11 +82,15 @@ class Media():
         """
         ...
 
-    display_name = display_title
-    """
-    DEPRECATED PROPERTY!!! This will be removed next major release (v4.6)! 
-    Use ``Media.display_title`` instead.
-    """
+    @property
+    @deprecated(
+        deprecated_in = "4.5",
+        removed_in = "4.6",
+        details = "The property 'Media.display_name' is deprecated!!! " \
+            "Use 'Media.display_title' instead. This will be removed next major release (v4.6)!"
+    )
+    def display_name(self) -> None:
+        return self.display_title
 
     def get_quality(self) -> Optional[Quality]:
         """Uses ffprode to grab the quality of the stream."""

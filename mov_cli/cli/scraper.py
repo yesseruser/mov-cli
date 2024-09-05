@@ -188,8 +188,8 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
 
     scraper_options_args: List[Tuple[str, str | bool]] = []
 
-    hook_args = plugin.hook_data["args"]
-    
+    hook_args = plugin.hook_data.get("args", {})
+
     for index, arg in enumerate(query):
         if arg.startswith("--"):
             arg_value = None
@@ -200,7 +200,9 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
                 did_you_mean_these = [(x, fuzz.ratio(arg, x)) for x in hook_args.keys()]
                 did_you_mean_these.sort(key = lambda x: x[1], reverse = True)
 
-                mov_cli_logger.error(f"Unknown arg found: {arg}. Did you mean: {Colours.GREEN}--{did_you_mean_these[0][0]}{Colours.RESET}")
+                mov_cli_logger.error(
+                    f"Unknown arg found: {arg}. Did you mean: {Colours.GREEN}--{did_you_mean_these[0][0]}{Colours.RESET}"
+                )
 
                 continue
 
@@ -226,12 +228,14 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
                     mov_cli_logger.error(f"Expected {arg_type.__qualname__} for '{arg}' but nothing was given.")
                     continue
 
-                arg_value = True   
+                arg_value = True
 
             try:
                 arg_value = arg_type(arg_value)
             except Exception as e:
-                mov_cli_logger.error(f"Couldn't convert '{arg_value}' for '{arg}' to type {arg_type.__qualname__}. \nError: {e}")
+                mov_cli_logger.error(
+                    f"Couldn't convert '{arg_value}' for '{arg}' to type {arg_type.__qualname__}. \nError: {e}"
+                )
                 continue
 
             scraper_options_args.append((_arg, arg_value))

@@ -222,7 +222,7 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
             arg_type = hook_args[_arg]
 
             if arg_value is None:
-                if arg_type != bool:
+                if arg_type is not bool:
                     mov_cli_logger.error(f"Expected {arg_type.__qualname__} for '{arg}' but nothing was given.")
                     continue
 
@@ -231,7 +231,7 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
             try:
                 arg_value = arg_type(arg_value)
             except Exception as e:
-                mov_cli_logger.error(f"Couldn't convert '{arg_value}' for '{arg}' to type {arg_type.__qualname__}.")
+                mov_cli_logger.error(f"Couldn't convert '{arg_value}' for '{arg}' to type {arg_type.__qualname__}. \nError: {e}")
                 continue
 
             scraper_options_args.append((_arg, arg_value))

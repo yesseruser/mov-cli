@@ -91,8 +91,14 @@ class Metadata:
 
     @property
     def display_name(self) -> str:
+        """How the metadata title should be displayed in selectors (e.g. fzf)."""
         return f"{Colours.BLUE if self.type == MetadataType.SINGLE else Colours.PINK_GREY}{self.title}" \
-            f"{Colours.RESET}" + (f" ({self.year})" if self.year is not None else "")
+            f"{Colours.RESET} ({self.display_release_date})"
+
+    @property
+    def display_release_date(self) ->  str:
+        "How the release date is displayed in selectors (e.g. fzf)."
+        return str(self.release_date.year) if self.release_date is not None else ""
 
 
 # This is deprecated now but let's give plugin 

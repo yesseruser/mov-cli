@@ -33,6 +33,7 @@ class Media():
         self,
         url: str,
         metadata: Metadata,
+        episode: Optional[EpisodeSelector] = None,
         audio_url: Optional[str] = None,
         audio_tracks: Optional[List[AudioTrack]] = None,
         referrer: Optional[str] = None,

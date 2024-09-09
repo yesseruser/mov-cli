@@ -240,13 +240,15 @@ class Config():
 
     @property
     def debug_deprecation_warnings(self) -> bool:
-        """Returns whether deprecation warnings should be enabled on mov-cli"""
+        """Returns whether deprecation warnings should be enabled on mov-cli."""
         debug: dict | bool = self.data.get("debug", {})
 
         if isinstance(debug, bool):
             return True
 
-        return debug.get("player", True)
+        # NOTE: Change defaults to False when 4.5 becomes the stable version.
+
+        return debug.get("deprecation_warnings", True) 
 
     @property
     def http_timeout(self) -> int:

@@ -11,7 +11,7 @@ assignees: ''
 **Describe the bug:**
 <!-- A clear and concise description of what the bug is. -->
 
-**mov-cli version:** <!-- version here -->
+**Mov-cli version:** ``{version goes here}``
 <!-- If you're not using the latest version and you create a bug report, we may close your issue. -->
 
 **Expected behavior:**

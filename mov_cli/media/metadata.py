@@ -4,11 +4,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import List, Callable, Optional, Tuple
 
-import warnings
 from enum import Enum
 from datetime import datetime
 from devgoldyutils import Colours
 from dataclasses import dataclass, field
+
+from ..logger import warn_deprecation
 
 __all__ = (
     "MetadataType",
@@ -66,27 +67,23 @@ class Metadata:
     # NOTE: we can remove this function in v4.6 when 'year' and 'extra_func' is removed.
     def __post_init__(self):
         if self.release_date is not None and self.year is not None:
-            raise TypeError(
+            warn_deprecation(
                 "You shouldn't use both 'release_date' and 'year' params. " \
                     "Use one, and you should use 'release_date' as the 'year' param is now deprecated."
             )
 
         if self.year is not None:
-            warnings.warn(
+            warn_deprecation(
                 "The parameter 'year' is now deprecated! The param 'release_date' " \
-                    "should be used instead because 'year' is gonna be removed in v4.6.",
-                category = DeprecationWarning,
-                stacklevel = 3
+                    "should be used instead because 'year' is gonna be removed in v4.6."
             )
 
             self.release_date = datetime(year = int(self.year), month = 1, day = 1)
 
         if self.extra_func is not None:
-            warnings.warn(
+            warn_deprecation(
                 "The parameter 'extra_func' is now deprecated! It's being getting " \
-                    "removed in v4.6 as ExtraMetadata has now been merged with Metadata.",
-                category = DeprecationWarning,
-                stacklevel = 3
+                    "removed in v4.6 as ExtraMetadata has now been merged with Metadata."
             )
 
     @property

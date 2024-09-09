@@ -9,3 +9,4 @@ target-version = "py38"
 "scripts/*" = ["F401"]
 "mov_cli/players/__init__.py" = ["F405"]
 "mov_cli/players/mpv.py" = ["F821"]
+"mov_cli/media/media.py" = ["F811"]

@@ -1,20 +1,19 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
     from typing import Optional, List
 
+    from .metadata import Metadata
     from ..utils import EpisodeSelector
 
 import json
 import shutil
-import warnings
 import subprocess
-from abc import abstractmethod
 from deprecation import deprecated
 from devgoldyutils import LoggerAdapter
 
-from ..logger import mov_cli_logger
+from ..logger import mov_cli_logger, warn_deprecation
 
 from .quality import Quality
 from .subtitle import Subtitle
@@ -28,39 +27,64 @@ __all__ = (
 
 logger = LoggerAdapter(mov_cli_logger, prefix = "Media")
 
+@overload
+class Media():
+    def __init__(
+        self,
+        url: str,
+        metadata: Metadata,
+        audio_url: Optional[str] = None,
+        audio_tracks: Optional[List[AudioTrack]] = None,
+        referrer: Optional[str] = None,
+        subtitles: Optional[List[Subtitle]] = None
+    ) -> None:
+        ...
+
 class Media():
     """Represents any piece of media in mov-cli that can be streamed or downloaded."""
     def __init__(
         self,
         url: str,
-        title: str,
-        audio_url: Optional[str],
-        audio_tracks: Optional[List[AudioTrack]],
-        referrer: Optional[str],
-        subtitles: Optional[List[Subtitle]]
+        title: Optional[str] = None,
+        metadata: Optional[Metadata] = None,
+        episode: Optional[EpisodeSelector] = None,
+        audio_url: Optional[str] = None,
+        audio_tracks: Optional[List[AudioTrack]] = None,
+        referrer: Optional[str] = None,
+        subtitles: Optional[List[Subtitle]] = None
     ) -> None:
+        if title is not None:
+            warn_deprecation(
+                "The 'title' parameter is DEPRECATED!!! Use 'metadata' instead before v4.6! \n" \
+                    "Also 'metadata.title' will take priority over the 'title' param."
+            )
+
+        if metadata is not None:
+            title = metadata.title
+
         if audio_url is not None:
-            warnings.warn(
-                "The parameter 'audio_url=' is deprecated!!! It will be removed in v4.6! Use 'audio_tracks=' instead.",
-                category = DeprecationWarning,
-                stacklevel = 3
+            warn_deprecation(
+                "The parameter 'audio_url=' is deprecated!!! It will be removed in v4.6! Use 'audio_tracks=' instead."
             )
 
             audio_tracks = [AudioTrack(audio_url)]
 
         if isinstance(subtitles, list):
-            warnings.warn(
+            warn_deprecation(
                 "The parameter 'subtitles=' should now be a list of Subtitle objects! " \
-                    "Passing strings into 'subtitles=' will break in v4.6!",
-                category = DeprecationWarning,
-                stacklevel = 3
+                    "Passing strings into 'subtitles=' will break in v4.6!"
             )
+
             subtitles = [Subtitle(url = subtitle_url) for subtitle_url in subtitles]
 
         self.url = url
         """The stream-able url of the media (Can also be a path to a file). """
         self.title = title
         """A raw title of the media."""
+        self.metadata = metadata
+        """The metadata of this media."""
+        self.episode = episode
+        """The episode and season to display on the player."""
         self.audio_tracks = audio_tracks
         """
         A list of streamable audio tracks to stream alongside the video.
@@ -75,12 +99,21 @@ class Media():
         self.__stream_quality: Optional[Quality] = None
 
     @property
-    @abstractmethod
     def display_title(self) -> str:
         """
-        The title that should be displayed by the player. (includes attributes like episode and season)
+        The title that should be displayed by the player. (e.g. it includes attributes like episode and season)
         """
-        ...
+
+        if self.episode is not None:
+            return f"{self.title} - S{self.episode.season} EP{self.episode.episode}"
+
+        if self.metadata is not None: # NOTE: Will always be None in v4.6
+            release_data = self.metadata.release_date
+
+            if release_data is not None:
+                return f"{self.title} ({release_data.year})"
+
+        return self.title
 
     @property
     @deprecated(
@@ -136,6 +169,7 @@ class Media():
 
         return self.__stream_quality
 
+
 class Multi(Media):
     """Represents a media that has multiple episodes like a TV Series, Anime or Cartoon."""
     def __init__(
@@ -148,21 +182,15 @@ class Multi(Media):
         referrer: Optional[str] = None,
         subtitles: Optional[List[Subtitle]] = None
     ) -> None:
-        self.episode = episode
-        """The episode and season of this series."""
-
         super().__init__(
             url,
             title = title,
+            episode = episode,
             audio_url = audio_url,
             audio_tracks = audio_tracks,
             referrer = referrer,
             subtitles = subtitles
         )
-
-    @property
-    def display_name(self) -> str:
-        return f"{self.title} - S{self.episode.season} EP{self.episode.episode}"
 
 class Single(Media):
     """Represents a media with a single episode, like a Film/Movie or a YouTube video."""
@@ -187,7 +215,3 @@ class Single(Media):
             referrer = referrer,
             subtitles = subtitles
         )
-
-    @property
-    def display_name(self) -> str:
-        return f"{self.title} ({self.year})" if self.year is not None else self.title

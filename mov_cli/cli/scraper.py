@@ -185,6 +185,7 @@ def select_scraper(
 def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
     args_to_kidnap: List[str] = []
     arg_values_to_kidnap: List[str] = []
+    failed_args: List[str] = []
 
     scraper_options_args: List[Tuple[str, str | bool]] = []
 
@@ -196,29 +197,35 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
 
             _arg = arg.replace("--", "").replace("-", "_")
 
-            if _arg not in hook_args.keys():
-                did_you_mean_these = [(x, fuzz.ratio(arg, x)) for x in hook_args.keys()]
-                did_you_mean_these.sort(key = lambda x: x[1], reverse = True)
-
-                mov_cli_logger.error(
-                    f"Unknown arg found: {arg}. Did you mean: {Colours.GREEN}--{did_you_mean_these[0][0]}{Colours.RESET}"
-                )
-
-                continue
-
             try:
                 arg_value_maybe = query[index + 1]
 
                 if not arg_value_maybe.startswith("--"):
                     arg_value = arg_value_maybe
 
-                    arg_values_to_kidnap.append(arg_value)
-
             except IndexError as e:
                 mov_cli_logger.debug(
                     f"No scraper option argument value was found after '{arg}' so we'll assume this argument is a flag. \nError: {e}"
                 )
 
+            if _arg not in hook_args.keys():
+                did_you_mean_text = ""
+                did_you_mean_these = [(x, fuzz.ratio(arg, x)) for x in hook_args.keys()]
+                did_you_mean_these.sort(key = lambda x: x[1], reverse = True)
+
+                if did_you_mean_these:
+                    did_you_mean_text = f"Did you mean: {Colours.GREEN}--{did_you_mean_these[0][0]}{Colours.RESET}"
+
+                mov_cli_logger.error(
+                    f"Unknown arg found: {arg}. {did_you_mean_text}"
+                )
+
+                failed_arg = [arg, arg_value] if arg_value else [arg]
+                failed_args.extend(failed_arg)
+
+                continue
+
+            arg_values_to_kidnap.append(arg_value)
             args_to_kidnap.append(arg)
 
             arg_type = hook_args[_arg]
@@ -241,7 +248,7 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
             scraper_options_args.append((_arg, arg_value))
 
     # KIDNAP THEM ARGS!!!!!
-    for arg_or_arg_value in args_to_kidnap + arg_values_to_kidnap:
+    for arg_or_arg_value in args_to_kidnap + arg_values_to_kidnap + failed_args:
         query.remove(arg_or_arg_value)
 
     mov_cli_logger.debug(f"Scraper args picked up on --> {scraper_options_args}")

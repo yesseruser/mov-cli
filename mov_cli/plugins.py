@@ -28,8 +28,8 @@ logger = LoggerAdapter(mov_cli_logger, prefix = "Plugins")
 T = TypeVar("T", int, str, bool)
 
 class PluginHookData(TypedDict):
-    version: Literal[1]
-    """The version of the plugin hook to use. Version 1 is latest currently."""
+    version: Literal[2]
+    """The version of the plugin hook to use. Version 2 is latest currently."""
     package_name: str
     """The name of the pypi package. This is required for the plugin update notifier to work."""
     scrapers: Dict[str, Type[Scraper]] | PluginHookScrapersT

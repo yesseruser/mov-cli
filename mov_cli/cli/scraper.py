@@ -191,6 +191,8 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
 
     hook_args = plugin.hook_data.get("args", {})
 
+    plugin_args = hook_args.keys()
+
     for index, arg in enumerate(query):
         if arg.startswith("--"):
             arg_value = None
@@ -208,9 +210,9 @@ def steal_scraper_args(query: List[str], plugin: Plugin) -> ScraperOptionsT:
                     f"No scraper option argument value was found after '{arg}' so we'll assume this argument is a flag. \nError: {e}"
                 )
 
-            if _arg not in hook_args.keys():
+            if _arg not in plugin_args:
                 did_you_mean_text = ""
-                did_you_mean_these = [(x, fuzz.ratio(arg, x)) for x in hook_args.keys()]
+                did_you_mean_these = [(x, fuzz.ratio(arg, x)) for x in plugin_args]
                 did_you_mean_these.sort(key = lambda x: x[1], reverse = True)
 
                 if did_you_mean_these:

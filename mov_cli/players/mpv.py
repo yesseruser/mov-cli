@@ -81,7 +81,7 @@ class MPV(Player):
                 ]
             )
 
-        elif self.platform == "Linux" or self.platform == "Windows" or self.platform == "Darwin":
+        elif self.platform == "Linux" or self.platform == "Windows" or self.platform == "Darwin" or self.platform == "FreeBSD":
             default_args = [
                 "mpv", 
                 media.url

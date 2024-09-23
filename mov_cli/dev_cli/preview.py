@@ -29,7 +29,7 @@ preview_app = typer.Typer(
 def image(id: str):
     platform = what_platform()
 
-    if not platform == "Linux" and not platform == "Android":
+    if not platform == "Linux" and not platform == "FreeBSD" and not platform == "Android":
         print("Image preview only works on Linux & Android atm.")
         return False
 
@@ -63,11 +63,15 @@ def image(id: str):
         ])
 
     elif shutil.which("chafa") is not None:
-        file = image_url_to_file(image_url, id, platform).resolve()
+        file = image_url_to_file(image_url, id, platform)
+
+        if file is None:
+            print("Image not found! (◡︵◡)")
+            raise typer.Exit(1)
 
         call([
             "chafa", 
-            file, 
+            file.resolve(), 
             f"--size={fzf_preview_columns}x{fzf_preview_lines}", 
             "--clear"
         ])
@@ -81,17 +85,17 @@ def image_url_to_file(image_url: str, id: str, platform: str) -> Optional[Path]:
     temp = get_temp_directory(platform)
     file = temp.joinpath(slugify(id))
 
+    if file.exists():
+        return file
+
     request = httpx.get(image_url)
 
     if request.is_error:
         return None
-    
-    if file.exists():
-        return file
-    
+
     with file.open("wb") as f:
         f.write(request.content)
-    
+
     return file
 
 def slugify(value): # https://github.com/django/django/blob/main/django/utils/text.py#L452-L469

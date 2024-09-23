@@ -30,7 +30,7 @@ def image(id: str):
     platform = what_platform()
 
     if not platform == "Linux" and not platform == "FreeBSD" and not platform == "Android":
-        print("Image preview only works on Linux & Android atm.")
+        print("Image preview only works on Linux, Android an FreeBSD atm.")
         return False
 
     cache = Cache(

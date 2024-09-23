@@ -54,6 +54,7 @@
 - **A supported platform:**
   - Linux
   - Windows
+  - FreeBSD (#359)
   - Android (via [Termux](https://termux.dev/en/))
   - iOS (via [iSH Shell](https://ish.app/))
   - MacOS

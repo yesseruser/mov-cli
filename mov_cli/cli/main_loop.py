@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..scraper import Scraper
     from ..media.metadata import Metadata
     from ..utils.platform import SUPPORTED_PLATFORMS
-    from ..utils.episode_selector import EpisodeSelector
+    from ..media.episode_selector import EpisodeSelector
 
 from devgoldyutils import Colours, LoggerAdapter
 
@@ -31,7 +31,6 @@ def query_and_grab_content(
     query: str,
     auto_select: Optional[int],
     episode: Optional[str],
-    continue_watching: bool,
     scraper: Scraper,
     selected_scraper: SelectedScraperT,
     platform: SUPPORTED_PLATFORMS,
@@ -69,7 +68,6 @@ def query_and_grab_content(
                 query = query,
                 auto_select = auto_select,
                 episode = episode,
-                continue_watching = continue_watching,
                 scraper = scraper,
                 selected_scraper = selected_scraper,
                 platform = platform,
@@ -86,7 +84,7 @@ def query_and_grab_content(
         scraper = scraper, 
         choice = choice, 
         fzf_enabled = config.fzf_enabled,
-        continue_watching = continue_watching
+        continue_watching = config.auto_continue
     )
 
     if chosen_episode is None:
@@ -115,7 +113,7 @@ def query_and_grab_content(
                 query = query,
                 auto_select = auto_select,
                 episode = episode,
-                continue_watching = continue_watching,
+                continue_watching = config.auto_continue,
                 scraper = scraper,
                 selected_scraper = selected_scraper,
                 platform = platform,
@@ -137,7 +135,6 @@ def try_again_with_next_scraper(
     query: str,
     auto_select: Optional[int],
     episode: Optional[str],
-    continue_watching: bool,
     scraper: Scraper,
     selected_scraper: SelectedScraperT,
     platform: SUPPORTED_PLATFORMS,
@@ -162,7 +159,6 @@ def try_again_with_next_scraper(
         query = query,
         auto_select = auto_select,
         episode = episode,
-        continue_watching = continue_watching,
         scraper = next_chosen_scraper,
         selected_scraper = next_selected_scraper,
         platform = platform,

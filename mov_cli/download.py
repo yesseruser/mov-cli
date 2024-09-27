@@ -32,7 +32,7 @@ class Download():
             logger.warning("yt-dlp was not found, defaulting to ffmpeg!")
             use_yt_dlp = False
 
-        elif media.audio_url is not None:
+        elif media.audio_tracks is not None:
             logger.warning("Can't use yt-dlp as this media contains an audio url, defaulting to ffmpeg!")
             use_yt_dlp = False
 
@@ -67,7 +67,7 @@ class Download():
                 media.url,
             ]
 
-            if media.audio_url:
+            if media.audio_url: # TODO: Support multiple audio urls. Make the user choose what audio should be joined.
                 args.extend(["-i", media.audio_url])
 
             if subtitles:

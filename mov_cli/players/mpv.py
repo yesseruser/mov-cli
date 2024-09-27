@@ -50,10 +50,15 @@ class MPV(Player):
         if media.subtitles is not None:
 
             for subtitle in media.subtitles:
-                args.append(f"--sub-file={subtitle}")
+                args.append(f"--sub-file={subtitle.url}")
 
         if self.debug is False:
             args.append("--no-terminal")
+
+        if media.audio_tracks is not None:
+            args.extend(
+                [f"--audio-file={audio_track.url}" for audio_track in media.audio_tracks]
+            )
 
         args = self.handle_additional_args(args, self.args)
 
@@ -86,9 +91,6 @@ class MPV(Player):
                 "mpv", 
                 media.url
             ]
-
-            if media.audio_url is not None:
-                default_args.append(f"--audio-file={media.audio_url}")
 
             return subprocess.Popen(default_args + self._get_args(self.platform, media), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 

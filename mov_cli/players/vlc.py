@@ -86,8 +86,8 @@ class VLC(Player):
                 media.url
             ]
 
-            if media.audio_url is not None:
-                default_args.append(f"--input-slave={media.audio_url}") # WHY IS THIS UNDOCUMENTED!!!
+            if media.audio_tracks is not None:
+                default_args.append(f"--input-slave={media.audio_tracks[0].url}") # WHY IS THIS UNDOCUMENTED!!!
 
             args = [
                 f'--meta-title="{media.display_name}"'
@@ -102,7 +102,7 @@ class VLC(Player):
 
                     if subtitle.startswith("https://"):
                         logger.debug("Subtitles detected as a url.")
-                        subtitle = str(self.__url_subtitles_to_file(media, subtitle))
+                        subtitle = str(self.__url_subtitles_to_file(media, subtitle.url))
 
                     args.append(f"--sub-file={subtitle}")
 

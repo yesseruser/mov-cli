@@ -14,6 +14,8 @@ if TYPE_CHECKING:
         value: Any
         expiring_date: Optional[float]
 
+    BasicCacheOrSectionDataT = Dict[str, BasicCacheData | Dict[str, BasicCacheData]]
+
 import json
 from datetime import datetime
 from devgoldyutils import LoggerAdapter, Colours
@@ -45,7 +47,7 @@ class Cache():
             f"Getting '{id}' cache" + ("..." if self.section is None else f" from '{self.section}' section...")
         )
 
-        data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = {}
+        data: BasicCacheOrSectionDataT = {}
 
         with self.__get_cache_file("r") as file:
             data = json.load(file)
@@ -80,7 +82,7 @@ class Cache():
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
+            json_data: BasicCacheOrSectionDataT = json.load(file)
 
         with self.__get_cache_file("w") as file:
             timestamp = None
@@ -118,7 +120,7 @@ class Cache():
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
+            json_data: BasicCacheOrSectionDataT = json.load(file)
 
         if self.section is not None:
             json_data[self.section].pop(id)
@@ -136,7 +138,7 @@ class Cache():
         json_data = {}
 
         with self.__get_cache_file("r") as file:
-            json_data: Dict[str, BasicCacheData | Dict[str, BasicCacheData]] = json.load(file)
+            json_data: BasicCacheOrSectionDataT = json.load(file)
 
         if self.section is not None:
 
@@ -157,7 +159,9 @@ class Cache():
     def __get_cache_file(self, mode: str) -> TextIOWrapper:
 
         if not self._basic_cache_file_path.exists():
-            logger.debug("Cache file doesn't exist, creating one...")
+            logger.debug(
+                f"Cache file doesn't exist, creating one at '{self._basic_cache_file_path}'..."
+            )
 
             with self._basic_cache_file_path.open("w") as file:
                 file.write("{}")

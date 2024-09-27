@@ -126,7 +126,7 @@ async def get_stream(data: models.StreamModel) -> models.StreamResultModel:
 
     return {
         "url":  media.url, 
-        "audio_url": media.audio_url, 
+        "audio_urls": [audio_track.url for audio_track in media.audio_tracks], 
         "title": media.title, 
         "subtitles_url": media.subtitles
     }

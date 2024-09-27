@@ -9,7 +9,8 @@ from mov_cli import prompt
 from mov_cli.config import Config
 from mov_cli.players import PLAYER_TABLE
 from mov_cli.http_client import HTTPClient
-from mov_cli.utils import EpisodeSelector, what_platform
+from mov_cli.media import EpisodeSelector
+from mov_cli.utils import what_platform
 
 from mov_cli_youtube.yt_dlp import YTDlpScraper
 

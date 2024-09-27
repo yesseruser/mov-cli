@@ -48,9 +48,6 @@ class SyncPlay(MPV):
                 "--"
             ]
 
-            if media.audio_url is not None: # NOTE: Let us know if this works.
-                default_args.append(f"--mpv-audio-file={media.audio_url}")
-
             return subprocess.Popen(
                 default_args + [f"--mpv{x.replace('--', '-')}" for x in mpv_args]
             )

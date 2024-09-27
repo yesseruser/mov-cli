@@ -44,8 +44,10 @@ class IINA(Player):
                 media.url
             ]
 
-            if media.audio_url is not None: # TODO: This will need testing.
-                default_args.append(f"--mpv-audio-file={media.audio_url}")
+            if media.audio_tracks is not None: # TODO: This will need testing.
+                default_args.extend(
+                    [f"--mpv-audio-file={audio_track.url}" for audio_track in media.audio_tracks]
+                )
 
             additional_args = [
                 f"--mpv-force-media-title={media.display_name}",
@@ -57,7 +59,7 @@ class IINA(Player):
             if media.subtitles is not None: # TODO: This will need testing.
 
                 for subtitle in media.subtitles:
-                    additional_args.append(f"--mpv-sub-file={subtitle}")
+                    additional_args.append(f"--mpv-sub-file={subtitle.url}")
 
             if self.debug is False:
                 additional_args.append("--no-stdin")

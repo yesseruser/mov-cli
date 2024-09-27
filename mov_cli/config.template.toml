@@ -10,6 +10,7 @@ quality = "auto"
 # editor = "nano"
 skip_update_checker = false
 auto_try_next_scraper = true
+auto_continue = false
 hide_ip = true
 
 # [mov-cli.quality]

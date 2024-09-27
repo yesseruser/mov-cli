@@ -77,6 +77,7 @@ class ConfigData(TypedDict):
     quality: ConfigQualityData | str
     subtitle: ConfigSubtitleData
     auto_try_next_scraper: bool
+    auto_continue: bool
 
 HttpHeadersData = TypedDict(
     "HttpHeadersData", 
@@ -189,6 +190,10 @@ class Config():
         return self.data.get("auto_try_next_scraper", True)
 
     @property
+    def auto_continue(self) -> bool:
+        return self.data.get("auto_continue", False)
+
+    @property
     def hide_ip(self) -> bool:
         return self.data.get("hide_ip", True)
 
@@ -232,6 +237,18 @@ class Config():
             return False
 
         return debug.get("player", False)
+
+    @property
+    def debug_deprecation_warnings(self) -> bool:
+        """Returns whether deprecation warnings should be enabled on mov-cli."""
+        debug: dict | bool = self.data.get("debug", {})
+
+        if isinstance(debug, bool):
+            return True
+
+        # NOTE: Change defaults to False when 4.5 becomes the stable version.
+
+        return debug.get("deprecation_warnings", True) 
 
     @property
     def http_timeout(self) -> int:

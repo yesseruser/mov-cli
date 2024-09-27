@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 import typer
 import shutil
 import logging
+import warnings
 from pathlib import Path
 
 from .play import play
@@ -38,11 +39,11 @@ def mov_cli(
         "the first nyan cat video to show up in search results."
     ), 
     limit: Optional[int] = typer.Option(None, "--limit", "-l", help = "Specify the maximum number of results"), 
+    continue_watching: bool = typer.Option(None, "--continue", "-co", help = "Continue where you left off in a series."), 
 
     version: bool = typer.Option(False, "--version", help = "Display what version mov-cli is currently on."), 
     edit: bool = typer.Option(False, "--edit", "-e", help = "Opens the mov-cli config with your respective editor."), 
     download: bool = typer.Option(False, "--download", "-d", help = "Downloads the media instead of playing."), 
-    continue_watching: bool = typer.Option(False, "--continue", "-co", help = "Continue where you left off in a series."), 
     list_plugins: bool = typer.Option(False, "--list-plugins", "-lp", help = "Prints all configured plugins and their scrapers."), 
     clear_cache: bool = typer.Option(False, "--no-cache", "--clear-cache", help = "Clears ALL cache stored by mov-cli, including the temp directory cache."),
     no_auto_try_next_scraper: bool = typer.Option(False, "--no-auto-try-next-scraper", "--no-atns", help = "Disables auto try next scraper."),
@@ -58,11 +59,16 @@ def mov_cli(
         fzf = (fzf, ["ui", "fzf"]),
         preview = (preview, ["ui", "preview"]),
         limit = (limit, ["ui", "limit"]),
-        auto_try_next_scraper = not no_auto_try_next_scraper
+        auto_try_next_scraper = not no_auto_try_next_scraper,
+        auto_continue = continue_watching
     )
 
     if config.debug:
         mov_cli_logger.setLevel(logging.DEBUG)
+
+    # Enable deprecation warnings so plugin devs and users are aware of soon coming breakage.
+    if config.debug_deprecation_warnings:
+        warnings.simplefilter("default", category = DeprecationWarning)
 
     if clear_cache:
         mov_cli_logger.info("Clearing cache...")
@@ -97,11 +103,8 @@ def mov_cli(
     print(welcome_message)
 
     if query is not None:
-        scrape_options = steal_scraper_args(query) 
         # This allows passing arguments to scrapers like this: 
         # https://github.com/mov-cli/mov-cli-youtube/commit/b538d82745a743cd74a02530d6a3d476cd60b808#diff-4e5b064838aa74a5375265f4dfbd94024b655ee24a191290aacd3673abed921a
-
-        query: str = " ".join(query)
 
         http_client = HTTPClient(
             headers = config.http_headers, 
@@ -123,16 +126,17 @@ def mov_cli(
                     "You can set a default scraper with the default key in config.toml."
             )
             return False
+        
+        scrape_options = steal_scraper_args(query, selected_scraper[3])
 
         selected_scraper[2].update(scrape_options)
 
         chosen_scraper = use_scraper(selected_scraper, config, http_client)
 
         content_or_bool = query_and_grab_content(
-            query = query,
+            query = " ".join(query),
             auto_select = auto_select,
             episode = episode,
-            continue_watching = continue_watching,
             scraper = chosen_scraper,
             selected_scraper = selected_scraper,
             platform = platform,

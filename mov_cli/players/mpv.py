@@ -90,6 +90,6 @@ class MPV(Player):
             if media.audio_url is not None:
                 default_args.append(f"--audio-file={media.audio_url}")
 
-            return subprocess.Popen(default_args + self._get_args(self.platform, media))
+            return subprocess.Popen(default_args + self._get_args(self.platform, media), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         return None

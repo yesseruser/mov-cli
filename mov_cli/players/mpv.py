@@ -91,8 +91,8 @@ class MPV(Player):
                 "mpv", 
                 media.url
             ]
-
+            
             return subprocess.Popen(default_args + self._get_args(self.platform, media),
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                                    stdout=(subprocess.STDOUT if self.debug else subprocess.DEVNULL), stderr=subprocess.STDOUT)
 
         return None

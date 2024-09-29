@@ -18,11 +18,16 @@ from ..cache import Cache
 from ..logger import mov_cli_logger
 from ..errors import InternalPluginError
 
-def cache_image_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
+def cache_metadata_for_preview(cache: Cache) -> Callable[[Metadata], Metadata]:
     ansi_remover = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])') # Remove colours
 
     def before_display_callable(metadata: Metadata) -> Metadata:
-        cache.set_cache(ansi_remover.sub("", metadata.display_name), metadata.image_url)
+        preview_data = {
+            "image_url": metadata.image_url,
+            "details": metadata.preview_details
+        }
+
+        cache.set_cache(ansi_remover.sub("", metadata.display_name), preview_data)
 
         return metadata
 
@@ -39,7 +44,7 @@ def search(
 ) -> Optional[Metadata]:
     choice = None
 
-    cache = Cache(platform, section = "image_urls")
+    cache = Cache(platform, section = "metadata_preview")
 
     mov_cli_logger.info(f"Searching for '{Colours.ORANGE.apply(query)}'...")
 
@@ -54,8 +59,8 @@ def search(
                 choices = (choice for choice in search_results), 
                 display = lambda x: x.display_name, 
                 fzf_enabled = fzf_enabled,
-                before_display = cache_image_for_preview(cache),
-                preview = "mov-cli-dev preview image -- {}" if preview else None
+                before_display = cache_metadata_for_preview(cache),
+                preview = "mov-cli-dev preview metadata -- {}" if preview else None
             )
 
     except Exception as e:

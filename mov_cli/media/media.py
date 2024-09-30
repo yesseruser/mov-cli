@@ -34,7 +34,6 @@ class Media():
         url: str,
         metadata: Metadata,
         episode: Optional[EpisodeSelector] = None,
-        audio_url: Optional[str] = None,
         audio_tracks: Optional[List[AudioTrack]] = None,
         referrer: Optional[str] = None,
         subtitles: Optional[List[Subtitle]] = None
@@ -70,13 +69,16 @@ class Media():
 
             audio_tracks = [AudioTrack(audio_url)]
 
-        if isinstance(subtitles, list):
-            warn_deprecation(
-                "The parameter 'subtitles=' should now be a list of Subtitle objects! " \
-                    "Passing strings into 'subtitles=' will break in v4.6!"
-            )
+        if subtitles is not None:
 
-            subtitles = [Subtitle(url = subtitle_url) for subtitle_url in subtitles]
+            if len(subtitles) > 0 and isinstance(subtitles[0], str):
+
+                warn_deprecation(
+                    "The parameter 'subtitles=' should now be a list of Subtitle objects! " \
+                        "Passing strings into 'subtitles=' will break in v4.6!"
+                )
+
+                subtitles = [Subtitle(url = subtitle_url) for subtitle_url in subtitles]
 
         self.url = url
         """The stream-able url of the media (Can also be a path to a file). """

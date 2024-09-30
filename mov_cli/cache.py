@@ -133,7 +133,7 @@ class Cache():
         return None
 
     def clear_all_cache(self) -> None:
-        logger.debug("Clearing all cache in file or section...")
+        logger.debug("Clearing all cache" + ("..." if self.section is None else f" in '{self.section}' section..."))
 
         json_data = {}
 
